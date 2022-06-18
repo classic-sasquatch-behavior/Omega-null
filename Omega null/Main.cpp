@@ -1,5 +1,6 @@
 #define PROGRAM_FILE "matvec.cl"
 #define KERNEL_FUNC "matvec_mult"
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include<stdlib.h>
