@@ -1,0 +1,26 @@
+
+
+
+
+
+
+
+
+<Construct add_by_element, {A, B, C}>
+	<for_element(i,j) add_loop>
+		C[i][j] = A[i][j] + B[i][j];
+	</add_loop>
+</add_by_element>
+
+<Construct duplicate, {A, B, C}>
+	<add_loop/>
+</duplicate>
+
+
+
+<for_element(dims)>
+<for_row(dims - 1)>
+<for_col(dims - 1)>
+<for_plane(dims - 2)> //not applicable to 1 dimensional data
+<for_diagonal(1)> //only applies to square tensors
+<for_neighborhood(dims)>
