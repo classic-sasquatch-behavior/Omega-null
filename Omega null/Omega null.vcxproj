@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="cl_test\clMain.cpp" />
     <ClCompile Include="cu_test\cuMain.cpp" />
+    <ClCompile Include="cu_test\Parser.cpp" />
     <ClCompile Include="cu_test\Tensor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +157,7 @@
     <ClInclude Include="cu_test\device_headers.h" />
     <ClInclude Include="cu_test\host_headers.h" />
     <ClInclude Include="cu_test\on_structures.h" />
+    <ClInclude Include="cu_test\Parser.h" />
     <ClInclude Include="cu_test\Tensor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

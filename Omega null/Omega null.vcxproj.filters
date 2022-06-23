@@ -24,6 +24,9 @@
     <ClCompile Include="cu_test\Tensor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cu_test\Parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cl_test\matvec.cl" />
@@ -43,6 +46,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cu_test\on_structures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_test\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
