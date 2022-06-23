@@ -4,8 +4,20 @@
 
 
 
+__serial //force function to be structured in serial
+__parallel //force function to be structured in parallel
+
+__synchronous //force function to be structured synchronously
+__asynchronous //force function to be structured asynchronously
+__sync //hint to sync between structures
+
+__on_device() //force function to be written for device
 
 
+
+
+
+__serial
 <Construct add_by_element, {A, B, C}>
 	<for_element(i,j) add_loop>
 		C[i][j] = A[i][j] + B[i][j];
@@ -15,6 +27,9 @@
 <Construct duplicate, {A, B, C}>
 	<add_loop/>
 </duplicate>
+
+
+
 
 
 

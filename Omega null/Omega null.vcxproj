@@ -152,7 +152,10 @@
     <None Include="cu_test\example.on" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cu_test\project_headers.h" />
+    <ClInclude Include="cu_test\classes.h" />
+    <ClInclude Include="cu_test\device_headers.h" />
+    <ClInclude Include="cu_test\host_headers.h" />
+    <ClInclude Include="cu_test\on_structures.h" />
     <ClInclude Include="cu_test\Tensor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

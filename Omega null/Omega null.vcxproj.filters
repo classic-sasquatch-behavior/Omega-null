@@ -30,10 +30,19 @@
     <None Include="cu_test\example.on" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cu_test\project_headers.h">
+    <ClInclude Include="cu_test\host_headers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cu_test\Tensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_test\classes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_test\device_headers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_test\on_structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

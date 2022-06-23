@@ -1,5 +1,6 @@
-#include"example.on" //therefore, after precompilation example.on must serve as the header for the construct.
-#include"project_headers.h"
+#include"host_headers.h"
+#include"device_headers.h"
+#include"on_structures.h"
 
 
 
