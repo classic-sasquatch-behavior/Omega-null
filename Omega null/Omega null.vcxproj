@@ -143,13 +143,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cl_test\clMain.cpp" />
     <ClCompile Include="cu_test\cuMain.cpp" />
     <ClCompile Include="cu_test\parser\Parser.cpp" />
     <ClCompile Include="cu_test\tensors\Tensor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cl_test\matvec.cl" />
     <None Include="cu_test\example.on" />
     <None Include="cu_test\example.txt" />
   </ItemGroup>
@@ -157,7 +155,9 @@
     <ClInclude Include="cu_test\global_includes.h" />
     <ClInclude Include="cu_test\headers\classes.h" />
     <ClInclude Include="cu_test\headers\device_headers.h" />
+    <ClInclude Include="cu_test\headers\global_macros.h" />
     <ClInclude Include="cu_test\headers\host_headers.h" />
+    <ClInclude Include="cu_test\headers\host_macros.h" />
     <ClInclude Include="cu_test\parser\Parser.h" />
     <ClInclude Include="cu_test\tensors\Tensor.h" />
   </ItemGroup>

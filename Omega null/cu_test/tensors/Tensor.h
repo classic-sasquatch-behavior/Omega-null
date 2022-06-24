@@ -19,11 +19,11 @@ public:
 	int x_dim;
 	int y_dim;
 	int dims;
-	int[2] size;
+	int size[2];
 
 private:
-	Number[i][j] host_data;
-	Number[i][j] device_data;
+	Number host_data[i][j];
+	Number device_data[i][j];
 	bool host_current;
 	bool device_current;
 	bool synced;

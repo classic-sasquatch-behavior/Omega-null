@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cl_test\clMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cu_test\cuMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,7 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cl_test\matvec.cl" />
     <None Include="cu_test\example.txt" />
     <None Include="cu_test\example.on" />
   </ItemGroup>
@@ -50,6 +46,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cu_test\global_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_test\headers\host_macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_test\headers\global_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
