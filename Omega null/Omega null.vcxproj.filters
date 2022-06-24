@@ -21,34 +21,35 @@
     <ClCompile Include="cu_test\cuMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\Tensor.cpp">
+    <ClCompile Include="cu_test\tensors\Tensor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\Parser.cpp">
+    <ClCompile Include="cu_test\parser\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cl_test\matvec.cl" />
+    <None Include="cu_test\example.txt" />
     <None Include="cu_test\example.on" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cu_test\host_headers.h">
+    <ClInclude Include="cu_test\headers\host_headers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\Tensor.h">
+    <ClInclude Include="cu_test\tensors\Tensor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\classes.h">
+    <ClInclude Include="cu_test\headers\classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\device_headers.h">
+    <ClInclude Include="cu_test\headers\device_headers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\on_structures.h">
+    <ClInclude Include="cu_test\parser\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\Parser.h">
+    <ClInclude Include="cu_test\global_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

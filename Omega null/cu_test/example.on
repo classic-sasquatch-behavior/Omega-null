@@ -4,92 +4,16 @@
 
 
 
-__serial //force function to be structured in serial
-__parallel //force function to be structured in parallel
-
-__synchronous //force function to be structured synchronously
-__asynchronous //force function to be structured asynchronously
-__sync //hint to sync between structures
-
-__on_device() //force function to be written for device
 
 
 
 
-.on:
-__serial
-<Construct add_by_element, {on::Tensor A, on::Tensor B, on::Tensor C}>
+
+
+
+
+<Construct add_by_element, dims=2, data={on::Tensor A, on::Tensor B, on::Tensor C}>
 	<for_element(i,j) add_loop>
 		C[i][j] = A[i][j] + B[i][j];
 	</add_loop>
 </add_by_element>
-
-.h:
-add_by_element_launch(on::Tensor A, on::Tensor B, on::Tensor C);
-
-.cu:
-
-
-
-
-
-
-
-
-
-
-<Construct duplicate, {A, B, C}>
-	<add_loop/>
-</duplicate>
-if the operation shown here is valid, then the structures must be traversed from the inside out
-structure must first be understood in abstract terms, spatial terms
-i.e. this structure resides within this structure, which resides within this structure
-once the arrangement is defined, work the other way and specify shape
-from the shape of the parent, the shape of the structure must follow
-
-showing the order in which add_by_element would be processed:
-
-__serial
-<Construct add_by_element, {A, B, C}>
-	<for_element(i,j) add_loop>
-		C[i][j] = A[i][j] + B[i][j];
-	</add_loop>
-</add_by_element>
-
-compiler has nothing in memory
-
-compiler sees __serial, notes that the next structure encountered will have the property of being serial
-
-compiler sees open bracket, Construct, creates a construct object, sees a space with no comma followed by 
-another identifier, no parenthesis following identfier, comma separates arguments, compiler recognizes 
-the data arguments by the curly brace, compiler acknowledges the existence of data, sees close bracket, and continues
-
-compiler sees open brace, recognizes identifier for_element, sees that coordinates have been requested, sees name
-because the compiler has seen a new tag, whatever follows will be placed within add_loop.
-
-compiler sees no underscores or pointy brackets, copies string as a literal
-
-compiler sees end add_loop, closes add_loop
-
-compiler sees end add_by_element, closes add_by_element
-
-compiler has in memory:
-Construct with child for_element with literal
-compiler must now transform this into .h and .cu, and leave behind an .on file that points to the header (or find a way to replace #include .on with .h)
-
-
-
-
-
-
-
-
-
-
-
-<for_element(dims)>
-<for_row(dims - 1)>
-<for_col(dims - 1)>
-<for_plane(dims - 2)> //not applicable to 1 dimensional data
-<for_diagonal(1)> //only applies to square tensors above 1d
-<for_neighborhood(dims)>

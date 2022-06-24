@@ -1,6 +1,5 @@
 #pragma once
-#include"host_headers.h"
-
+#include"../global_includes.h"
 
 
 
@@ -10,11 +9,15 @@ namespace on{
 
 class Parser {
 public:
-	Parser();
+	Parser(std::string topdir);
 	~Parser();
 
 	void parse();
 private:
+	std::string _topdir;
+
+
+
 };
 
 
