@@ -14,7 +14,8 @@ public:
 
 	void parse();
 	void find_on_files();
-
+	void enter_parse_queue();
+	void read_on_file(fs::path path_to_input);
 
 #pragma region util
 	void print_found_files();
@@ -24,14 +25,14 @@ public:
 #pragma region get/set
 
 
-	inline void add_path_to_queue(fs::path input) { _queue.push(input); }
+	inline void add_path_to_queue(fs::path input) { _parse_queue.push(input); }
 
 #pragma endregion
 
 
 private:
 	std::string _topdir;
-	std::queue<fs::path> _queue;
+	std::queue<fs::path> _parse_queue;
 
 
 };

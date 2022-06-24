@@ -12,20 +12,7 @@ namespace on {
 	void Parser::parse() {
 		find_on_files();
 		//print_found_files();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		enter_parse_queue();
 	}
 
 	void Parser::find_on_files() {
@@ -41,18 +28,33 @@ namespace on {
 	}
 
 	void Parser::print_found_files() {
-		std::cout << "found " << _queue.size() << " .on files:" << std::endl;
+		std::cout << "found " << _parse_queue.size() << " .on files:" << std::endl;
 		
-		while (!_queue.empty()) { //make queue macro later
-			fs::path current_path = _queue.front(); //might have to be converting path to string explicitly at some point? maybe? double slash is problematic, whats that about
-			_queue.pop();
+		while (!_parse_queue.empty()) { //make queue macro later
+			fs::path current_path = _parse_queue.front(); //might have to be converting path to string explicitly at some point? maybe? double slash is problematic, whats that about
+			_parse_queue.pop();
 			std::cout << current_path << std::endl;
 		}
 		std::cout << std::endl;
 	}
 
+	void Parser::enter_parse_queue() {
+		Run_Queue(_parse_queue, current_path,
+			read_on_file(current_path);
+		);
+	}
 
 
+
+
+
+	void Parser::read_on_file(fs::path path_to_input) {
+
+
+
+
+
+	}
 
 
 
