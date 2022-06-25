@@ -24,7 +24,7 @@
     <ClCompile Include="cu_test\parser\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\parser\structures\SelfConcept.cpp">
+    <ClCompile Include="cu_test\parser\structures\Reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -54,7 +54,7 @@
     <ClInclude Include="cu_test\headers\host_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\parser\structures\SelfConcept.h">
+    <ClInclude Include="cu_test\parser\structures\Reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

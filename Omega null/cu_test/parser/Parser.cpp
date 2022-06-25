@@ -44,13 +44,19 @@ namespace on {
 		);
 	}
 
-
-
-
-
 	void Parser::read_on_file(fs::path path_to_input) {
+		Reader* reader = new Reader();
+		bool reading = true;
+		//set up ifstream blah blah blah
+
+		while(reading){
+			//_char_buffer = ifstream stuff idk
+			reader->step(reader->char_buffer);
 
 
+			//if we reach end(ifstream stuff) break loop
+
+		}
 
 
 

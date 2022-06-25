@@ -145,7 +145,7 @@
   <ItemGroup>
     <ClCompile Include="cu_test\cuMain.cpp" />
     <ClCompile Include="cu_test\parser\Parser.cpp" />
-    <ClCompile Include="cu_test\parser\structures\SelfConcept.cpp" />
+    <ClCompile Include="cu_test\parser\structures\Reader.cpp" />
     <ClCompile Include="cu_test\tensors\Tensor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -159,7 +159,7 @@
     <ClInclude Include="cu_test\headers\host_headers.h" />
     <ClInclude Include="cu_test\headers\host_macros.h" />
     <ClInclude Include="cu_test\parser\Parser.h" />
-    <ClInclude Include="cu_test\parser\structures\SelfConcept.h" />
+    <ClInclude Include="cu_test\parser\structures\Reader.h" />
     <ClInclude Include="cu_test\tensors\Tensor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
