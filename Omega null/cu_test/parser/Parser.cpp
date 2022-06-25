@@ -46,34 +46,12 @@ namespace on {
 
 	void Parser::read_on_file(fs::path path_to_input) {
 		Reader* reader = new Reader();
-		bool reading = true;
-		//set up ifstream blah blah blah
-
-		while(reading){
-			//_char_buffer = ifstream stuff idk
+		std::ifstream file(path_to_input);
+		
+		while(file.get(reader->char_buffer)){
 			reader->step(reader->char_buffer);
-
-
-			//if we reach end(ifstream stuff) break loop
-
 		}
-
-
-
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
