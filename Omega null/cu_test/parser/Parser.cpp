@@ -48,8 +48,8 @@ namespace on {
 		Reader* reader = new Reader();
 		std::ifstream file(path_to_input);
 		
-		while(file.get(reader->char_buffer)){
-			reader->step(reader->char_buffer);
+		while(file.get(reader->pointer)){
+			reader->step(reader->pointer);
 		}
 	}
 }

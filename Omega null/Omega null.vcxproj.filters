@@ -27,6 +27,9 @@
     <ClCompile Include="cu_test\parser\structures\Reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cu_test\parser\structures\Structure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cu_test\example.txt" />
@@ -55,6 +58,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cu_test\parser\structures\Reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_test\parser\structures\Structure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

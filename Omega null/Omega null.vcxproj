@@ -117,13 +117,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenCL.lib;opencv_world452d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,6 +146,7 @@
     <ClCompile Include="cu_test\cuMain.cpp" />
     <ClCompile Include="cu_test\parser\Parser.cpp" />
     <ClCompile Include="cu_test\parser\structures\Reader.cpp" />
+    <ClCompile Include="cu_test\parser\structures\Structure.cpp" />
     <ClCompile Include="cu_test\tensors\Tensor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +161,7 @@
     <ClInclude Include="cu_test\headers\host_macros.h" />
     <ClInclude Include="cu_test\parser\Parser.h" />
     <ClInclude Include="cu_test\parser\structures\Reader.h" />
+    <ClInclude Include="cu_test\parser\structures\Structure.h" />
     <ClInclude Include="cu_test\tensors\Tensor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
