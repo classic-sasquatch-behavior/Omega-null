@@ -5,17 +5,16 @@
 
 namespace fs = std::filesystem;
 namespace on {
-	Parser::Parser(std::string topdir) {
+	ParseQueue::ParseQueue(std::string topdir) {
 		_topdir = topdir;
 	}
 
-	void Parser::parse() {
+	void ParseQueue::parse() {
 		find_on_files();
-		//print_found_files();
 		enter_parse_queue();
 	}
 
-	void Parser::find_on_files() {
+	void ParseQueue::find_on_files() {
 		fs::path src_path = _topdir;
 		if (fs::exists(src_path) && fs::is_directory(src_path)) {
 			for (const auto& entry : fs::recursive_directory_iterator(src_path)) {
@@ -27,7 +26,7 @@ namespace on {
 		}
 	}
 
-	void Parser::print_found_files() {
+	void ParseQueue::print_found_files() {
 		std::cout << "found " << _parse_queue.size() << " .on files:" << std::endl;
 		
 		while (!_parse_queue.empty()) { //make queue macro later
@@ -38,14 +37,14 @@ namespace on {
 		std::cout << std::endl;
 	}
 
-	void Parser::enter_parse_queue() {
-		Run_Queue(_parse_queue, current_path,
+	void ParseQueue::enter_parse_queue() {
+		RUN_QUEUE(_parse_queue, current_path,
 			read_on_file(current_path);
 		);
 	}
 
-	void Parser::read_on_file(fs::path path_to_input) {
-		Reader* reader = new Reader();
+	void ParseQueue::read_on_file(fs::path path_to_input) {
+		Parser* reader = new Parser();
 		std::ifstream file(path_to_input);
 		
 		while(file.get(reader->pointer)){

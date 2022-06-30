@@ -4,15 +4,16 @@
 
 namespace on {
 
-	struct Reader {
+	struct Parser {
 	public:
-		Reader();
-		~Reader();
+		Parser();
+		~Parser();
 
 		void step(char input);
 		std::string flush_buffer(int argument);
 		void change_state(int new_state);
 		void change_substate(int new_substate);
+		void initialize_page();
 
 		int state = 0;
 		int substate = 0;
@@ -28,7 +29,17 @@ namespace on {
 		void state_2_substate_3(char input);
 		void state_2_substate_4(char input);
 
-#pragma region get_set
+#pragma region get-set
+
+
+
+		//TODO: fill in parser get-set
+
+
+
+
+
+
 
 
 #pragma endregion
@@ -36,8 +47,8 @@ namespace on {
 	private:
 		std::vector<std::string> _content;
 		std::string _buffer;
-		std::vector<Structure> _structures;
-		Structure* _new_structure;
+		std::vector<Structure*> _structures;
+		Structure* _current_structure;
 	};
 
 }

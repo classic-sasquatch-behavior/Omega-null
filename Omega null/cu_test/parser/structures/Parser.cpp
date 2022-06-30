@@ -6,16 +6,20 @@ namespace on {
 
 
 
-	Reader::Reader() {
-
+	Parser::Parser() {
+		initialize_page();
 	}
 
-
-
-
+	void Parser::initialize_page() {
+		Structure* page = new Structure(page, 0);
+		_structures.push_back(page);
+		_current_structure = page;
+		_buffer = "page";
+		flush_buffer(1);
+	}
 
 	//-1 for flush without push, 0 for raw text, 1 to begin structure, 2 to end structure, 3 to identify arguments
-	std::string Reader::flush_buffer(int argument) {
+	std::string Parser::flush_buffer(int argument) {
 		std::string begin = "begin ";
 		std::string end = "end ";
 
@@ -32,7 +36,7 @@ namespace on {
 
 #pragma region states
 
-	void Reader::step(char input) {
+	void Parser::step(char input) {
 		switch (state) {
 		case 0:
 			state_0(input); break;
@@ -45,7 +49,7 @@ namespace on {
 		}
 	}
 
-	void Reader::state_0(char input) { //idle
+	void Parser::state_0(char input) { //idle
 		switch (input) {
 		case '<': change_state(2); break;
 		case ' ': break;
@@ -54,14 +58,14 @@ namespace on {
 		}
 	}
 
-	void Reader::state_1(char input) { //raw c
+	void Parser::state_1(char input) { //raw c
 		switch (input) {
 		case '\n': flush_buffer(0); break;
 		default: _buffer += input;  break;
 		}
 	}
 
-	void Reader::state_2(char input) { //header
+	void Parser::state_2(char input) { //header
 		switch (substate) {
 		case 0: state_2_substate_0(input); break;
 		case 1: state_2_substate_1(input); break;
@@ -72,7 +76,7 @@ namespace on {
 		}
 	}
 
-	void Reader::state_2_substate_0(char input) { //structure type
+	void Parser::state_2_substate_0(char input) { //structure type
 		switch (input) {
 		case '<': break;
 		case ' ': break; //needs to be ignored before type, and serve as end of type after
@@ -84,7 +88,7 @@ namespace on {
 		}
 	}
 
-	void Reader::state_2_substate_1(char input) { //structure name
+	void Parser::state_2_substate_1(char input) { //structure name
 		switch (input) {
 		case ' ': break;
 		case ',': //set name of structure
@@ -93,7 +97,7 @@ namespace on {
 		}
 	}
 
-	void Reader::state_2_substate_2(char input) { //arguments
+	void Parser::state_2_substate_2(char input) { //arguments
 		switch (input) {
 		case ' ': break;
 		case '=': //flush_buffer(-1) and do something with the argument
@@ -104,7 +108,7 @@ namespace on {
 		}
 	}
 
-	void Reader::state_2_substate_3(char input) { //end tag
+	void Parser::state_2_substate_3(char input) { //end tag
 		switch (input) {
 		case ' ': break;
 		case '\n': flush_buffer(2); break;
@@ -112,7 +116,7 @@ namespace on {
 		}
 	}
 
-	void Reader::state_2_substate_4(char input) { //define dims
+	void Parser::state_2_substate_4(char input) { //define dims
 		switch (input) {
 
 		}
@@ -122,7 +126,7 @@ namespace on {
 #pragma endregion
 
 
-	void Reader::change_state(int new_state) {
+	void Parser::change_state(int new_state) {
 		int& old_state = state;
 		switch (new_state) {
 		case 0:
@@ -139,7 +143,7 @@ namespace on {
 		}
 	}
 
-	void Reader::change_substate(int new_substate) {
+	void Parser::change_substate(int new_substate) {
 		int old_substate = substate;
 		switch (new_substate) {
 		case 0: substate = 0; break;

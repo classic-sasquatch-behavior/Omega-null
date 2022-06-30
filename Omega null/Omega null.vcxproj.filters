@@ -21,10 +21,10 @@
     <ClCompile Include="cu_test\tensors\Tensor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\parser\Parser.cpp">
+    <ClCompile Include="cu_test\parser\ParseQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\parser\structures\Reader.cpp">
+    <ClCompile Include="cu_test\parser\structures\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cu_test\parser\structures\Structure.cpp">
@@ -48,7 +48,7 @@
     <ClInclude Include="cu_test\headers\device_headers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\parser\Parser.h">
+    <ClInclude Include="cu_test\parser\ParseQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cu_test\global_includes.h">
@@ -57,7 +57,7 @@
     <ClInclude Include="cu_test\headers\host_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\parser\structures\Reader.h">
+    <ClInclude Include="cu_test\parser\structures\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cu_test\parser\structures\Structure.h">

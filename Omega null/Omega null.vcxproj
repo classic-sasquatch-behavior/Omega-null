@@ -144,8 +144,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cu_test\cuMain.cpp" />
-    <ClCompile Include="cu_test\parser\Parser.cpp" />
-    <ClCompile Include="cu_test\parser\structures\Reader.cpp" />
+    <ClCompile Include="cu_test\parser\ParseQueue.cpp" />
+    <ClCompile Include="cu_test\parser\structures\Parser.cpp" />
     <ClCompile Include="cu_test\parser\structures\Structure.cpp" />
     <ClCompile Include="cu_test\tensors\Tensor.cpp" />
   </ItemGroup>
@@ -159,8 +159,8 @@
     <ClInclude Include="cu_test\headers\device_headers.h" />
     <ClInclude Include="cu_test\headers\host_headers.h" />
     <ClInclude Include="cu_test\headers\host_macros.h" />
-    <ClInclude Include="cu_test\parser\Parser.h" />
-    <ClInclude Include="cu_test\parser\structures\Reader.h" />
+    <ClInclude Include="cu_test\parser\ParseQueue.h" />
+    <ClInclude Include="cu_test\parser\structures\Parser.h" />
     <ClInclude Include="cu_test\parser\structures\Structure.h" />
     <ClInclude Include="cu_test\tensors\Tensor.h" />
   </ItemGroup>

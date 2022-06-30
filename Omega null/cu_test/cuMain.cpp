@@ -5,7 +5,7 @@ std::string topdir = "C:/Users/Thelonious/source/repos/Omega null/Omega null/cu_
 
 int main() {
 	
-	on::Parser* parser = new on::Parser(topdir);
+	on::ParseQueue* parser = new on::ParseQueue(topdir);
 	parser->parse();
 
 	return 0;

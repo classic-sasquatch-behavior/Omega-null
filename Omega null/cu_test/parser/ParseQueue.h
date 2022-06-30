@@ -7,10 +7,10 @@ namespace on{
 
 
 
-class Parser {
+class ParseQueue {
 public:
-	Parser(std::string topdir);
-	~Parser();
+	ParseQueue(std::string topdir);
+	~ParseQueue();
 
 	void parse();
 	void find_on_files();

@@ -1,17 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 <Construct add_by_element, dims=2, data={on::Tensor A, on::Tensor B, on::Tensor C}>
 	<for_element(i,j) add_loop>
 		C[i][j] = A[i][j] + B[i][j];
