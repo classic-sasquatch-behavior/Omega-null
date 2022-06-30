@@ -15,53 +15,56 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cu_test\cuMain.cpp">
+    <ClCompile Include="cuMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\tensors\Tensor.cpp">
+    <ClCompile Include="tensors\Tensor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\parser\ParseQueue.cpp">
+    <ClCompile Include="parser\ParseQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\parser\structures\Parser.cpp">
+    <ClCompile Include="parser\structures\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cu_test\parser\structures\Structure.cpp">
+    <ClCompile Include="parser\structures\Structure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cu_test\example.txt" />
-    <None Include="cu_test\example.on" />
+    <None Include="example.txt" />
+    <None Include="example.on" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cu_test\headers\host_headers.h">
+    <ClInclude Include="headers\host_headers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\tensors\Tensor.h">
+    <ClInclude Include="tensors\Tensor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\headers\classes.h">
+    <ClInclude Include="headers\classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\headers\device_headers.h">
+    <ClInclude Include="headers\device_headers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\parser\ParseQueue.h">
+    <ClInclude Include="parser\ParseQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\global_includes.h">
+    <ClInclude Include="global_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\headers\host_macros.h">
+    <ClInclude Include="headers\host_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\parser\structures\Parser.h">
+    <ClInclude Include="parser\structures\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_test\parser\structures\Structure.h">
+    <ClInclude Include="parser\structures\Structure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include=".gitignore" />
   </ItemGroup>
 </Project>

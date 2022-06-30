@@ -143,26 +143,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cu_test\cuMain.cpp" />
-    <ClCompile Include="cu_test\parser\ParseQueue.cpp" />
-    <ClCompile Include="cu_test\parser\structures\Parser.cpp" />
-    <ClCompile Include="cu_test\parser\structures\Structure.cpp" />
-    <ClCompile Include="cu_test\tensors\Tensor.cpp" />
+    <ClCompile Include="cuMain.cpp" />
+    <ClCompile Include="parser\ParseQueue.cpp" />
+    <ClCompile Include="parser\structures\Parser.cpp" />
+    <ClCompile Include="parser\structures\Structure.cpp" />
+    <ClCompile Include="tensors\Tensor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cu_test\example.on" />
-    <None Include="cu_test\example.txt" />
+    <None Include="example.on" />
+    <None Include="example.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cu_test\global_includes.h" />
-    <ClInclude Include="cu_test\headers\classes.h" />
-    <ClInclude Include="cu_test\headers\device_headers.h" />
-    <ClInclude Include="cu_test\headers\host_headers.h" />
-    <ClInclude Include="cu_test\headers\host_macros.h" />
-    <ClInclude Include="cu_test\parser\ParseQueue.h" />
-    <ClInclude Include="cu_test\parser\structures\Parser.h" />
-    <ClInclude Include="cu_test\parser\structures\Structure.h" />
-    <ClInclude Include="cu_test\tensors\Tensor.h" />
+    <ClInclude Include="global_includes.h" />
+    <ClInclude Include="headers\classes.h" />
+    <ClInclude Include="headers\device_headers.h" />
+    <ClInclude Include="headers\host_headers.h" />
+    <ClInclude Include="headers\host_macros.h" />
+    <ClInclude Include="parser\ParseQueue.h" />
+    <ClInclude Include="parser\structures\Parser.h" />
+    <ClInclude Include="parser\structures\Structure.h" />
+    <ClInclude Include="tensors\Tensor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
