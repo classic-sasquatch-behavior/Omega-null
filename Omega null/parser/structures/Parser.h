@@ -14,6 +14,7 @@ namespace on {
 		void change_state(int new_state);
 		void change_substate(int new_substate);
 		void initialize_page();
+		void initialize_structure(Structure* parent, int level);
 
 		int state = 0;
 		int substate = 0;

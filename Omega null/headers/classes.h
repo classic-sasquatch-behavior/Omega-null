@@ -4,3 +4,5 @@
 
 #include"../parser/structures/Parser.h"
 #include"../parser/structures/Structure.h"
+
+#include"../parser/states/State.h"

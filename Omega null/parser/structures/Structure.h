@@ -4,8 +4,6 @@
 
 namespace on {
 
-
-
 	struct Structure {
 	public:
 		Structure(Structure* parent, int level);

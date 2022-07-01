@@ -18,6 +18,12 @@ namespace on {
 		flush_buffer(1);
 	}
 
+	void initialize_structure(Structure* parent, int level) {
+
+
+
+	}
+
 	//-1 for flush without push, 0 for raw text, 1 to begin structure, 2 to end structure, 3 to identify arguments
 	std::string Parser::flush_buffer(int argument) {
 		std::string begin = "begin ";
