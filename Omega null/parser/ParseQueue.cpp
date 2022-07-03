@@ -44,11 +44,11 @@ namespace on {
 	}
 
 	void ParseQueue::read_on_file(fs::path path_to_input) {
-		Parser* reader = new Parser();
+		Lexer* reader = new Lexer();
 		std::ifstream file(path_to_input);
 		
 		while(file.get(reader->pointer)){
-			reader->step(reader->pointer);
+			reader->read(reader->pointer);
 		}
 	}
 }

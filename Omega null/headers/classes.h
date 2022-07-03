@@ -2,7 +2,7 @@
 #include"../tensors/Tensor.h"
 #include"../parser/ParseQueue.h"
 
-#include"../parser/structures/Parser.h"
+#include"../parser/structures/Lexer.h"
 #include"../parser/structures/Structure.h"
 
 #include"../parser/states/State.h"
