@@ -1,6 +1,6 @@
 #include"global_includes.h"
 
-std::string topdir = "C:/Users/Thelonious/source/repos/Omega null/Omega null/cu_test";
+std::string topdir = "C:/Users/Thelonious/source/repos/Omega null";
 
 
 int main() {

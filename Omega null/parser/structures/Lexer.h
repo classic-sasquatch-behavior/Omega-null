@@ -3,6 +3,8 @@
 
 
 namespace on {
+	struct Structure;
+
 
 	struct Lexer {
 	public:
@@ -16,6 +18,7 @@ namespace on {
 		void change_state(int new_state);
 		void initialize_page();
 		void initialize_structure();
+		void generate_report();
 		
 		
 		void complete_type();
@@ -45,16 +48,16 @@ namespace on {
 
 
 #pragma region get-set
-		inline std::string get_content(int index) { return _content[index]; }
-		inline std::string get_buffer() { return _buffer; }
-		inline Structure* get_structure(int index) { return _structures[index]; }
-		inline Structure* get_current_structure() { return _current_structure; }
+		std::string get_content(int index) { return _content[index]; }
+		std::string get_buffer() { return _buffer; }
+		Structure* get_structure(int index) { return _structures[index]; }
+		Structure* get_current_structure() { return _current_structure; }
 
 		//TODO: fill in parser get-set
-		inline void add_content(std::string input) { _content.push_back(input); }
-		inline void add_to_buffer(char input) { _buffer += input; }
-		inline void add_structure(Structure* input) { _structures.push_back(input); }
-		inline void set_current_structure(Structure* input) { _current_structure = input; }
+		void add_content(std::string input) { _content.push_back(input); }
+		void add_to_buffer(char input) { _buffer += input; }
+		void add_structure(Structure* input) { _structures.push_back(input); }
+		void set_current_structure(Structure* input) { _current_structure = input; }
 #pragma endregion
 
 	private:

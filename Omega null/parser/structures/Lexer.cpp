@@ -6,14 +6,16 @@
 namespace on {
 
 
-
+	struct Structure;
 
 	Lexer::Lexer() {
 		initialize_page();
 	}
 
 	void Lexer::initialize_page() {
-		Structure* page = new Structure(page, 0);
+		Structure* page = nullptr;
+		page = new Structure(page, 0);
+		//Structure* page = new Structure(page, 0);
 		_structures.push_back(page);
 		_current_structure = page;
 		_buffer = "page";
@@ -25,6 +27,19 @@ namespace on {
 		set_current_structure(new_structure);
 	}
 
+	void Lexer::generate_report() {
+		std::cout << std::endl;
+		std::cout << "generated report:" << std::endl;
+		for (std::string line : _content) {
+			std::cout << line << std::endl;
+		}
+		std::cout << std::endl;
+
+
+
+
+	}
+
 	std::string Lexer::flush_buffer(int argument) {
 		std::string begin = "begin ";
 		std::string end = "end ";
@@ -34,6 +49,7 @@ namespace on {
 		case END_RAW_TEXT: _content.push_back(_buffer); _current_structure->add_content(_buffer);  break;
 		case MARK_BEGINNING_OF_STRUCTURE: begin += _buffer; _content.push_back(begin); break;
 		case MARK_END_OF_STRUCTURE: end += _buffer; _content.push_back(end); break;
+		case PUSH_BACK_DIM:_current_structure->add_dim_name(_buffer); break;
 		default: std::cout << "ERROR - flush_buffer argument undefined: " << argument << std::endl; break;
 		}
 		std::string result = _buffer;
@@ -80,14 +96,7 @@ namespace on {
 	}
 
 	void Lexer::complete_dims() {
-
-
-
-
-
-
-
-
+		_current_structure->set_num_dims(_current_structure->get_all_dims().size());
 	}
 
 	void Lexer::complete_data() {
@@ -150,6 +159,7 @@ namespace on {
 		}
 	}
 
+	//state 8
 	void Lexer::tag_idle_state(char input) {
 		switch (input) {
 		case '{': change_state(STRUCTURE_DATA); break;
@@ -182,11 +192,13 @@ namespace on {
 		}
 	}
 
-
 	//state 5
 	void Lexer::structure_dims_state(char input) {
 		switch (input) {
-
+		case ',': flush_buffer(PUSH_BACK_DIM);  break;
+		case ')': flush_buffer(PUSH_BACK_DIM); complete_dims(); break;
+		case ' ': break;
+		default: add_to_buffer(input); break;
 		}
 	}
 

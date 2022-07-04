@@ -27,15 +27,16 @@ namespace on {
 		std::string get_data() { return _data; }
 		Structure* get_parent() { return _parent; }
 		std::string get_dim(int index) { return _dim_names[index]; }
+		std::vector<std::string> get_all_dims() { return _dim_names; }
 		Structure* get_child(int index) { return _children[index]; }
 		std::string get_line_of_content(int index) { return _content[index]; }
 #pragma endregion
 
 	private:
-		int _level;
-		std::string _type;
-		std::string _name;
-		std::string _data;		//data i.e. "A, B, C" as a raw string
+		int _level = 0;
+		std::string _type = "default";
+		std::string _name = "default";
+		std::string _data = " ";		//data i.e. "A, B, C" as a raw string
 		Structure* _parent = nullptr;
 		int _num_dims;
 		std::vector<std::string> _dim_names;
