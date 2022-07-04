@@ -6,11 +6,12 @@ namespace on {
 	struct Structure;
 
 
-	struct Lexer {
+	struct Parser {
 	public:
-		Lexer();
-		~Lexer();
+		Parser();
+		~Parser();
 
+#pragma region reader functions
 		void read(char input);
 		inline void step_up() { level++; }
 		inline void step_down() { level--; }
@@ -20,18 +21,27 @@ namespace on {
 		void initialize_structure();
 		void generate_report();
 		void close_tag();
-		
 		void complete_type();
 		void complete_name();
 		void complete_dims();
 		void complete_data();
+#pragma endregion
 
+#pragma region writer functions
+		void generate_code();
+		void tokenize_content(std::vector<Structure*>& kernels);
+		void identify_kernels();
+		void generate_files(std::string kernel_name);
+		Structure* find_structure_with_name(std::string target_name);
+#pragma endregion
+
+#pragma region public data
 		int state = 0;
 		int level = 0;
 		char pointer;
+#pragma endregion
 
-
-		//states
+#pragma region states
 		void idle_state(char input); 
 		void raw_text_state(char input);
 		void open_tag_state(char input);
@@ -41,11 +51,7 @@ namespace on {
 		void structure_data_state(char input);
 		void close_tag_state(char input);
 		void tag_idle_state(char input);
-
-
-
-
-
+#pragma endregion
 
 #pragma region get-set
 		std::string get_content(int index) { return _content[index]; }
@@ -53,7 +59,6 @@ namespace on {
 		Structure* get_structure(int index) { return _structures[index]; }
 		Structure* get_current_structure() { return _current_structure; }
 
-		//TODO: fill in parser get-set
 		void add_content(std::string input) { _content.push_back(input); }
 		void add_to_buffer(char input) { _buffer += input; }
 		void add_structure(Structure* input) { _structures.push_back(input); }

@@ -44,7 +44,7 @@ namespace on {
 	}
 
 	void ParseQueue::read_on_file(fs::path path_to_input) {
-		Lexer* reader = new Lexer();
+		Parser* reader = new Parser();
 		std::ifstream file(path_to_input);
 		std::cout << "reading .on file..." << std::endl;
 
@@ -53,6 +53,7 @@ namespace on {
 			reader->read(reader->pointer);
 		}
 		reader->generate_report();
+		reader->generate_code();
 	}
 }
 
