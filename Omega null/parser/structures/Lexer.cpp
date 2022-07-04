@@ -103,12 +103,15 @@ namespace on {
 		_current_structure->set_data(flush_buffer(RETURN));
 	}
 
+	void Lexer::close_tag() {
 
+	}
 
 
 
 #pragma region states
 	void Lexer::read(char input) {
+		std::cout << input << " : " << state << " | " << _buffer << std::endl;
 		switch (state) {
 		case IDLE:
 			idle_state(input); break;
@@ -139,6 +142,7 @@ namespace on {
 		case '<': change_state(OPEN_TAG); break;
 		case ' ': break;
 		case '\n': break;
+		case '\t': break;
 		default: change_state(RAW_TEXT); _buffer += input; break;
 		}
 	}
@@ -146,7 +150,7 @@ namespace on {
 	//state 1
 	void Lexer::raw_text_state(char input) {
 		switch (input) {
-		case '\n': flush_buffer(END_RAW_TEXT); break;
+		case '\n': flush_buffer(END_RAW_TEXT); change_state(IDLE); break;
 		default: _buffer += input;  break;
 		}
 	}
@@ -164,8 +168,9 @@ namespace on {
 		switch (input) {
 		case '{': change_state(STRUCTURE_DATA); break;
 		case '(': change_state(STRUCTURE_DIMS); break;
-		case '>': change_state(IDLE); break;
+		case '>': close_tag();  change_state(IDLE); break;
 		case ' ': break;
+		case ',': break;
 		default: add_to_buffer(input); change_state(STRUCTURE_NAME);  break;
 		}
 	}
@@ -196,7 +201,7 @@ namespace on {
 	void Lexer::structure_dims_state(char input) {
 		switch (input) {
 		case ',': flush_buffer(PUSH_BACK_DIM);  break;
-		case ')': flush_buffer(PUSH_BACK_DIM); complete_dims(); break;
+		case ')': flush_buffer(PUSH_BACK_DIM); complete_dims(); change_state(TAG_IDLE); break;
 		case ' ': break;
 		default: add_to_buffer(input); break;
 		}
@@ -214,7 +219,7 @@ namespace on {
 	void Lexer::close_tag_state(char input) { 
 		switch (input) {
 		case ' ': break;
-		case '>': flush_buffer(MARK_END_OF_STRUCTURE); step_down(); set_current_structure(_current_structure->get_parent()); break;
+		case '>': flush_buffer(MARK_END_OF_STRUCTURE); step_down(); set_current_structure(_current_structure->get_parent()); change_state(IDLE); break;
 		default: _buffer += input; break;
 		}
 	}

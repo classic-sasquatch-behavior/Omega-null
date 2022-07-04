@@ -19,7 +19,7 @@ namespace on {
 		void initialize_page();
 		void initialize_structure();
 		void generate_report();
-		
+		void close_tag();
 		
 		void complete_type();
 		void complete_name();
