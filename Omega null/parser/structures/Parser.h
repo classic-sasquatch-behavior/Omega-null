@@ -31,8 +31,20 @@ namespace on {
 		void generate_code();
 		void tokenize_content(std::vector<Structure*>& kernels);
 		void identify_kernels();
-		void generate_files(std::string kernel_name);
+		void initialize_files(std::string kernel_name, std::ofstream &header_file, std::ofstream &cuda_file);
 		Structure* find_structure_with_name(std::string target_name);
+		void generate_header(Structure* kernel, std::ofstream& header_file);
+		void generate_cuda_code(Structure* kernel, std::ofstream& cuda_file);
+
+		//string templates
+		std::string template_kernel_begin(Structure* kernel);
+		std::string template_kernel_content(Structure* kernel);
+		std::string template_kernel_end(Structure* kernel);
+
+		std::string template_launch_begin(Structure* kernel);
+		std::string template_launch_dims(Structure* kernel);
+		std::string template_launch_kernel_call(Structure* kernel);
+		std::string template_launch_end(Structure* kernel);
 #pragma endregion
 
 #pragma region public data

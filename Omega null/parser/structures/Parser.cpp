@@ -25,15 +25,16 @@ namespace on {
 	void Parser::initialize_page() {
 		Structure* page = nullptr;
 		page = new Structure(page, 0);
-		//Structure* page = new Structure(page, 0);
+		page->set_name("page");
 		_structures.push_back(page);
-		_current_structure = page;
+		set_current_structure(page);
 		_buffer = "page";
 		flush_buffer(1);
 	}
 
 	void Parser::initialize_structure() {
 		Structure* new_structure = new Structure(get_current_structure(), level + 1);
+		add_structure(new_structure);
 		set_current_structure(new_structure);
 	}
 
@@ -228,16 +229,92 @@ namespace on {
 		tokenize_content(kernels);
 		if (kernels.size() <= 0) { __THROW_ERROR(generate code, no kernels found, "very sad"); }
 
+		std::ofstream header_file;
+		std::ofstream cuda_file;
 		std::string kernel_name = kernels[0]->get_name();
-		generate_files(kernel_name);
+		initialize_files(kernel_name, header_file, cuda_file);
 
+		for (Structure* kernel : kernels) {
+			generate_header(kernel, header_file);
+			generate_cuda_code(kernel, cuda_file);
+		}
 
-
-
+		header_file.close();
+		cuda_file.close();
 
 
 
 	}
+
+	void Parser::generate_header(Structure* kernel, std::ofstream& header_file) {
+		std::string data = kernel->get_data();
+		std::string name = kernel->get_name();
+
+		header_file << "void " + name + "_launch(" + data + ");";
+	}
+
+	void Parser::generate_cuda_code(Structure* kernel, std::ofstream& cuda_file) {
+
+
+		cuda_file << template_kernel_begin(kernel);
+		cuda_file << template_kernel_content(kernel); //TODO: fill this out 
+		cuda_file << template_kernel_end(kernel);
+
+		cuda_file << template_launch_begin(kernel);
+		cuda_file << template_launch_dims(kernel);
+
+
+	}
+
+#pragma region code templates
+	std::string Parser::template_kernel_begin(Structure* kernel) {
+		std::string data = kernel->get_data();
+		std::string name = kernel->get_name();
+
+		std::string result = "__global__ void " + name + "_kernel(" + data + "){\n";
+		return result;
+	}
+
+	std::string Parser::template_kernel_content(Structure* kernel) {
+		std::string result = "";
+		return result;
+	}
+
+	std::string Parser::template_kernel_end(Structure* kernel) {
+		std::string result = "}\n\n";
+		return result;
+	}
+
+	std::string Parser::template_launch_begin(Structure* kernel) {
+		std::string data = kernel->get_data();
+		std::string name = kernel->get_name();
+
+		std::string result = "void " + name + "_launch(" + data + "){\n";
+		return result;
+	}
+
+	std::string Parser::template_launch_dims(Structure* kernel) {
+		//need shape. shape comes from the first argument within data. probably want to get it when we search for kernels in the last step.
+	}
+
+	std::string Parser::template_launch_kernel_call(Structure* kernel) {
+
+	}
+
+	std::string Parser::template_launch_end(Structure* kernel) {
+
+	}
+
+#pragma endregion
+
+
+
+
+
+
+
+
+
 
 	void Parser::tokenize_content(std::vector<Structure*> &kernels) {
 
@@ -277,7 +354,12 @@ namespace on {
 		
 	}
 
-	void Parser::generate_files(std::string kernel_name) {
+	void Parser::initialize_files(std::string kernel_name, std::ofstream &header_file, std::ofstream &cuda_file) {
+		std::string header_name = kernel_name + ".h";
+		std::string cuda_file_name = kernel_name + ".cu";
+
+		header_file.open(output_path + header_name);
+		cuda_file.open(output_path + cuda_file_name);
 
 	}
 
@@ -291,7 +373,7 @@ namespace on {
 			}
 		}
 		if (result == nullptr) {
-			__THROW_ERROR(find structure with name, no structure with name, target_name);
+			__THROW_ERROR(find_structure_with_name, no structure with name, target_name);
 		}
 		return result;
 	}

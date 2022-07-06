@@ -8,7 +8,7 @@ while(!queue_name.empty()){ \
 	content;}
 
 #define __THROW_ERROR(function_name, reason_for_error, data_to_display) \
-std::cout << "ERROR in function_name - reason_for_error: " << data_to_display << std::endl;
+std::cout << "ERROR in " #function_name " - " #reason_for_error ": " << data_to_display << std::endl;
 
 
 
