@@ -15,6 +15,8 @@ namespace on {
 		void set_name(std::string input) { _name = input; }
 		void set_data(std::string input) { _data = input; }  
 		void set_parent(Structure* input) { _parent = input; }
+		void set_parent_name(std::string input) { _parent_name = input; }
+		void set_parent_type(std::string input) { _parent_type = input; }
 		void set_num_dims(int input) { _num_dims = input; }
 		void add_dim_name(std::string input) { _dim_names.push_back(input); }
 		void add_child(Structure* input) { _children.push_back(input); }
@@ -26,6 +28,9 @@ namespace on {
 		std::string get_name() { return _name; }
 		std::string get_data() { return _data; }
 		Structure* get_parent() { return _parent; }
+		std::string get_parent_name() { return _parent_name; }
+		std::string get_parent_type() { return _parent_type; }
+		
 		std::string get_dim(int index) { return _dim_names[index]; }
 		std::vector<std::string> get_all_dims() { return _dim_names; }
 		Structure* get_child(int index) { return _children[index]; }
@@ -38,6 +43,8 @@ namespace on {
 		std::string _name = "default";
 		std::string _data = " ";		//data i.e. "A, B, C" as a raw string
 		Structure* _parent = nullptr;
+		std::string _parent_name;
+		std::string _parent_type;
 		int _num_dims;
 		std::vector<std::string> _dim_names;
 		std::vector<Structure*> _children;

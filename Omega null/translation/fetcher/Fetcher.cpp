@@ -1,4 +1,4 @@
-#include"../global_includes.h"
+#include"../../global_includes.h"
 
 
 
@@ -52,7 +52,8 @@ namespace on {
 		while(file.get(reader->pointer)){
 			reader->read(reader->pointer);
 		}
-		reader->generate_report();
+		reader->wrap_up();
+		reader->generate_report(); //for debug
 		reader->generate_code();
 	}
 }

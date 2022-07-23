@@ -25,6 +25,8 @@ namespace on {
 		void complete_name();
 		void complete_dims();
 		void complete_data();
+		void complete_parent(std::string data_to_check);
+		void wrap_up();
 #pragma endregion
 
 #pragma region writer functions

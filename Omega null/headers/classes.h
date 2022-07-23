@@ -1,8 +1,6 @@
 #pragma once
-#include"../tensors/Tensor.h"
-#include"../parser/ParseQueue.h"
-
-#include"../parser/structures/Parser.h"
-#include"../parser/structures/Structure.h"
+#include"../translation/fetcher/Fetcher.h"
+#include"../translation/reader/Reader.h"
+#include"../translation/structures/Structure.h"
 
 

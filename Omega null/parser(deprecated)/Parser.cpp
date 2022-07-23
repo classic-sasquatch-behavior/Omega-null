@@ -98,11 +98,41 @@ namespace on {
 	}
 
 	void Parser::complete_data() {
-		_current_structure->set_data(flush_buffer(RETURN));
+		std::string data = flush_buffer(RETURN);
+		_current_structure->set_data(data);
+		complete_parent(data);
+	}
+
+	void Parser::complete_parent(std::string data_to_check) {
+		std::string parent;
+
+		//split on spaces
+		int start = 0;
+		int end = data_to_check.find(",");
+		parent = data_to_check.substr(start, end);
+		
+		start = parent.find_first_not_of(" ");
+		end = parent.find_last_not_of(" ");
+		parent = parent.substr(start, end);
+
+		std::string parent_name;
+		std::string parent_type;
+
+		start = 0;
+		end = parent.size();
+		int split = parent.find(" "); //this is not at all robust. specifically, will break if the arguments have any additional spaces. you probably want to refactor the whole function eventually, remember when u make the semantic checker.
+		parent_type = parent.substr(start, split);
+		parent_name = parent.substr(split, end);
+
+
 	}
 
 	void Parser::close_tag() {
 
+	}
+
+	void Parser::wrap_up() {
+		//stuff goes here
 	}
 #pragma endregion
 
@@ -254,16 +284,14 @@ namespace on {
 	}
 
 	void Parser::generate_cuda_code(Structure* kernel, std::ofstream& cuda_file) {
-
-
 		cuda_file << template_kernel_begin(kernel);
 		cuda_file << template_kernel_content(kernel); //TODO: fill this out 
 		cuda_file << template_kernel_end(kernel);
 
 		cuda_file << template_launch_begin(kernel);
 		cuda_file << template_launch_dims(kernel);
-
-
+		cuda_file << template_launch_kernel_call(kernel);
+		cuda_file << template_launch_end(kernel);
 	}
 
 #pragma region code templates
@@ -295,14 +323,23 @@ namespace on {
 
 	std::string Parser::template_launch_dims(Structure* kernel) {
 		//need shape. shape comes from the first argument within data. probably want to get it when we search for kernels in the last step.
+		std::string parent = kernel->get_parent_name();
+		std::string result = "kernel dims\n";
+		
+
+		return result;
 	}
 
 	std::string Parser::template_launch_kernel_call(Structure* kernel) {
+		std::string kernel_name = kernel->get_name();
+		std::string result = "kernel call\n";
 
+		return result;
 	}
 
 	std::string Parser::template_launch_end(Structure* kernel) {
-
+		std::string result = "}";
+		return result;
 	}
 
 #pragma endregion
