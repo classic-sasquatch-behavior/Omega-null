@@ -1,5 +1,5 @@
 #pragma once
-#include"../../global_includes.h"
+#include"../../headers/global_includes.h"
 
 
 namespace fs = std::filesystem;
@@ -7,10 +7,10 @@ namespace on{
 
 
 
-class ParseQueue {
+class Fetcher {
 public:
-	ParseQueue(std::string topdir);
-	~ParseQueue();
+	Fetcher(std::string topdir);
+	~Fetcher();
 
 	void parse();
 	void find_on_files();
