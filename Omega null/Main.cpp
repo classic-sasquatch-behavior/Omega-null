@@ -4,8 +4,8 @@
 const std::string output_path = "C:/Users/Thelonious/source/repos/Omega null/Omega null/output/";
 const std::string topdir = "C:/Users/Thelonious/source/repos/Omega null/";
 
-struct Kernel {
-	Kernel(){}
+struct KernelData {
+	KernelData(){}
 	std::string name;
 	std::string dims;
 	std::string shape;
@@ -46,8 +46,8 @@ void close_file(std::ofstream& file) {
 	file.close();
 }
 
-Kernel load_kernel(Node root) {
-	Kernel kernel;
+KernelData load_kernel(Node root) {
+	KernelData kernel;
 	kernel.name = root.attribute("name").as_string();
 	kernel.data = root.attribute("data").as_string();
 	kernel.dims = root.attribute("dims").as_string();
@@ -55,7 +55,15 @@ Kernel load_kernel(Node root) {
 	return kernel;
 }
 
-void write_launch_function(Kernel kernel, std::ofstream& header, std::ofstream& cuda_file) {
+
+
+
+
+
+
+#pragma region writer functions
+
+void write_launch_function(KernelData kernel, std::ofstream& header, std::ofstream& cuda_file) {
 
 	std::string name = kernel.name;
 	std::string shape = kernel.shape;
@@ -77,7 +85,12 @@ void write_launch_function(Kernel kernel, std::ofstream& header, std::ofstream& 
 	cuda_file << "}" << std::endl;
 }
 
-void begin_kernel(Kernel kernel, std::ofstream& cuda_file) {
+
+void write_to_kernel(std::string content, std::ofstream& cuda_file) {
+	cuda_file << content << std::endl;
+}
+
+void begin_kernel(Node node, KernelData kernel, std::ofstream& cuda_file) {
 	std::string name = kernel.name;
 	std::string dims = kernel.dims;
 	std::string shape = kernel.shape;
@@ -88,12 +101,52 @@ void begin_kernel(Kernel kernel, std::ofstream& cuda_file) {
 	cuda_file << "CHECK_BOUNDS(" << shape << ".maj_span, " << shape << ".min_span);" << std::endl;
 }
 
-void write_to_kernel(std::string content, std::ofstream& cuda_file) {
-	cuda_file << content;
+void for_element(Node node, KernelData data, std::ofstream& cuda_file) {
+
 }
 
-void end_kernel(std::ofstream& cuda_file) {
-	cuda_file << "}" << std::endl;
+void for_neighbor(Node node, KernelData data, std::ofstream& cuda_file) {
+
+}
+
+void for_maj(Node node, KernelData data, std::ofstream& cuda_file) {
+
+}
+
+void for_min(Node node, KernelData data, std::ofstream& cuda_file) {
+
+}
+
+void cast_down(Node node, KernelData data, std::ofstream& cuda_file) {
+
+}
+
+void cast_up(Node node, KernelData data, std::ofstream& cuda_file) {
+
+}
+
+#pragma endregion
+
+
+
+
+void traverse_node(Node root, KernelData data, std::ofstream& cuda_file) {
+	std::string structure_type = root.name();
+
+	if (structure_type == "Kernel") { begin_kernel(root, data, cuda_file); }
+	if (structure_type == "For_Element") { for_element(root, data, cuda_file); }
+	if (structure_type == "For_Neighbor") { for_neighbor(root, data, cuda_file); }
+	if (structure_type == "For_Maj") { for_maj(root, data, cuda_file); }
+	if (structure_type == "For_Min") { for_min(root, data, cuda_file); }
+	if (structure_type == "Cast_Down") { cast_down(root, data, cuda_file); }
+	if (structure_type == "Cast_Up") { cast_up(root, data, cuda_file); }
+	
+	for (Node node : root) {
+		if (node.type() == pugi::node_pcdata) { write_to_kernel(node.text().as_string(), cuda_file); }
+		else { traverse_node(node, data, cuda_file); }
+	}
+
+	cuda_file << std::endl << "}" << std::endl;
 }
 
 
@@ -131,27 +184,9 @@ int main() {
 		//	a) use kernel header to write launch function
 		//	b) use whole kernel structure to write kernel in .cu 
 		for (Node root : on_file) {
-			Kernel kernel = load_kernel(root);
+			KernelData kernel = load_kernel(root);
 			write_launch_function(kernel, header_stream, cuda_stream);
-			begin_kernel(kernel, cuda_stream);
-
-
-
-
-			Node node = root;
-			while (!node.children().empty()) {
-
-				for (Node child : node) {
-
-				}
-
-			}
-
-
-
-
-
-			end_kernel(cuda_stream);
+			traverse_node(root, kernel, cuda_stream);
 		}
 	}
 
