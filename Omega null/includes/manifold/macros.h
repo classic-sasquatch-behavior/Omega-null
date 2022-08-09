@@ -3,4 +3,12 @@
 
 typedef unsigned int uint;
 
-#define AS_STRING(_content_) #_content_
+
+
+#define ON_STRING(_content_) #_content_
+
+//a struct which contains only data
+#define ON_BEING struct
+
+//a static struct which contains only functions
+#define ON_PROCESS static struct

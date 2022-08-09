@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<Kernel name ="add_by_element" dims ="row, col" data ="d_Mat A, d_Mat B, d_Mat C">
-	<For_Element name ="add_loop">
+<Kernel name ="add_by_element" dims ="row, col" shape ="A" data ="on::Tensor A, on::Tensor B, on::Tensor C">
 		C(row, col) = A(row, col) + B(row, col);
-	</For_Element>
 </Kernel>

@@ -1,11 +1,27 @@
 #include"manifold.h"
 
+/*
+	had to include this to the .vcxproj:
+
+  <ItemGroup>
+	<ClInclude Include="output\*.h" />
+	<CudaCompile Include="output\*.cu" />
+  </ItemGroup>
+
+  but, it doesn't work as automatically as I'd like it to. we'll do it manually for now and 
+  figure out how to make this work later.
+*/
 
 const std::string output_path = "C:/Users/Thelonious/source/repos/Omega null/Omega null/output/";
 const std::string topdir = "C:/Users/Thelonious/source/repos/Omega null/";
 
-struct KernelData {
-	KernelData(){}
+template<typename Text>
+void print(Text text) {
+	std::cout << std::endl << text << std::endl;
+}
+
+ON_BEING KernelData{
+	KernelData() {}
 	std::string name;
 	std::string dims;
 	std::string shape;
@@ -35,126 +51,133 @@ struct KernelData {
 	}
 };
 
-std::ofstream open_file(std::string file_name, std::string extension) {
-	std::string full_name = file_name + extension;
-	std::ofstream file;
-	file.open(output_path + full_name);
-	return file;
-}
+ON_PROCESS Write{
 
-void close_file(std::ofstream& file) {
-	file.close();
-}
+	static void declare_launch_function(KernelData kernel, std::ofstream& header) {
 
-KernelData load_kernel(Node root) {
-	KernelData kernel;
-	kernel.name = root.attribute("name").as_string();
-	kernel.data = root.attribute("data").as_string();
-	kernel.dims = root.attribute("dims").as_string();
-	kernel.shape = root.attribute("shape").as_string();
-	return kernel;
-}
+		std::string name = kernel.name;
+		std::string shape = kernel.shape;
+		std::string data = kernel.data;
+		uint block_dim_x = kernel.block_dim_x();
+		uint block_dim_y = kernel.block_dim_y();
 
+		header << "void " << name << "_launch(" << data << ");" << std::endl;
+	}
 
+	static void write_to_kernel(std::string content, std::ofstream& cuda_file) {
+		cuda_file << content << std::endl;
+	}
 
+	static void begin_kernel(Node node, KernelData kernel, std::ofstream& cuda_file) {
+		std::string name = kernel.name;
+		std::string dims = kernel.dims;
+		std::string shape = kernel.shape;
+		std::string data = kernel.data;
 
+		cuda_file << "__global__ void " << name << "(" << data << "){" << std::endl;
+		cuda_file << "GET_DIMS(" << dims << ");" << std::endl;
+		cuda_file << "CHECK_BOUNDS(" << shape << ".maj_span, " << shape << ".min_span);" << std::endl;
+	}
 
+	static void for_element(Node node, KernelData data, std::ofstream& cuda_file) {
 
+	}
 
-#pragma region writer functions
+	static void for_neighbor(Node node, KernelData data, std::ofstream& cuda_file) {
 
-void write_launch_function(KernelData kernel, std::ofstream& header, std::ofstream& cuda_file) {
+	}
 
-	std::string name = kernel.name;
-	std::string shape = kernel.shape;
-	std::string data = kernel.data;
-	uint block_dim_x = kernel.block_dim_x();
-	uint block_dim_y = kernel.block_dim_y();
+	static void for_maj(Node node, KernelData data, std::ofstream& cuda_file) {
 
-	header << "void " << name << "_launch(" << data << ");" << std::endl;
+	}
 
-	cuda_file << "void " << name << "_launch(" << data << "){" << std::endl;
-	cuda_file << "on::Tensor& shape = " << shape << ";" << std::endl;
-	cuda_file << "unsigned int block_dim_x = " << block_dim_x << ";" << std::endl;
-	cuda_file << "unsigned int block_dim_y = " << block_dim_y << ";" << std::endl;
-	cuda_file << "unsigned int grid_dim_x = (shape.maj_span - (shape.maj_span % block_dim_x))/block_dim_x;" << std::endl;
-	cuda_file << "unsigned int grid_dim_y = (shape.min_span - (shape.min_span % block_dim_y))/block_dim_y;" << std::endl;
-	cuda_file << "dim3 num_blocks(grid_dim_x + 1, grid_dim_y + 1);" << std::endl;
-	cuda_file << "dim3 threads_per_block(block_dim_x, block_dim_y)" << std::endl;
-	cuda_file << name << "<<<num_block, threads_per_block>>>(" << data << ");" << std::endl;
-	cuda_file << "}" << std::endl;
-}
+	static void for_min(Node node, KernelData data, std::ofstream& cuda_file) {
 
+	}
 
-void write_to_kernel(std::string content, std::ofstream& cuda_file) {
-	cuda_file << content << std::endl;
-}
+	static void cast_down(Node node, KernelData data, std::ofstream& cuda_file) {
 
-void begin_kernel(Node node, KernelData kernel, std::ofstream& cuda_file) {
-	std::string name = kernel.name;
-	std::string dims = kernel.dims;
-	std::string shape = kernel.shape;
-	std::string data = kernel.data;
+	}
 
-	cuda_file << "__global__ void " << name << "(" << data << "){" << std::endl;
-	cuda_file << "GET_DIMS(" << dims << ");" << std::endl;
-	cuda_file << "CHECK_BOUNDS(" << shape << ".maj_span, " << shape << ".min_span);" << std::endl;
-}
+	static void cast_up(Node node, KernelData data, std::ofstream& cuda_file) {
 
-void for_element(Node node, KernelData data, std::ofstream& cuda_file) {
+	}
 
-}
+	static void define_launch_function(KernelData kernel, std::ofstream& cuda_file) {
 
-void for_neighbor(Node node, KernelData data, std::ofstream& cuda_file) {
+		std::string name = kernel.name;
+		std::string shape = kernel.shape;
+		std::string data = kernel.data;
+		std::string block_dim_x = std::to_string(kernel.block_dim_x());
+		std::string block_dim_y = std::to_string(kernel.block_dim_y());
 
-}
+		cuda_file << "\n"
+			"void " + name + "_launch(" + data + ")" + "\n"
+			"on::Tensor& shape = " + shape + ";" + "\n"
+			"\n"
+			"unsigned int block_dim_x = " + block_dim_x + ";" + "\n"
+			"unsigned int block_dim_y = " + block_dim_y + ";" + "\n"
+			"unsigned int grid_dim_x = (shape.maj_span - (shape.maj_span % block_dim_x))/block_dim_x;" + "\n"
+			"unsigned int grid_dim_y = (shape.min_span - (shape.min_span % block_dim_y))/block_dim_y;" + "\n"
+			"dim3 num_blocks(grid_dim_x + 1, grid_dim_y + 1);" + "\n"
+			"dim3 threads_per_block(block_dim_x, block_dim_y)" + "\n"
+			+ name + "<<<num_block, threads_per_block>>>(" + data + ");" + "\n"
+			"}" + "\n";
+	}
 
-void for_maj(Node node, KernelData data, std::ofstream& cuda_file) {
+};
 
-}
+ON_PROCESS Load{
+	static std::ofstream file(std::string file_name, std::string extension) {
+		print("opening file");
+		std::string full_name = file_name + extension;
+		print(full_name);
+		std::ofstream file;
+		file.open(full_name);
+		file << std::endl;
+		return file;
+	}
 
-void for_min(Node node, KernelData data, std::ofstream& cuda_file) {
+	//static void close_file(std::ofstream& file) {
+	//	file.close();
+	//}
 
-}
+	static KernelData kernel_data(Node root) {
+		KernelData kernel;
+		kernel.name = root.attribute("name").as_string();
+		kernel.data = root.attribute("data").as_string();
+		kernel.dims = root.attribute("dims").as_string();
+		kernel.shape = root.attribute("shape").as_string();
+		return kernel;
+	}
+};
 
-void cast_down(Node node, KernelData data, std::ofstream& cuda_file) {
-
-}
-
-void cast_up(Node node, KernelData data, std::ofstream& cuda_file) {
-
-}
-
-#pragma endregion
-
-
-
-
-void traverse_node(Node root, KernelData data, std::ofstream& cuda_file) {
+ON_PROCESS Read{
+	static void next_node(Node root, KernelData data, std::ofstream & cuda_file) {
+	print("traversing node");
 	std::string structure_type = root.name();
 
-	if (structure_type == "Kernel") { begin_kernel(root, data, cuda_file); }
-	if (structure_type == "For_Element") { for_element(root, data, cuda_file); }
-	if (structure_type == "For_Neighbor") { for_neighbor(root, data, cuda_file); }
-	if (structure_type == "For_Maj") { for_maj(root, data, cuda_file); }
-	if (structure_type == "For_Min") { for_min(root, data, cuda_file); }
-	if (structure_type == "Cast_Down") { cast_down(root, data, cuda_file); }
-	if (structure_type == "Cast_Up") { cast_up(root, data, cuda_file); }
-	
+	if (structure_type == "Kernel") { Write::begin_kernel(root, data, cuda_file); }
+	if (structure_type == "For_Element") { Write::for_element(root, data, cuda_file); }
+	if (structure_type == "For_Neighbor") { Write::for_neighbor(root, data, cuda_file); }
+	if (structure_type == "For_Maj") { Write::for_maj(root, data, cuda_file); }
+	if (structure_type == "For_Min") { Write::for_min(root, data, cuda_file); }
+	if (structure_type == "Cast_Down") { Write::cast_down(root, data, cuda_file); }
+	if (structure_type == "Cast_Up") { Write::cast_up(root, data, cuda_file); }
+
 	for (Node node : root) {
-		if (node.type() == pugi::node_pcdata) { write_to_kernel(node.text().as_string(), cuda_file); }
-		else { traverse_node(node, data, cuda_file); }
+		if (node.type() == pugi::node_pcdata) { Write::write_to_kernel(node.text().as_string(), cuda_file); }
+		else { Read::next_node(node, data, cuda_file); }
 	}
 
 	cuda_file << std::endl << "}" << std::endl;
-}
-
-
+	}
+};
 
 int main() {
-	
 	std::queue<fs::path> file_queue;
 
+	print("finding .on files");
 	//1) get all .on files in project dir
 	fs::path src_path = topdir;
 	if (fs::exists(src_path) && fs::is_directory(src_path)) {
@@ -166,6 +189,7 @@ int main() {
 		}
 	}
 
+	print("making .h and .cu for each .on file");
 	//2) for each .on file, make a .h and a .cu file with the same name
 	while(!file_queue.empty()) {
 		auto current_path = file_queue.front();
@@ -175,18 +199,21 @@ int main() {
 		pugi::xml_parse_result loaded_file_successfully = on_file.load_file(current_path.c_str());
 		if (!loaded_file_successfully) { std::cout << "XML file " << current_path.c_str() << " could not be loaded." << std::endl; }
 
-		std::string file_name = current_path.filename().u8string();
-		std::ofstream header_stream = open_file(file_name, ".h");
-		std::ofstream cuda_stream = open_file(file_name, ".cu");
+		std::string file_name = output_path + current_path.stem().u8string();
+		print(file_name);
+		std::ofstream header_stream = Load::file(file_name, ".h");
+		std::ofstream cuda_stream = Load::file(file_name, ".cu");
 
 
 		//3) for each kernel in .on file:
 		//	a) use kernel header to write launch function
 		//	b) use whole kernel structure to write kernel in .cu 
 		for (Node root : on_file) {
-			KernelData kernel = load_kernel(root);
-			write_launch_function(kernel, header_stream, cuda_stream);
-			traverse_node(root, kernel, cuda_stream);
+			print("making kernel");
+			KernelData kernel = Load::kernel_data(root);
+			Write::declare_launch_function(kernel, header_stream);
+			Read::next_node(root, kernel, cuda_stream);
+			Write::define_launch_function(kernel, cuda_stream);
 		}
 	}
 

@@ -2,6 +2,7 @@
 
 
 #include<iostream>
+using std::endl;
 #include<fstream>
 #include<queue>
 #include<string>
