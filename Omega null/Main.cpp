@@ -65,7 +65,7 @@ ON_STRUCTURE Writer{
 
 	ON_PROCESS Write{
 
-		static void launcher_declaration(KernelData kernel, std::ofstream & header) {
+		static void launcher_declaration(KernelData kernel, Filestream & header) {
 
 			std::string name = kernel.name;
 			std::string shape = kernel.shape;
@@ -76,11 +76,11 @@ ON_STRUCTURE Writer{
 			header << "void " << name << "_launch(" << data << ");" << std::endl;
 		}
 
-		static void to_kernel(std::string content, std::ofstream & cuda_file) {
+		static void to_kernel(std::string content, Filestream & cuda_file) {
 			cuda_file << content << std::endl;
 		}
 
-		static void kernel_declaration(Node node, KernelData kernel, std::ofstream & cuda_file) {
+		static void kernel_declaration(Node node, KernelData kernel, Filestream & cuda_file) {
 			std::string name = kernel.name;
 			std::string dims = kernel.dims;
 			std::string shape = kernel.shape;
@@ -91,31 +91,31 @@ ON_STRUCTURE Writer{
 			cuda_file << "CHECK_BOUNDS(" << shape << ".maj_span, " << shape << ".min_span);" << std::endl;
 		}
 
-		static void for_element(Node node, KernelData data, std::ofstream & cuda_file) {
+		static void for_element(Node node, KernelData data, Filestream & cuda_file) {
 
 		}
 
-		static void for_neighbor(Node node, KernelData data, std::ofstream & cuda_file) {
+		static void for_neighbor(Node node, KernelData data, Filestream & cuda_file) {
 
 		}
 
-		static void for_maj(Node node, KernelData data, std::ofstream & cuda_file) {
+		static void for_maj(Node node, KernelData data, Filestream & cuda_file) {
 
 		}
 
-		static void for_min(Node node, KernelData data, std::ofstream & cuda_file) {
+		static void for_min(Node node, KernelData data, Filestream & cuda_file) {
 
 		}
 
-		static void cast_down(Node node, KernelData data, std::ofstream & cuda_file) {
+		static void cast_down(Node node, KernelData data, Filestream & cuda_file) {
 
 		}
 
-		static void cast_up(Node node, KernelData data, std::ofstream & cuda_file) {
+		static void cast_up(Node node, KernelData data, Filestream & cuda_file) {
 
 		}
 
-		static void launcher_definition(KernelData kernel, std::ofstream & cuda_file) {
+		static void launcher_definition(KernelData kernel, Filestream & cuda_file) {
 
 			std::string name = kernel.name;
 			std::string shape = kernel.shape;
@@ -149,8 +149,27 @@ ON_STRUCTURE Writer{
 
 ON_STRUCTURE Loader{
 	ON_PROCESS Load{
-		static void structures() {
+		static void structures(std::queue<fs::path> &file_queue) {
+			while (!file_queue.empty()) {
+				auto current_path = LoadStructures::file_queue.front();
+				LoadStructures::file_queue.pop();
 
+				pugi::xml_document on_file;
+				pugi::xml_parse_result loaded_file_successfully = on_file.load_file(current_path.c_str());
+				if (!loaded_file_successfully) { std::cout << "XML file " << current_path.c_str() << " could not be loaded." << std::endl; }
+
+				std::string file_name = Parameter::output_path + current_path.stem().u8string();
+				Debug::print(file_name);
+				Filestream header = Load::file(file_name, ".h");
+				Filestream cuda = Load::file(file_name, ".cu");
+
+				for (Node kernel : on_file) {
+					KernelData data = Load::kernel_data(kernel);
+					Write::launcher_declaration(data, header);
+					Read::next_node(kernel, data, cuda);
+					Write::launcher_definition(data, cuda);
+				}
+			}
 		}
 
 		static void project(std::string topdir, std::queue<fs::path>&file_queue) {
@@ -193,10 +212,10 @@ ON_STRUCTURE Reader{
 	using ON_STRUCTURE Writer;
 	ON_PROCESS Read{
 		static void next_node(Node root, KernelData data, std::ofstream & cuda_file) {
-		Debug::print("traversing node");
+
 		std::string structure_type = root.name();
 
-		if (structure_type == "Kernel") { Write::begin_kernel(root, data, cuda_file); }
+		if (structure_type == "Kernel") { Write::kernel_declaration(root, data, cuda_file); }
 		if (structure_type == "For_Element") { Write::for_element(root, data, cuda_file); }
 		if (structure_type == "For_Neighbor") { Write::for_neighbor(root, data, cuda_file); }
 		if (structure_type == "For_Maj") { Write::for_maj(root, data, cuda_file); }
@@ -205,7 +224,7 @@ ON_STRUCTURE Reader{
 		if (structure_type == "Cast_Up") { Write::cast_up(root, data, cuda_file); }
 
 		for (Node node : root) {
-			if (node.type() == pugi::node_pcdata) { Write::write_to_kernel(node.text().as_string(), cuda_file); }
+			if (node.type() == pugi::node_pcdata) { Write::to_kernel(node.text().as_string(), cuda_file); }
 			else { Read::next_node(node, data, cuda_file); }
 		}
 
@@ -221,49 +240,7 @@ using ON_STRUCTURE Reader;
 int main() {
 
 	Load::project(Parameter::topdir, LoadStructures::file_queue);
-
-
-
-
-	Debug::print("making .h and .cu for each .on file");
-	//2) for each .on file, make a .h and a .cu file with the same name
-	while(!LoadStructures::file_queue.empty()) {
-		auto current_path = LoadStructures::file_queue.front();
-		LoadStructures::file_queue.pop();
-
-		pugi::xml_document on_file;
-		pugi::xml_parse_result loaded_file_successfully = on_file.load_file(current_path.c_str());
-		if (!loaded_file_successfully) { std::cout << "XML file " << current_path.c_str() << " could not be loaded." << std::endl; }
-
-		std::string file_name = Parameter::output_path + current_path.stem().u8string();
-		Debug::print(file_name);
-		std::ofstream header_stream = Load::file(file_name, ".h");
-		std::ofstream cuda_stream = Load::file(file_name, ".cu");
-
-
-
-
-
-
-
-		//3) for each kernel in .on file:
-		//	a) use kernel header to write launch function
-		//	b) use whole kernel structure to write kernel in .cu 
-		for (Node root : on_file) {
-			Debug::print("making kernel");
-			KernelData kernel = Load::kernel_data(root);
-			Write::launcher_declaration(kernel, header_stream);
-			Read::next_node(root, kernel, cuda_stream);
-			Write::launcher_definition(kernel, cuda_stream);
-		}
-
-
-
-
-
-
-
-	}
+	Load::structures(LoadStructures::file_queue);
 
 	//4) find and replace #include"name.on" with #include"name.h"
 

@@ -13,5 +13,5 @@ typedef unsigned int uint;
 //a static struct which contains only functions
 #define ON_PROCESS static struct
 
-//a namespace which contains constants
+//a namespace which contains both data and functions
 #define ON_STRUCTURE namespace
