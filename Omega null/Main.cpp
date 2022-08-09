@@ -15,6 +15,8 @@
 ON_BEING KernelData{
 
 	KernelData() {}
+	int layer = 0;
+
 	std::string name;
 	std::string dims;
 	std::string shape;
@@ -63,9 +65,19 @@ ON_STRUCTURE Meta{
 
 ON_STRUCTURE Writer{
 
+	ON_PROCESS Get {
+		static std::string tabs(int layer) {
+			std::string result = "";
+			for (int i = 0; i < layer; i++) {
+				result += "\t";
+			}
+			return result;
+		}
+	};
+
 	ON_PROCESS Write{
 
-		static void launcher_declaration(KernelData kernel, Filestream & header) {
+		static void launcher_declaration(KernelData & kernel, Filestream & header) {
 
 			std::string name = kernel.name;
 			std::string shape = kernel.shape;
@@ -76,46 +88,50 @@ ON_STRUCTURE Writer{
 			header << "void " << name << "_launch(" << data << ");" << std::endl;
 		}
 
-		static void to_kernel(std::string content, Filestream & cuda_file) {
-			cuda_file << content << std::endl;
+		static void to_kernel( KernelData& data, Filestream & cuda_file, std::string content) {
+			cuda_file << Get::tabs(data.layer) << content << std::endl;
 		}
 
-		static void kernel_declaration(Node node, KernelData kernel, Filestream & cuda_file) {
+		static void text_to_kernel(KernelData& data, Filestream& cuda_file, std::string content) {
+			cuda_file << content;
+		}
+
+		static void kernel_declaration(Node node, KernelData& kernel, Filestream & cuda_file) {
 			std::string name = kernel.name;
 			std::string dims = kernel.dims;
 			std::string shape = kernel.shape;
 			std::string data = kernel.data;
 
-			cuda_file << "__global__ void " << name << "(" << data << "){" << std::endl;
-			cuda_file << "GET_DIMS(" << dims << ");" << std::endl;
-			cuda_file << "CHECK_BOUNDS(" << shape << ".maj_span, " << shape << ".min_span);" << std::endl;
+			Write::to_kernel(kernel, cuda_file, "__global__ void " + name + "(" + data + "){"); kernel.layer++;
+			Write::to_kernel(kernel, cuda_file, "GET_DIMS(" + dims + ");");
+			Write::to_kernel(kernel, cuda_file, "CHECK_BOUNDS(" + shape + ".maj_span, " + shape + ".min_span);");
 		}
 
-		static void for_element(Node node, KernelData data, Filestream & cuda_file) {
-
-		}
-
-		static void for_neighbor(Node node, KernelData data, Filestream & cuda_file) {
+		static void for_element(Node node, KernelData& data, Filestream & cuda_file) {
 
 		}
 
-		static void for_maj(Node node, KernelData data, Filestream & cuda_file) {
+		static void for_neighbor(Node node, KernelData& data, Filestream & cuda_file) {
 
 		}
 
-		static void for_min(Node node, KernelData data, Filestream & cuda_file) {
+		static void for_maj(Node node, KernelData& data, Filestream & cuda_file) {
 
 		}
 
-		static void cast_down(Node node, KernelData data, Filestream & cuda_file) {
+		static void for_min(Node node, KernelData& data, Filestream & cuda_file) {
 
 		}
 
-		static void cast_up(Node node, KernelData data, Filestream & cuda_file) {
+		static void cast_down(Node node, KernelData& data, Filestream & cuda_file) {
 
 		}
 
-		static void launcher_definition(KernelData kernel, Filestream & cuda_file) {
+		static void cast_up(Node node, KernelData& data, Filestream & cuda_file) {
+
+		}
+
+		static void launcher_definition(KernelData& kernel, Filestream & cuda_file) {
 
 			std::string name = kernel.name;
 			std::string shape = kernel.shape;
@@ -123,43 +139,72 @@ ON_STRUCTURE Writer{
 			std::string block_dim_x = std::to_string(kernel.block_dim_x());
 			std::string block_dim_y = std::to_string(kernel.block_dim_y());
 
-			cuda_file << "\n"
-				"void " + name + "_launch(" + data + ")" + "\n"
-				"on::Tensor& shape = " + shape + ";" + "\n"
-				"\n"
-				"unsigned int block_dim_x = " + block_dim_x + ";" + "\n"
-				"unsigned int block_dim_y = " + block_dim_y + ";" + "\n"
-				"unsigned int grid_dim_x = (shape.maj_span - (shape.maj_span % block_dim_x))/block_dim_x;" + "\n"
-				"unsigned int grid_dim_y = (shape.min_span - (shape.min_span % block_dim_y))/block_dim_y;" + "\n"
-				"dim3 num_blocks(grid_dim_x + 1, grid_dim_y + 1);" + "\n"
-				"dim3 threads_per_block(block_dim_x, block_dim_y)" + "\n"
-				+ name + "<<<num_block, threads_per_block>>>(" + data + ");" + "\n"
-				"}" + "\n";
+			Write::to_kernel(kernel, cuda_file, "void " + name + "_launch(" + data + "){");
+			kernel.layer++;
+			Write::to_kernel(kernel, cuda_file, "on::Tensor& shape = " + shape + ";");
+			Write::to_kernel(kernel, cuda_file, "");
+			Write::to_kernel(kernel, cuda_file, "unsigned int block_dim_x = " + block_dim_x + ";");
+			Write::to_kernel(kernel, cuda_file, "unsigned int block_dim_y = " + block_dim_y + ";");
+			Write::to_kernel(kernel, cuda_file, "unsigned int grid_dim_x = (shape.maj_span - (shape.maj_span % block_dim_x))/block_dim_x;");
+			Write::to_kernel(kernel, cuda_file, "unsigned int grid_dim_y = (shape.min_span - (shape.min_span % block_dim_y))/block_dim_y;");
+			Write::to_kernel(kernel, cuda_file, "");
+			Write::to_kernel(kernel, cuda_file, "dim3 num_blocks(grid_dim_x + 1, grid_dim_y + 1);");
+			Write::to_kernel(kernel, cuda_file, "dim3 threads_per_block(block_dim_x, block_dim_y)");
+			Write::to_kernel(kernel, cuda_file, "");
+			Write::to_kernel(kernel, cuda_file, name + "<<<num_block, threads_per_block>>>(" + data + ");");
+			kernel.layer--;
+			Write::to_kernel(kernel, cuda_file, "}"); 
 		}
 
 	};
 
-	ON_BEING WriteData{
-		WriteData() {}
-		int layer = 0;
-		//current layer
-	};
 
 }
 
+ON_STRUCTURE Reader{
+	using ON_STRUCTURE Meta;
+	using ON_STRUCTURE Writer;
+
+	ON_PROCESS Read{
+		static void next_node(Node root, KernelData data, std::ofstream & cuda_file) {
+
+		std::string structure_type = root.name();
+
+		cuda_file << Get::tabs(data.layer);
+		if (structure_type == "Kernel") { Write::kernel_declaration(root, data, cuda_file); }
+		if (structure_type == "For_Element") { Write::for_element(root, data, cuda_file); }
+		if (structure_type == "For_Neighbor") { Write::for_neighbor(root, data, cuda_file); }
+		if (structure_type == "For_Maj") { Write::for_maj(root, data, cuda_file); }
+		if (structure_type == "For_Min") { Write::for_min(root, data, cuda_file); }
+		if (structure_type == "Cast_Down") { Write::cast_down(root, data, cuda_file); }
+		if (structure_type == "Cast_Up") { Write::cast_up(root, data, cuda_file); }
+
+		for (Node node : root) {
+			if (node.type() == pugi::node_pcdata) { Write::text_to_kernel(data, cuda_file, node.text().as_string()); }
+			else { Read::next_node(node, data, cuda_file); }
+		}
+
+		data.layer--;
+		Write::to_kernel(data, cuda_file, "}\n");
+		}
+	};
+};
+
 ON_STRUCTURE Loader{
+	using ON_STRUCTURE Meta;
+	using ON_STRUCTURE Reader;
+	using ON_STRUCTURE Writer;
 	ON_PROCESS Load{
 		static void structures(std::queue<fs::path> &file_queue) {
 			while (!file_queue.empty()) {
-				auto current_path = LoadStructures::file_queue.front();
-				LoadStructures::file_queue.pop();
+				auto current_path = file_queue.front();
+				file_queue.pop();
 
 				pugi::xml_document on_file;
 				pugi::xml_parse_result loaded_file_successfully = on_file.load_file(current_path.c_str());
 				if (!loaded_file_successfully) { std::cout << "XML file " << current_path.c_str() << " could not be loaded." << std::endl; }
 
 				std::string file_name = Parameter::output_path + current_path.stem().u8string();
-				Debug::print(file_name);
 				Filestream header = Load::file(file_name, ".h");
 				Filestream cuda = Load::file(file_name, ".cu");
 
@@ -206,32 +251,6 @@ ON_STRUCTURE Loader{
 		static std::queue<fs::path> file_queue;
 	}
 }
-
-ON_STRUCTURE Reader{
-	using ON_STRUCTURE Meta;
-	using ON_STRUCTURE Writer;
-	ON_PROCESS Read{
-		static void next_node(Node root, KernelData data, std::ofstream & cuda_file) {
-
-		std::string structure_type = root.name();
-
-		if (structure_type == "Kernel") { Write::kernel_declaration(root, data, cuda_file); }
-		if (structure_type == "For_Element") { Write::for_element(root, data, cuda_file); }
-		if (structure_type == "For_Neighbor") { Write::for_neighbor(root, data, cuda_file); }
-		if (structure_type == "For_Maj") { Write::for_maj(root, data, cuda_file); }
-		if (structure_type == "For_Min") { Write::for_min(root, data, cuda_file); }
-		if (structure_type == "Cast_Down") { Write::cast_down(root, data, cuda_file); }
-		if (structure_type == "Cast_Up") { Write::cast_up(root, data, cuda_file); }
-
-		for (Node node : root) {
-			if (node.type() == pugi::node_pcdata) { Write::to_kernel(node.text().as_string(), cuda_file); }
-			else { Read::next_node(node, data, cuda_file); }
-		}
-
-		cuda_file << std::endl << "}" << std::endl;
-		}
-	};
-};
 
 using ON_STRUCTURE Meta;
 using ON_STRUCTURE Writer;
