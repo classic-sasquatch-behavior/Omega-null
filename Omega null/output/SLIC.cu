@@ -43,11 +43,31 @@ __global__ void assign_pixels_to_centers(Tensor L_src, Tensor A_src, Tensor B_sr
         int neighbor_label = LINEAR_CAST(neighbor_row, neighbor_col, center_rows.min_span);
         
         int color_distance = 0;
-        UNROLL_FOR(int i = 0; i }
+        UNROLL_FOR(int i = 0; i  3; i++){
+          color_distance += SQUARE(self_channels[i] - neighbor_channels[i]);
+        }
+        color_distance = sqrtf(color_distance);
+        
+        int spatial_distance = 0;
+        UNROLL_FOR(int i = 0; i  2; i++) {
+          spatial_distance += SQUARE(self_channels[i] - neighbor_channels[i]);  
+        }
+        spatial_distance = sqrtf(spatial_distance);
+        
+        int total_distance = color_distance + (density_modifier * spatial_distance);
+        if(total_distance  min_distance){
+          min_distance = total_distance;
+          closest_center = neighbor_label;
+        }
+          
+      }
 
 }
 
-}
+
+    labels(row, col) = closest_center;
+    
+  }
 
 void assign_pixels_to_centers_launch(Tensor L_src, Tensor A_src, Tensor B_src, int intensity_modifier, Tensor center_rows, Tensor center_cols, Tensor labels){
 	on::Tensor& shape = labels;

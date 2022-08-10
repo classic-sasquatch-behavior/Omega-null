@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<Kernel name ="add_by_element" dims ="row, col" shape ="A" data ="on::Tensor A, on::Tensor B, on::Tensor C">
-    C(row, col) = A(row, col) + B(row, col);
-</Kernel>
+<example>
+	<Kernel name ="add_by_element" dims ="row, col" shape ="A" data ="on::Tensor A, on::Tensor B, on::Tensor C">
+		C(row, col) = A(row, col) + B(row, col);
+	</Kernel>
+</example>
