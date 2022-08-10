@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<SLIC>
+
+  <Kernel name="sample_centers" dims ="sector_row, sector_col" 
+          data ="Tensor source, Tensor center_rows, Tensor center_cols" shape="source">
+    
+    <Cast_Up dims="actual_row, actual_col" shape ="source">
+      center_rows(sector_row, sector_col) = actual_row;
+      center_cols(sector_row, sector_col) = actual_col;
+    </Cast_Up>
+    
+  </Kernel>
+
+  <Kernel name="assign_pixels_to_centers" dims ="row, col" shape ="labels" 
+          data="Tensor L_src, Tensor A_src, Tensor B_src, int intensity_modifier, Tensor center_rows, Tensor center_cols, Tensor labels">
+    int self_channels[3] = { L_src(row, col), A_src(row, col), B_src(row, col) };
+    int self_coordinates[2] = {row, col};
+    
+    <Cast_Down dims ="sector_row, sector_col" shape ="center_rows">
+      
+      int min_distance = 1000000;
+      int closest_center_id = -1;
+      
+      <For_Neighbor dims ="neighbor_row, neighbor_col" shape ="center_rows">
+        int actual_neighbor_row = center_rows(neighbor_row, neighbor_col);
+        int actual_neighbor_col = center_cols(neighbor_row, neighbor_col);
+
+        int neighbor_channels[3] = { L_src(actual_neighbor_row, actual_neighbor_col), A_src(actual_neighbor_row, actual_neighbor_col), B_src(actual_neighbor_row, actual_neighbor_col) };
+        int neighbor_coordinates[2] = {actual_neighbor_row, actual_neighbor_col};
+        int neighbor_label = LINEAR_CAST(neighbor_row, neighbor_col, center_rows.min_span);
+        
+        int color_distance = 0;
+        UNROLL_FOR(int i = 0; i < 3; i++){
+          color_distance += SQUARE(self_channels[i] - neighbor_channels[i]);
+        }
+        color_distance = sqrtf(color_distance);
+        
+        int spatial_distance = 0;
+        UNROLL_FOR(int i = 0; i < 2; i++) {
+          spatial_distance += SQUARE(self_channels[i] - neighbor_channels[i]);  
+        }
+        spatial_distance = sqrtf(spatial_distance);
+        
+        int total_distance = color_distance + (density_modifier * spatial_distance);
+        if(total_distance < min_distance){
+          min_distance = total_distance;
+          closest_center = neighbor_label;
+        }
+          
+      </For_Neighbor>
+    </Cast_Down>
+    labels(row, col) = closest_center;
+    
+  </Kernel>
+  
+  
+</SLIC>
+
+

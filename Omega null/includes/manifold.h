@@ -1,5 +1,8 @@
 #pragma once
 
-#include"manifold/external_libraries.h"
-#include"manifold/macros.h"
+//includes and macros from header_macros, plus objects
 
+#include"header_manifold.h"
+
+//objects
+#include"manifold/translator.h"
