@@ -6,8 +6,6 @@ typedef unsigned int uint;
 typedef unsigned char uchar;
 typedef void kernel;
 
-
-
 //aquire the coordinates of the thread. works on 2d kernels as well as 1d, if youre okay with ignoring one of the dimensions.
 #define GET_DIMS(_maj_dim_, _min_dim_)							\
 	int _maj_dim_ = (blockIdx.x * blockDim.x) + threadIdx.x;	\
@@ -75,25 +73,4 @@ cudaError_t error = cudaGetLastError(); if(error != cudaSuccess) std::cout << st
 
 //inline functions
 
-namespace on {
-	static class Kernel {
-	public:
-		Kernel();
-		static uint _block_dim_x_;
-		static uint _block_dim_y_;
-		
-		static uint _grid_dim_x_;
-		static uint _grid_dim_y_;
 
-		static dim3 _num_blocks_;
-		static dim3 _threads_per_block_;
-
-		static void conf_2d(int maj_span, int min_span);
-		static void conf_1d(int maj_span);
-
-		static dim3 num_blocks() { return _num_blocks_; }
-		static dim3 threads_per_block() { return _threads_per_block_; }
-	};
-}
-
-#define KERNEL_SHAPE on::Kernel::num_blocks(), on::Kernel::threads_per_block()
