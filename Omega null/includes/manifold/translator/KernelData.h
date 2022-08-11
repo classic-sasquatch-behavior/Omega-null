@@ -12,6 +12,8 @@ ON_BEING KernelData{
 	std::string shape;
 	std::string data;
 
+	std::string raw_xml;
+
 	std::string maj_dim;
 	std::string min_dim;
 	int num_dims() {

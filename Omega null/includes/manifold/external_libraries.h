@@ -3,6 +3,7 @@
 
 #include<iostream>
 #include<fstream>
+#include<sstream>
 using std::endl;
 typedef std::ofstream Filestream;
 

@@ -8,6 +8,11 @@ ON_STRUCTURE Meta{
 		static std::string topdir = "C:/Users/Thelonious/source/repos/Omega null/";
 	};
 
+	ON_STRUCTURE Configuration{
+		const bool ON_EMBEDDED = true;
+		const bool ON_FILE = true;
+	};
+
 	ON_PROCESS Debug{
 		template<typename Text>
 		static void print(Text text) {
