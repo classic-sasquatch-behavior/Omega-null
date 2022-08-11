@@ -9,7 +9,7 @@ ON_STRUCTURE Meta{
 	};
 
 	ON_STRUCTURE Configuration{
-		const bool ON_EMBEDDED = true;
+		const bool ON_EMBEDDED = false;
 		const bool ON_FILE = true;
 	};
 
