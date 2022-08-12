@@ -1,16 +1,12 @@
 
 #include"global_config.h"
 
-
-
-#ifdef ON_LANGUAGE
+#ifdef ON_SUBSTRATE
 namespace on {
-
-	on_Structure Language{
+	on_Structure Substrate {
 		static void readme() {
-			
+
 		}
 	}
-
 }
 #endif

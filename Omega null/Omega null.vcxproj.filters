@@ -36,10 +36,7 @@
     <ClCompile Include="readme.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="on_substrate\include\manifold\useful_cuda_macros.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="on_substrate\readme.cpp">
+    <ClCompile Include="demos\on_substrate\readme.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="on_language\readme.cpp">
@@ -48,18 +45,15 @@
     <ClCompile Include="on_library\readme.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="on_vision\readme.cpp">
+    <ClCompile Include="demos\on_vision\readme.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shared\manifold\manifold.h">
+    <ClInclude Include="common\include\global_manifold.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\manifold\external_libraries.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\manifold\translator.h">
+    <ClInclude Include="common\include\global_manifold\external_libraries.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="on_language\src\xml translator\translator\Loader.h">
@@ -74,49 +68,40 @@
     <ClInclude Include="on_language\src\xml translator\translator\Writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\manifold\header_manifold.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="on_language\src\xml translator\translator\KernelData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_library\include\global_constants.h">
+    <ClInclude Include="common\include\global_manifold\global_constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_library\include\macros.h">
+    <ClInclude Include="common\include\global_manifold\on_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="on_library\src\Tensor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_library\include\cuda_macros.h">
+    <ClInclude Include="common\include\global_manifold\cuda_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="on_library\src\Launch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_library\include\omega_null.h">
+    <ClInclude Include="on_library\include\on_library.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_substrate\include\manifold\objects\Tensor.h">
+    <ClInclude Include="common\include\omega_null.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_substrate\include\manifold\external_libraries.h">
+    <ClInclude Include="on_language\include\on_language.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_substrate\include\manifold\global_constants.h">
+    <ClInclude Include="global_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_substrate\include\manifold\macros.h">
+    <ClInclude Include="demos\on_vision\include\on_vision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_substrate\include\manifold\objects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="on_substrate\include\manifold.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\shared_manifold.h">
+    <ClInclude Include="demos\on_substrate\include\on_substrate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -132,7 +117,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="on_library\src\Tensor.cu" />
-    <CudaCompile Include="on_substrate\src\main.cu" />
-    <CudaCompile Include="on_substrate\src\tensor\Tensor.cu" />
+    <CudaCompile Include="demos\on_substrate\src\main.cu" />
   </ItemGroup>
 </Project>
