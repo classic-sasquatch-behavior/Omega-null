@@ -1,8 +1,7 @@
-
 #include"global_config.h"
+#include"omega_null.h"
 
 
-namespace on {
 	/***********************************OMEGA NULL*******************************************
 	This repository is a series of projects which develop the Omega Null language and library.
 	There are four projects, two of which comprise the useful part of the library, intended to
@@ -18,40 +17,26 @@ namespace on {
 	on_vision: computer vision demonstration
 	*/
 
-
-}
-
-
-
-using namespace on;
 int main() {
-	#ifdef ON_LANGUAGE
-	using ON_STRUCTURE on::Language;
-	on::Language::readme();
-	#endif
 
 	#ifdef ON_LIBRARY
-	using ON_STRUCTURE on::Library;
-	on::Library::readme();
+		on::Library::main();
+	#endif
+
+	#ifdef ON_LANGUAGE
+		on::Language::main();
 	#endif
 
 	#ifdef ON_SUBSTRATE
-	using ON_STRUCTURE on::Substrate;
-	on::Substrate::readme();
+		on::Substrate::main();
 	#endif
 
 	#ifdef ON_VISION
-	using ON_STRUCTURE on::Vision;
-	on::Vision::readme();
+		on::Vision::main();
 	#endif
 
-	namespace demo_input {
-
-
-
-
-
-
+	//write test code here
+	{
 
 
 

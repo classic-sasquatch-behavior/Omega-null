@@ -118,7 +118,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega null\Omega null;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,13 +144,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="on_language\readme.cpp" />
-    <ClCompile Include="on_library\readme.cpp" />
+    <ClCompile Include="on_language\language_main.cpp" />
+    <ClCompile Include="on_library\library_main.cpp" />
     <ClCompile Include="on_library\src\Launch.cpp" />
     <ClCompile Include="on_language\src\compile.cpp" />
-    <ClCompile Include="demos\on_substrate\readme.cpp" />
-    <ClCompile Include="demos\on_vision\readme.cpp" />
-    <ClCompile Include="readme.cpp" />
+    <ClCompile Include="demos\on_substrate\substrate_main.cpp" />
+    <ClCompile Include="demos\on_vision\vision_main.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="util\pugixml.cpp" />
     <ClCompile Include="on_language\src\xml translator\Loader.cpp" />
     <ClCompile Include="on_language\src\xml translator\Reader.cpp" />
@@ -158,8 +158,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demos\on_substrate\include\on_substrate.h" />
+    <ClInclude Include="demos\on_substrate\include\substrate_manifold.h" />
     <ClInclude Include="demos\on_vision\include\on_vision.h" />
+    <ClInclude Include="demos\on_vision\include\vision_manifold.h" />
     <ClInclude Include="global_config.h" />
+    <ClInclude Include="on_language\include\language_manifold.h" />
     <ClInclude Include="on_language\include\on_language.h" />
     <ClInclude Include="common\include\global_manifold.h" />
     <ClInclude Include="common\include\global_manifold\external_libraries.h" />
@@ -168,7 +171,7 @@
     <ClInclude Include="on_language\src\xml translator\translator\Meta.h" />
     <ClInclude Include="on_language\src\xml translator\translator\Reader.h" />
     <ClInclude Include="on_language\src\xml translator\translator\Writer.h" />
-    <ClInclude Include="common\include\global_manifold\global_constants.h" />
+    <ClInclude Include="on_library\include\library_manifold.h" />
     <ClInclude Include="on_library\include\on_library.h" />
     <ClInclude Include="on_library\src\Launch.h" />
     <ClInclude Include="common\include\global_manifold\on_macros.h" />

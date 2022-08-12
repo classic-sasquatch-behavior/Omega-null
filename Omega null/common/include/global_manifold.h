@@ -1,8 +1,6 @@
 #pragma once
 
-//includes and macros from header_macros, plus objects
+#include"global_manifold/external_libraries.h"
+#include"global_manifold/cuda_macros.h"
+#include"global_manifold/on_macros.h"
 
-#include"header_manifold.h"
-
-//objects
-#include"manifold/translator.h"
