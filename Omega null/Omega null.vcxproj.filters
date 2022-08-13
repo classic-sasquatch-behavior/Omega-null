@@ -30,22 +30,10 @@
     <ClCompile Include="on_language\src\xml translator\Loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="on_library\src\Launch.cpp">
+    <ClCompile Include="on_library\src\objects\Launch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="demos\on_substrate\substrate_main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="on_language\language_main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="on_library\library_main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="demos\on_vision\vision_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,13 +62,13 @@
     <ClInclude Include="common\include\global_manifold\on_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_library\src\Tensor.h">
+    <ClInclude Include="on_library\include\library_manifold\objects\tensor\Tensor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="common\include\global_manifold\cuda_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_library\src\Launch.h">
+    <ClInclude Include="on_library\include\library_manifold\objects\Launch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="on_library\include\on_library.h">
@@ -92,7 +80,7 @@
     <ClInclude Include="on_language\include\on_language.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="global_config.h">
+    <ClInclude Include="common\include\global_manifold\global_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="demos\on_vision\include\on_vision.h">
@@ -113,6 +101,9 @@
     <ClInclude Include="on_library\include\library_manifold.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="common\include\global_manifold\global_objects\Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="util\.gitignore" />
@@ -125,7 +116,7 @@
     <None Include="on_language\src\interface\examples\SLIC.on" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="on_library\src\Tensor.cu" />
+    <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
     <CudaCompile Include="demos\on_substrate\src\main.cu" />
   </ItemGroup>
 </Project>

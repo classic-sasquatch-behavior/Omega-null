@@ -54,23 +54,7 @@ typedef void kernel;
 		}																			 \
 }		
 
-
-
 #define ON_CUDA_ERROR_CHECK(_where_) { \
 cudaError_t error = cudaGetLastError(); if(error != cudaSuccess) std::cout << std::endl << "CUDA error " << cudaGetErrorName(error) \
 << " at " << #_where_ <<": " << cudaGetErrorString(error) << std::endl;}
-
-
-
-
-
-
-
-
-
-
-
-
-//inline functions
-
 

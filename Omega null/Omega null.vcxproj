@@ -118,13 +118,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\ArrayFire\v3\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\demos\on_vision\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\on_library\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\on_language\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenCL.lib;opencv_world452d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cuda.lib;cudart.lib;afcuda.lib;OpenCL.lib;opencv_world452d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\ArrayFire\v3\lib;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,12 +144,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="on_language\language_main.cpp" />
-    <ClCompile Include="on_library\library_main.cpp" />
-    <ClCompile Include="on_library\src\Launch.cpp" />
+    <ClCompile Include="on_library\src\objects\Launch.cpp" />
     <ClCompile Include="on_language\src\compile.cpp" />
-    <ClCompile Include="demos\on_substrate\substrate_main.cpp" />
-    <ClCompile Include="demos\on_vision\vision_main.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="util\pugixml.cpp" />
     <ClCompile Include="on_language\src\xml translator\Loader.cpp" />
@@ -157,11 +153,12 @@
     <ClCompile Include="on_language\src\xml translator\Writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common\include\global_manifold\global_objects\Debug.h" />
     <ClInclude Include="demos\on_substrate\include\on_substrate.h" />
     <ClInclude Include="demos\on_substrate\include\substrate_manifold.h" />
     <ClInclude Include="demos\on_vision\include\on_vision.h" />
     <ClInclude Include="demos\on_vision\include\vision_manifold.h" />
-    <ClInclude Include="global_config.h" />
+    <ClInclude Include="common\include\global_manifold\global_config.h" />
     <ClInclude Include="on_language\include\language_manifold.h" />
     <ClInclude Include="on_language\include\on_language.h" />
     <ClInclude Include="common\include\global_manifold.h" />
@@ -173,9 +170,9 @@
     <ClInclude Include="on_language\src\xml translator\translator\Writer.h" />
     <ClInclude Include="on_library\include\library_manifold.h" />
     <ClInclude Include="on_library\include\on_library.h" />
-    <ClInclude Include="on_library\src\Launch.h" />
+    <ClInclude Include="on_library\include\library_manifold\objects\Launch.h" />
     <ClInclude Include="common\include\global_manifold\on_macros.h" />
-    <ClInclude Include="on_library\src\Tensor.h" />
+    <ClInclude Include="on_library\include\library_manifold\objects\tensor\Tensor.h" />
     <ClInclude Include="common\include\global_manifold\cuda_macros.h" />
     <ClInclude Include="common\include\omega_null.h" />
   </ItemGroup>
@@ -190,7 +187,7 @@
     <None Include="on_language\src\interface\examples\SLIC.on" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="on_library\src\Tensor.cu" />
+    <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
     <CudaCompile Include="demos\on_substrate\src\main.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,4 +1,3 @@
-#include"manifold.h"
 
 ON_STRUCTURE Writer {
 

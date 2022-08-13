@@ -1,4 +1,4 @@
-#include"manifold.h"
+
 
 /*
 	had to include this to the .vcxproj:

@@ -19,36 +19,9 @@
 
 int main() {
 
-	#ifdef ON_LIBRARY
-		on::Library::main();
-	#endif
-
-	#ifdef ON_LANGUAGE
-		on::Language::main();
-	#endif
-
-	#ifdef ON_SUBSTRATE
-		on::Substrate::main();
-	#endif
-
-	#ifdef ON_VISION
-		on::Vision::main();
-	#endif
-
-	//write test code here
-	{
 
 
 
-
-
-
-
-
-
-
-
-	}
 
 	return 0;
 }
