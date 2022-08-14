@@ -160,11 +160,6 @@
     <ClInclude Include="demos\on_vision\include\vision_manifold.h" />
     <ClInclude Include="common\include\global_manifold\global_config.h" />
     <ClInclude Include="on_language\include\language_manifold.h" />
-    <ClInclude Include="on_language\include\language_manifold\objects\KernelData.h" />
-    <ClInclude Include="on_language\include\language_manifold\objects\Loader.h" />
-    <ClInclude Include="on_language\include\language_manifold\objects\Meta.h" />
-    <ClInclude Include="on_language\include\language_manifold\objects\Reader.h" />
-    <ClInclude Include="on_language\include\language_manifold\objects\Writer.h" />
     <ClInclude Include="on_language\include\on_language.h" />
     <ClInclude Include="common\include\global_manifold.h" />
     <ClInclude Include="common\include\global_manifold\external_libraries.h" />

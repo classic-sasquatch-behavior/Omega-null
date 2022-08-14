@@ -104,21 +104,6 @@
     <ClInclude Include="common\include\global_manifold\global_objects\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_language\include\language_manifold\objects\KernelData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="on_language\include\language_manifold\objects\Loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="on_language\include\language_manifold\objects\Meta.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="on_language\include\language_manifold\objects\Reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="on_language\include\language_manifold\objects\Writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="util\.gitignore" />
