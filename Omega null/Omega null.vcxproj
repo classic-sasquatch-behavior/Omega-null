@@ -153,7 +153,7 @@
     <ClCompile Include="on_language\src\xml translator\Writer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common\include\global_manifold\global_objects\Debug.h" />
+    <ClInclude Include="on_library\include\library_manifold\objects\Debug.h" />
     <ClInclude Include="demos\on_substrate\include\on_substrate.h" />
     <ClInclude Include="demos\on_substrate\include\substrate_manifold.h" />
     <ClInclude Include="demos\on_vision\include\on_vision.h" />
@@ -188,7 +188,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
-    <CudaCompile Include="demos\on_substrate\src\main.cu" />
+    <CudaCompile Include="demos\on_substrate\src\substrate_main.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

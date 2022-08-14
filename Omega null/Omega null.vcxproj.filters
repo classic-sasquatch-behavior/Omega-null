@@ -101,7 +101,7 @@
     <ClInclude Include="on_library\include\library_manifold.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="common\include\global_manifold\global_objects\Debug.h">
+    <ClInclude Include="on_library\include\library_manifold\objects\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -117,6 +117,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
-    <CudaCompile Include="demos\on_substrate\src\main.cu" />
+    <CudaCompile Include="demos\on_substrate\src\substrate_main.cu" />
   </ItemGroup>
 </Project>
