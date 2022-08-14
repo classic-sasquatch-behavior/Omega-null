@@ -1,15 +1,16 @@
+#include"global_manifold.h"
+#include"on_language.h"
 
 
 
 
 
+namespace on{
+	On_Structure Reader{
+		using On_Structure Meta;
+		using On_Structure Writer;
 
-
-ON_STRUCTURE Reader {
-	using ON_STRUCTURE Meta;
-	using ON_STRUCTURE Writer;
-
-		void Read::next_node(Node root, KernelData data, std::ofstream & cuda_file) {
+		void Read::next_node(Node root, KernelData data, std::ofstream& cuda_file) {
 
 		std::string structure_type = root.name();
 
@@ -32,4 +33,5 @@ ON_STRUCTURE Reader {
 		}
 
 
+	}
 }

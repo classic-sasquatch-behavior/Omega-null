@@ -1,8 +1,9 @@
 #pragma once
+#include"global_manifold.h"
+#include"on_language.h"
 
-
-
-ON_BEING KernelData{
+namespace on {
+	On_Being KernelData{
 
 	KernelData() {}
 	int layer = 0;
@@ -37,5 +38,7 @@ ON_BEING KernelData{
 		}
 	}
 
-};
+	};
+}
+
 

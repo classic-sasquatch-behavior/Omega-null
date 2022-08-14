@@ -1,9 +1,11 @@
 #pragma once
+#include"global_manifold.h"
+#include"on_language.h"
 
+namespace on {
+	On_Structure Loader{
 
-ON_STRUCTURE Loader{
-
-	ON_BEING File{
+	On_Being File{
 
 		fs::path source;
 		std::fstream stream;
@@ -17,7 +19,7 @@ ON_STRUCTURE Loader{
 
 	};
 
-	ON_PROCESS Load {
+	On_Process Load {
 		static void structures(std::queue<fs::path> &file_queue);
 
 		static void on_file(fs::path current_path, std::vector<Node>& kernels);
@@ -26,15 +28,16 @@ ON_STRUCTURE Loader{
 
 		static Node xml(std::string document);
 
-		static void project(std::string topdir, std::queue<fs::path>&file_queue);
+		static void project(std::string topdir, std::queue<fs::path>& file_queue);
 
 		static std::ofstream file(std::string file_name, std::string extension);
 
 		static KernelData kernel_data(Node root);
 	};
 
-	ON_STRUCTURE LoadStructures{
+	On_Structure LoadStructures{
 		static std::queue<fs::path> file_queue;
 	}
 
+	}
 }

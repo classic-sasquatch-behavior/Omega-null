@@ -1,5 +1,9 @@
+#include"global_manifold.h"
+#include"on_language.h"
 
-ON_STRUCTURE Writer {
+
+namespace on {
+	On_Structure Writer{
 
 	std::string Get::tabs(int layer) {
 		std::string result = "";
@@ -10,7 +14,7 @@ ON_STRUCTURE Writer {
 	}
 
 
-	void Write::launcher_declaration(KernelData& kernel, Filestream& header) {
+	void Write::launcher_declaration(KernelData & kernel, Filestream & header) {
 
 		std::string name = kernel.name;
 		std::string shape = kernel.shape;
@@ -21,15 +25,15 @@ ON_STRUCTURE Writer {
 		header << "void " << name << "_launch(" << data << ");" << std::endl;
 	}
 
-	void Write::to_kernel(KernelData& data, Filestream& cuda_file, std::string content) {
+	void Write::to_kernel(KernelData & data, Filestream & cuda_file, std::string content) {
 		cuda_file << Get::tabs(data.layer) << content << std::endl;
 	}
 
-	void Write::text_to_kernel(Filestream& cuda_file, std::string content) {
+	void Write::text_to_kernel(Filestream & cuda_file, std::string content) {
 		cuda_file << content;
 	}
 
-	void Write::kernel_declaration(Node node, KernelData& kernel, Filestream& cuda_file) {
+	void Write::kernel_declaration(Node node, KernelData & kernel, Filestream & cuda_file) {
 		std::string name = kernel.name;
 		std::string dims = kernel.dims;
 		std::string shape = kernel.shape;
@@ -40,31 +44,31 @@ ON_STRUCTURE Writer {
 		Write::to_kernel(kernel, cuda_file, "CHECK_BOUNDS(" + shape + ".maj_span, " + shape + ".min_span);");
 	}
 
-	void Write::for_element(Node node, KernelData& data, Filestream& cuda_file) {
+	void Write::for_element(Node node, KernelData & data, Filestream & cuda_file) {
 
 	}
 
-	void Write::for_neighbor(Node node, KernelData& data, Filestream& cuda_file) {
+	void Write::for_neighbor(Node node, KernelData & data, Filestream & cuda_file) {
 
 	}
 
-	void Write::for_maj(Node node, KernelData& data, Filestream& cuda_file) {
+	void Write::for_maj(Node node, KernelData & data, Filestream & cuda_file) {
 
 	}
 
-	void Write::for_min(Node node, KernelData& data, Filestream& cuda_file) {
+	void Write::for_min(Node node, KernelData & data, Filestream & cuda_file) {
 
 	}
 
-	void Write::cast_down(Node node, KernelData& data, Filestream& cuda_file) {
+	void Write::cast_down(Node node, KernelData & data, Filestream & cuda_file) {
 
 	}
 
-	void Write::cast_up(Node node, KernelData& data, Filestream& cuda_file) {
+	void Write::cast_up(Node node, KernelData & data, Filestream & cuda_file) {
 
 	}
 
-	void Write::launcher_definition(KernelData& kernel, Filestream& cuda_file) {
+	void Write::launcher_definition(KernelData & kernel, Filestream & cuda_file) {
 
 		std::string name = kernel.name;
 		std::string shape = kernel.shape;
@@ -89,4 +93,5 @@ ON_STRUCTURE Writer {
 		Write::to_kernel(kernel, cuda_file, "}");
 	}
 
+	}
 }

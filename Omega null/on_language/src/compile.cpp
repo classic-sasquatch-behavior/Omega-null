@@ -1,4 +1,5 @@
-
+#include"global_manifold.h"
+#include"on_language.h"
 
 /*
 	had to include this to the .vcxproj:
@@ -12,10 +13,11 @@
   figure out how to make this work later.
 */
 
-using ON_STRUCTURE Meta;
-using ON_STRUCTURE Writer;
-using ON_STRUCTURE Loader;
-using ON_STRUCTURE Reader;
+using namespace on;
+using On_Structure on::Meta;
+using On_Structure on::Writer;
+using On_Structure on::Loader;
+using On_Structure on::Reader;
 int main() {
 
 	Load::project(Parameter::topdir, LoadStructures::file_queue);
