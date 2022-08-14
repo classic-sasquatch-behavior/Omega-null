@@ -44,19 +44,19 @@
     <ClInclude Include="common\include\global_manifold\external_libraries.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_language\src\xml translator\translator\Loader.h">
+    <ClInclude Include="on_language\include\translator\Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_language\src\xml translator\translator\Meta.h">
+    <ClInclude Include="on_language\include\translator\Meta.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_language\src\xml translator\translator\Reader.h">
+    <ClInclude Include="on_language\include\translator\Reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_language\src\xml translator\translator\Writer.h">
+    <ClInclude Include="on_language\include\translator\Writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="on_language\src\xml translator\translator\KernelData.h">
+    <ClInclude Include="on_language\include\translator\KernelData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="common\include\global_manifold\on_macros.h">

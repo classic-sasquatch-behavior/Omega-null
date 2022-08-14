@@ -163,11 +163,11 @@
     <ClInclude Include="on_language\include\on_language.h" />
     <ClInclude Include="common\include\global_manifold.h" />
     <ClInclude Include="common\include\global_manifold\external_libraries.h" />
-    <ClInclude Include="on_language\src\xml translator\translator\KernelData.h" />
-    <ClInclude Include="on_language\src\xml translator\translator\Loader.h" />
-    <ClInclude Include="on_language\src\xml translator\translator\Meta.h" />
-    <ClInclude Include="on_language\src\xml translator\translator\Reader.h" />
-    <ClInclude Include="on_language\src\xml translator\translator\Writer.h" />
+    <ClInclude Include="on_language\include\translator\KernelData.h" />
+    <ClInclude Include="on_language\include\translator\Loader.h" />
+    <ClInclude Include="on_language\include\translator\Meta.h" />
+    <ClInclude Include="on_language\include\translator\Reader.h" />
+    <ClInclude Include="on_language\include\translator\Writer.h" />
     <ClInclude Include="on_library\include\library_manifold.h" />
     <ClInclude Include="on_library\include\on_library.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\Launch.h" />
