@@ -7,26 +7,12 @@
 
 namespace on {
 
-	//TODO move these enums to common
-	enum host_or_device { //need a better name
-		host = 0,
-		device = 1,
-	};
-
-	enum direction {
-		host_to_device = 0,
-		device_to_host = 1,
-	};
-	//end move to common
-
 	template<typename NumberType>
 	struct Tensor {
-	typedef NumberType Number;
-	public:
+		typedef NumberType Number;
+		public:
 		Number* device_data;
 		Number* host_data;
-
-		on::host_or_device current = 0;
 
 		uint num_dims = 0;
 
@@ -37,10 +23,35 @@ namespace on {
 
 		uint* spans[4] = { &maj_span, &min_span, &cub_span, &hyp_span };
 
+		private:
+		bool synced = false;
+		on::host_or_device current = 0;
+
+		void ready() {
+			synced = true;
+		}
+
+		void sync() {
+			if (!synced) {
+				switch (current) {
+				case on::host: copy(on::host_to_device); break;
+				case on::device: copy(on::device_to_host); break;
+				default: break; //TODO add error
+				}
+				synced = true; //TODO overload ++ for bools
+			}
+		}
+
+		void desync(on::host_or_device change) {
+			current = change;
+			synced = false;
+		}
+
+		public:
 		Tensor() { 
 			initialize_memory(); 
 			fill_memory(0); 
-			synced = true; 
+			ready();
 		}
 
 		Tensor(uint* in_spans[], Number constant = 0){
@@ -51,21 +62,11 @@ namespace on {
 
 			initialize_memory();
 			fill_memory(_constant);
-			synced = true;
+			ready();
 		}
 
-
-		//old, delete
-		Tensor(int _maj_span, int _min_span, Number _constant) {
-			maj_span = _maj_span;
-			min_span = _min_span;
-			initialize_memory();
-			fill_memory(_constant);
-			sync();
-		}
-
-
-		inline int num_elements() { return maj_span * min_span; }
+		public:
+		int num_elements() { return maj_span * min_span; }
 		inline int bytesize() { return (num_elements() * sizeof(NumberType)); }
 
 		//the host side of these next two functions are kinda messed up
@@ -86,14 +87,22 @@ namespace on {
 			cudaMemcpy(host_data, device_data, bytesize(), cudaMemcpyDeviceToHost);
 		}
 
+		void copy(on::direction input) {
+			switch (input) {
+			case on::host_to_device:
+			case on::device_to_host:
+			default: break; //TODO add error message
+			}
+		}
+
+	#pragma region interop
+		public:
 		__host__ __device__ void operator=(Tensor input) {
 			maj_span = input.maj_span;
 			min_span = input.min_span;
 			host_data = input.host_data;
 			device_data = input.device_data;
 		}
-
-		#pragma region interoperability
 
 		//doesn't work
 		__host__ __device__ void operator=(af::array input) {
@@ -111,46 +120,18 @@ namespace on {
 		//	//delete host_data;
 		//}
 
-		//attempt at interoperability with array
+		//doesn't work
 		operator af::array() { af::array temp(maj_span, min_span, const_cast<const uchar*>(device_data), afDevice); return temp; }
-
-		void copy(on::direction input) {
-			switch (input) {
-			case on::host_to_device:
-			case on::device_to_host:
-			default: break; //TODO add error message
-			}
-		}
-
-		#pragma endregion
-
-	private:
-		bool synced = false;
-
-		void sync() {
-			if (!synced) {
-				switch (current) {
-				case on::host: copy(on::host_to_device); break;
-				case on::device: copy(on::device_to_host); break;
-				default: break; //TODO add error
-				}
-				synced = true; //TODO overload ++ for bools
-			}
-		}
-
-		void desync(on::host_or_device changes) {
-			current = changes;
-			synced = false;
-		}
-
+	#pragma endregion
 	};
 
 
+	#ifdef ON_USE_RANDOM
 	template<typename Number>
 	Tensor<Number>& randu(uint maj_span, uint min_span);
 
 
 	Tensor<uchar> rand_ones_and_zeroes(uint maj_span, uint min_span);
-
+	#endif
 
 }

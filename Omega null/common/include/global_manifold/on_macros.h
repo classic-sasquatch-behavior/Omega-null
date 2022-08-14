@@ -18,9 +18,18 @@ inline int now_ms() { return std::chrono::time_point_cast<std::chrono::milliseco
 //a namespace which contains both data and functions
 #define On_Structure namespace
 
-//#define __begin_kernel__
-//
-//#define __end_kernel__
+namespace on {
+	enum host_or_device { //find a better name
+		host = 0,
+		device = 1,
+	};
+
+	enum direction {
+		host_to_device = 0,
+		device_to_host = 1,
+	};
+}
+
 
 
 

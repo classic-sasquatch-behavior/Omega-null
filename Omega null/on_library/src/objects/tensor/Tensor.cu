@@ -1,7 +1,7 @@
 #include"global_manifold.h"
 #include"on_library.h"
 
-
+#ifdef ON_USE_RANDOM
 namespace on {
 
 
@@ -79,3 +79,4 @@ namespace on {
 
 
 }
+#endif
