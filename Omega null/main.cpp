@@ -1,4 +1,4 @@
-#include"global_config.h"
+
 #include"omega_null.h"
 
 

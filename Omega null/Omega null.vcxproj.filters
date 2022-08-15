@@ -80,9 +80,6 @@
     <ClInclude Include="on_language\include\on_language.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="common\include\global_manifold\global_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="demos\on_vision\include\on_vision.h">
       <Filter>Header Files</Filter>
     </ClInclude>

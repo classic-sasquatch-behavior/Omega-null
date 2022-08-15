@@ -26,7 +26,7 @@ __global__ kernel conway_life(on::Tensor<uchar> present, on::Tensor<uchar> futur
 uchar* d_present;
 uchar* d_future;
 
-int main() {
+int substrate_main() {
 	srand(time(NULL));
 	on::Tensor<uchar> present = on::rand_ones_and_zeroes(WIDTH, HEIGHT);
 	on::Tensor<uchar> future(WIDTH, HEIGHT, (uchar)0);

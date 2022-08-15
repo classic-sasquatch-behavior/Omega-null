@@ -18,7 +18,7 @@ using On_Structure on::Meta;
 using On_Structure on::Writer;
 using On_Structure on::Loader;
 using On_Structure on::Reader;
-int main() {
+void compile() {
 
 	Load::project(Parameter::topdir, LoadStructures::file_queue);
 	Load::structures(LoadStructures::file_queue);
@@ -28,5 +28,5 @@ int main() {
 
 	//4) find and replace #include"name.on" with #include"name.h"
 
-	return 0;
+
 }

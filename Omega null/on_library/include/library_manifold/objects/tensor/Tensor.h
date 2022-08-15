@@ -61,7 +61,7 @@ namespace on {
 			}
 
 			initialize_memory();
-			fill_memory(_constant);
+			fill_memory(constant);
 			ready();
 		}
 
