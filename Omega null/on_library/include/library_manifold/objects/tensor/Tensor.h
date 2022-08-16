@@ -9,23 +9,57 @@ namespace on {
 
 	template<typename NumberType>
 	struct Tensor {
-		typedef NumberType Number;
-		public:
+	typedef NumberType Number;
+
+	#pragma region data	
+
 		Number* device_data;
 		Number* host_data;
 
 		uint num_dims = 0;
+		std::vector<uint> spans = { 1, 1, 1, 1 };
 
-		uint maj_span = 1;
-		uint min_span = 1;
-		uint cub_span = 1;
-		uint hyp_span = 1;
+		uint& maj_span = spans[0];
+		uint& min_span = spans[1];
+		uint& cub_span = spans[2];
+		uint& hyp_span = spans[3];
 
-		uint* spans[4] = { &maj_span, &min_span, &cub_span, &hyp_span };
-
-		private:
 		bool synced = false;
-		on::host_or_device current = 0;
+		on::host_or_device current = host;
+
+	#pragma endregion
+
+	#pragma region structors
+
+		Tensor() {
+			initialize_memory();
+			fill_memory(0);
+			ready();
+		}
+
+		Tensor(std::vector<uint> in_spans, Number constant = 0) {
+			int num_dims_in = in_spans.size();
+			for (int i = 0; i < num_dims_in; i++) {
+				int current_span = in_spans[i];
+				if (current_span > 1) {
+					spans[i] = in_spans[i];
+					num_dims++;
+				}
+			}
+
+			initialize_memory();
+			fill_memory(constant);
+			ready();
+		}
+
+		//~Tensor() {
+		//	cudaFree(device_data);
+		//	delete host_data;
+		//}
+
+	#pragma endregion
+
+	#pragma region core functions
 
 		void ready() {
 			synced = true;
@@ -34,49 +68,39 @@ namespace on {
 		void sync() {
 			if (!synced) {
 				switch (current) {
-				case on::host: copy(on::host_to_device); break;
-				case on::device: copy(on::device_to_host); break;
+				case on::host: upload(); break;
+				case on::device: download(); break;
 				default: break; //TODO add error
 				}
-				synced = true; //TODO overload ++ for bools
+				ready();
 			}
 		}
 
-		void desync(on::host_or_device change) {
-			current = change;
+		void desync(on::host_or_device changing) {
+			current = changing;
 			synced = false;
 		}
 
-		public:
-		Tensor() { 
-			initialize_memory(); 
-			fill_memory(0); 
-			ready();
-		}
+		//void copy(on::direction input) {
+		//	switch (input) {
+		//	case on::host_to_device:
+		//	case on::device_to_host:
+		//	default: break; //TODO add error message
+		//	}
+		//}
 
-		Tensor(uint* in_spans[], Number constant = 0){
-			num_dims = sizeof(in_spans)/sizeof(in_spans[0]);
-			for (int i = 0; i < num_dims; i++) {
-				spans[i] = in_spans[i];
-			}
+	#pragma endregion
 
-			initialize_memory();
-			fill_memory(constant);
-			ready();
-		}
+	#pragma region memory functions
 
-		public:
-		int num_elements() { return maj_span * min_span; }
-		inline int bytesize() { return (num_elements() * sizeof(NumberType)); }
-
-		//the host side of these next two functions are kinda messed up
 		void initialize_memory() {
-			cudaMalloc(&device_data, bytesize());
+			cudaMalloc( (void**)&device_data, bytesize());
+			host_data = (Number*)malloc(bytesize());
 		}
 
 		void fill_memory(Number input) {
 			cudaMemset(device_data, input, bytesize());
-			//host_data = { new Number[enumsize()] = { input } }; //whut
+			std::fill_n(host_data, num_elements(), input);
 		}
 
 		void upload() {
@@ -87,16 +111,26 @@ namespace on {
 			cudaMemcpy(host_data, device_data, bytesize(), cudaMemcpyDeviceToHost);
 		}
 
-		void copy(on::direction input) {
-			switch (input) {
-			case on::host_to_device:
-			case on::device_to_host:
-			default: break; //TODO add error message
-			}
+	#pragma endregion
+
+	#pragma region fetching functions
+
+		//get data
+		__host__ __device__ Number& operator ()(int maj, int min = 0, int cub = 0, int hyp = 0) {
+			#ifdef __CUDA_ARCH__			
+			return device_data[(maj * min_span) + min];
+			#else
+			return host_data[(maj * min_span) + min];
+			#endif
 		}
 
+		int num_elements() { return maj_span * min_span; }
+		int bytesize() { return (num_elements() * sizeof(NumberType)); }
+
+	#pragma endregion
+
+
 	#pragma region interop
-		public:
 		__host__ __device__ void operator=(Tensor input) {
 			maj_span = input.maj_span;
 			min_span = input.min_span;
@@ -112,17 +146,12 @@ namespace on {
 			device_data = input.device<Number>();
 		}
 
-		__device__ Number& operator ()(int maj, int min) { return device_data[(maj * min_span) + min]; }
-		//__host__ Number& operator ()(int maj, int min) { return host_data[(maj * min_span) + min]; }
 
-		//~Tensor() {
-		//	cudaFree(device_data);
-		//	//delete host_data;
-		//}
 
 		//doesn't work
 		operator af::array() { af::array temp(maj_span, min_span, const_cast<const uchar*>(device_data), afDevice); return temp; }
 	#pragma endregion
+
 	};
 
 

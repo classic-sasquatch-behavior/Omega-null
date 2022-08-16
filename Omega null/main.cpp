@@ -10,7 +10,7 @@
 
 	on_language: a framework for describing kernels, and code for the associated precompiler.
 
-	on_library: a matrix storage library designed for easy interoperability
+	on_library: a matrix manipulation library designed for interoperability with other libraries and CUDA
 
 	on_substrate: cellular automaton demonstration
 
@@ -21,6 +21,9 @@ int main() {
 
 
 
+	on::Tensor example({100, 100}, (uchar)5);
+
+	on::Debug::Print::tensor(example);
 
 
 	return 0;
