@@ -7,11 +7,10 @@
 
 namespace on {
 
-	template<typename NumberType>
+	template<typename Number>
 	struct Tensor {
-	typedef NumberType Number;
 
-	#pragma region data	
+	#pragma region metadata	
 
 		Number* device_data;
 		Number* host_data;
@@ -46,7 +45,6 @@ namespace on {
 					num_dims++;
 				}
 			}
-
 			initialize_memory();
 			fill_memory(constant);
 			ready();
@@ -54,7 +52,9 @@ namespace on {
 
 		~Tensor() {
 			cudaFree(device_data);
-			delete host_data; //this is incorrect, causes a heap error when the destructor is called.
+			free(host_data); //should be free, because I used malloc in initialize memory... right? 
+							 //evidently not, because I still get that heap error. that or theres another problem.
+							 //the fact that I'm just cutting and running in the main function probbaly doesnt help.
 		}
 
 	#pragma endregion
@@ -127,6 +127,10 @@ namespace on {
 
 		#pragma region transfer memory
 
+		//bytesize will always be accurate as long as the meta data is accurate, but can cuda memcpy allocate space on its own, or should I be managing 
+		//the memory completely manually? (i.e. freeing and reallocating it every time).
+		//CUDA has gotten pretty good about stuff like that recently so for now I wont worry about it unless it becomes a problem. If you start getting
+		//I guess device memory leaks, start here by controlling the memory more carefully.
 		void upload() {
 			cudaMemcpy(device_data, host_data, bytesize(), cudaMemcpyHostToDevice);
 		}
@@ -151,7 +155,7 @@ namespace on {
 		}
 
 		int num_elements() { return maj_span * min_span; }
-		int bytesize() { return (num_elements() * sizeof(NumberType)); }
+		int bytesize() { return (num_elements() * sizeof(Number)); }
 
 	#pragma endregion
 
@@ -173,7 +177,10 @@ namespace on {
 			desync(host);
 			num_dims = 1;
 			spans[0] = input.size();
+
+			//careful with this one, something about how it handles memory could be throwing things off with the destructor
 			std::copy(input.begin(), input.end(), host_data);
+
 			sync();
 		}
 
