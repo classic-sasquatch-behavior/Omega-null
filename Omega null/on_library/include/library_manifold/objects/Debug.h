@@ -44,14 +44,14 @@ namespace on {
 		
 		On_Process Print{
 			template <typename ElementType>
-			static void tensor(on::Tensor<ElementType> input, uint max_depth = 10) {
+			static void tensor(on::Tensor<ElementType> &input, uint max_depth = 10) {
 				input.sync();
 				std::cout << std::endl << input.num_dims << " dimensional matrix:" << std::endl;
 				
 				for (int i = 0; (i < max_depth) && (i < input.spans[1]); i++) {
 					std::cout << std::endl;
 					for (int j = 0; (j < max_depth) && (j < input.spans[0]); j++) {
-						std::cout << (int)input(i, j) << ", ";
+						std::cout << input(i, j) << ", ";
 					}
 					if (input.spans[0] > max_depth) {
 						std::cout << "..." << std::endl;
@@ -63,6 +63,10 @@ namespace on {
 
 			}
 		};
+
+		static void wait() {
+			std::cin.get();
+		}
 
 	}
 }

@@ -2,7 +2,7 @@
 #include"omega_null.h"
 
 
-	/***********************************OMEGA NULL*******************************************
+	/****************************************OMEGA NULL****************************************
 	This repository is a series of projects which develop the Omega Null language and library.
 	There are four projects, two of which comprise the useful part of the library, intended to
 	be used in other projects. The other two are demo projects, intended to provide a testing
@@ -20,11 +20,14 @@
 int main() {
 
 
+	std::vector<int> temp = { 5,5,5,5,5 };
+	on::Tensor<int> example;
 
-	on::Tensor example({100, 100}, (uchar)5);
+	example = temp;
 
 	on::Debug::Print::tensor(example);
 
+	on::Debug::wait();
 
 	return 0;
 }

@@ -52,10 +52,10 @@ namespace on {
 			ready();
 		}
 
-		//~Tensor() {
-		//	cudaFree(device_data);
-		//	delete host_data;
-		//}
+		~Tensor() {
+			cudaFree(device_data);
+			delete host_data; //this is incorrect, causes a heap error when the destructor is called.
+		}
 
 	#pragma endregion
 
@@ -93,15 +93,39 @@ namespace on {
 
 	#pragma region memory functions
 
+		#pragma region initialize memory
 		void initialize_memory() {
-			cudaMalloc( (void**)&device_data, bytesize());
+			initialize_host_memory();
+			initialize_device_memory();
+		}
+
+		void initialize_host_memory() {
 			host_data = (Number*)malloc(bytesize());
 		}
 
+		void initialize_device_memory() {
+			cudaMalloc((void**)&device_data, bytesize());
+		}
+		#pragma endregion
+
+		#pragma region fill memory
+
 		void fill_memory(Number input) {
-			cudaMemset(device_data, input, bytesize());
+			fill_host_memory(input);
+			fill_device_memory(input);
+		}
+
+		void fill_host_memory(Number input) {
 			std::fill_n(host_data, num_elements(), input);
 		}
+
+		void fill_device_memory(Number input) {
+			cudaMemset(device_data, input, bytesize());
+		}
+
+		#pragma endregion
+
+		#pragma region transfer memory
 
 		void upload() {
 			cudaMemcpy(device_data, host_data, bytesize(), cudaMemcpyHostToDevice);
@@ -110,6 +134,8 @@ namespace on {
 		void download() {
 			cudaMemcpy(host_data, device_data, bytesize(), cudaMemcpyDeviceToHost);
 		}
+
+		#pragma endregion
 
 	#pragma endregion
 
@@ -129,27 +155,76 @@ namespace on {
 
 	#pragma endregion
 
-
 	#pragma region interop
-		__host__ __device__ void operator=(Tensor input) {
+
+		//omega null
+		//is this actually already implicit?
+		void operator=(Tensor input) {
 			maj_span = input.maj_span;
 			min_span = input.min_span;
 			host_data = input.host_data;
 			device_data = input.device_data;
 		}
+		 
+		#pragma region vector
 
-		//doesn't work
-		__host__ __device__ void operator=(af::array input) {
-			maj_span = input.dims(0);
-			min_span = input.dims(1);
-			//host_data;
-			device_data = input.device<Number>();
+		//from vector
+		void operator=(std::vector<Number> input) {
+			desync(host);
+			num_dims = 1;
+			spans[0] = input.size();
+			std::copy(input.begin(), input.end(), host_data);
+			sync();
 		}
 
+		//to vector
+		operator std::vector<Number>() {
+		
+		}
 
+		#pragma endregion
 
-		//doesn't work
-		operator af::array() { af::array temp(maj_span, min_span, const_cast<const uchar*>(device_data), afDevice); return temp; }
+		#pragma region ArrayFire
+
+		//from array
+		void operator=(af::array input) {
+			maj_span = input.dims(0);
+			min_span = input.dims(1);
+			desync(device);
+			device_data = input.device<Number>();
+			sync();
+		}
+
+		//to array
+		operator af::array() {
+		
+		}
+
+		#pragma endregion
+
+		#pragma region OpenCV
+
+		//from Mat
+		void operator=(cv::Mat input) {
+
+		}
+
+		//to Mat
+		operator cv::Mat() {
+		
+		}
+
+		//from GpuMat
+		void operator=(cv::cuda::GpuMat input) {
+
+		}
+
+		//to GpuMat
+		operator cv::cuda::GpuMat() {
+		
+		}
+		#pragma endregion
+
 	#pragma endregion
 
 	};

@@ -21,7 +21,7 @@ namespace fs = std::filesystem;
 typedef pugi::xml_node Node;
 
 //cuda
-#include<cuda.h>
+#include<cuda.h> n 
 #include<cuda_runtime_api.h>
 
 //arrayfire
@@ -29,3 +29,4 @@ typedef pugi::xml_node Node;
 
 //opencv
 #include<opencv2/core.hpp>
+#include<opencv2/core/cuda.hpp>
