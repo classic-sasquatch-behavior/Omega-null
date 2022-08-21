@@ -45,7 +45,7 @@ namespace on {
 		On_Process Print{
 			template <typename ElementType>
 			static void tensor(on::Tensor<ElementType> &input, uint max_depth = 10) {
-				input.sync();
+				input.sync(); //is this necessary?
 				std::cout << std::endl << input.num_dims << " dimensional matrix:" << std::endl;
 				
 				for (int i = 0; (i < max_depth) && (i < input.spans[1]); i++) {
@@ -58,10 +58,23 @@ namespace on {
 					}
 				}
 				std::cout << std::endl;
-
-
-
 			}
+
+			template <typename ElementType>
+			static void vector(std::vector<ElementType>& input, uint max_depth = 10) {
+				std::cout << std::endl << input.size() << " element long vector: ";
+				
+				for (int i = 0; (i < max_depth) && (i < input.size()); i++) {
+					std::cout << input[i] << ", ";
+				}
+
+				if (input.size() > max_depth) {
+					std::cout << "...";
+				}
+				
+				std::cout << std::endl;
+			}
+
 		};
 
 		static void wait() {

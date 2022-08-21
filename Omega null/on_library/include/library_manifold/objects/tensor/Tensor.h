@@ -185,9 +185,7 @@ namespace on {
 		}
 
 		//to vector
-		operator std::vector<Number>() {
-		
-		}
+		operator std::vector<Number>() { return std::vector<Number>(host_data, host_data + num_elements()); }
 
 		#pragma endregion
 

@@ -19,13 +19,16 @@
 
 int main() {
 
-
 	std::vector<int> temp = { 5,5,5,5,5 };
+	std::vector<int> also_temp = { 7,7,7,7,7,7,7 };
 	on::Tensor<int> example;
 
 	example = temp;
+	also_temp = example;
 
 	on::Debug::Print::tensor(example);
+
+	on::Debug::Print::vector(also_temp);
 
 	on::Debug::wait();
 
