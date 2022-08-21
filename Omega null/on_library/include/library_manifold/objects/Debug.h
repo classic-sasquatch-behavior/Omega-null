@@ -1,6 +1,6 @@
 #pragma once
 #include"global_manifold.h"
-
+#include"on_library.h"
 
 namespace on {
 	On_Structure Debug {
@@ -74,6 +74,11 @@ namespace on {
 				
 				std::cout << std::endl;
 			}
+
+			static void af_array(const char* message, af::array& input){
+				af::print(message, input);
+			}
+
 
 		};
 

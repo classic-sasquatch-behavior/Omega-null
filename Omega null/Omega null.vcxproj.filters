@@ -33,9 +33,6 @@
     <ClCompile Include="on_library\src\objects\Launch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\include\global_manifold.h">
@@ -115,5 +112,8 @@
   <ItemGroup>
     <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
     <CudaCompile Include="demos\on_substrate\src\substrate_main.cu" />
+    <CudaCompile Include="main.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

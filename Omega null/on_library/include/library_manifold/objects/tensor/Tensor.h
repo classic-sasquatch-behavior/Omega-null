@@ -10,10 +10,10 @@ namespace on {
 	template<typename Number>
 	struct Tensor {
 
-	#pragma region metadata	
+	#pragma region data	
 
-		Number* device_data;
-		Number* host_data;
+		Number* device_data = nullptr;
+		Number* host_data = nullptr;
 
 		uint num_dims = 0;
 		std::vector<uint> spans = { 1, 1, 1, 1 };
@@ -29,6 +29,8 @@ namespace on {
 	#pragma endregion
 
 	#pragma region structors
+
+		
 
 		Tensor() {
 			initialize_memory();
@@ -192,7 +194,7 @@ namespace on {
 		#pragma region ArrayFire
 
 		//from array
-		void operator=(af::array input) {
+		void operator=(af::array& input) {
 			maj_span = input.dims(0);
 			min_span = input.dims(1);
 			desync(device);
@@ -201,9 +203,7 @@ namespace on {
 		}
 
 		//to array
-		operator af::array() {
-		
-		}
+		operator af::array() { return af::array((dim_t)maj_span, (dim_t)min_span, host_data); }
 
 		#pragma endregion
 

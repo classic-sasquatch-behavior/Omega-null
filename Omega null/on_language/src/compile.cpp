@@ -20,9 +20,10 @@ using On_Structure on::Loader;
 using On_Structure on::Reader;
 void compile() {
 
+	#ifdef FOUND_NEW_LIBRARY
 	Load::project(Parameter::topdir, LoadStructures::file_queue);
 	Load::structures(LoadStructures::file_queue);
-
+	#endif
 
 	
 

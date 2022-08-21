@@ -19,18 +19,23 @@
 
 int main() {
 
-	std::vector<int> temp = { 5,5,5,5,5 };
-	std::vector<int> also_temp = { 7,7,7,7,7,7,7 };
-	on::Tensor<int> example;
+	af::array test_array(10, 10, s32);
+	test_array = 5;
+	on::Tensor<int> test_tensor;
 
-	example = temp;
-	also_temp = example;
+	//test array to tensor
+	test_tensor = test_array;
 
-	on::Debug::Print::tensor(example);
+	//test tensor to array
 
-	on::Debug::Print::vector(also_temp);
+
+
+	//print array
+	on::Debug::Print::af_array("test array", test_array);
+
+	//print tensor
+	on::Debug::Print::tensor(test_tensor);
 
 	on::Debug::wait();
-
 	return 0;
 }

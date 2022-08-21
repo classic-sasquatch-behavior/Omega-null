@@ -1,12 +1,14 @@
 #pragma once
+
 #include"global_manifold.h"
 #include"on_language.h"
 
+
 namespace on {
+
 	On_Structure Loader{
-
+	#ifdef FOUND_NEW_FILESYSTEM
 	On_Being File{
-
 		fs::path source;
 		std::fstream stream;
 		std::string extension;
@@ -38,6 +40,6 @@ namespace on {
 	On_Structure LoadStructures{
 		static std::queue<fs::path> file_queue;
 	}
-
+		#endif
 	}
 }

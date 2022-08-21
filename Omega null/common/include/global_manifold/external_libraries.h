@@ -11,11 +11,11 @@ typedef std::ofstream Filestream;
 //standard lib
 #include<queue>
 #include<string>
-//#include<algorithm>
 
+//TODO find a new way to navigate the filesystem
 //filesystem
-#include<filesystem>
-namespace fs = std::filesystem;
+//#include<filesystem>
+//namespace fs = std::experimental::filesystem;
 
 //xml
 #include<pugixml.hpp>
