@@ -33,6 +33,12 @@
     <ClCompile Include="on_library\src\objects\Launch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="util\pugixml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cu">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\include\global_manifold.h">
@@ -122,8 +128,16 @@
   <ItemGroup>
     <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
     <CudaCompile Include="demos\on_substrate\src\substrate_main.cu" />
-    <CudaCompile Include="main.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="demos\on_vision\data\000000411.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="demos\on_vision\data\000000421.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="demos\on_vision\data\000000460.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ namespace on {
 			static void clip(Clip& input, const std::string source_path) {
 
 				fs::path resource_dir = source_path;
-				for (auto& file : std::filesystem::recursive_directory_iterator(resource_dir)) {
+				for (const auto& file : fs::recursive_directory_iterator(source_path)) {
 					if (file.path().extension() == ".png") {
 						h_Mat new_frame = cv::imread(file.path().string());
 						input.frames.push_back(new_frame);

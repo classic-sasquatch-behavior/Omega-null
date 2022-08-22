@@ -22,7 +22,7 @@ namespace fs = std::filesystem;
 typedef pugi::xml_node Node;
 
 //cuda
-#include<cuda.h> n 
+#include<cuda.h>
 #include<cuda_runtime_api.h>
 
 //arrayfire

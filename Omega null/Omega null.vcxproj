@@ -54,9 +54,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.7.props" />
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -80,9 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
@@ -99,25 +101,29 @@
       <LanguageStandard_C>Default</LanguageStandard_C>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableModules>true</EnableModules>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\include;C:\Program Files\ArrayFire\v3\include;C:\c++ libraries\opencv GPU\build\install\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\demos\on_vision\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>-std:c++20 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies);cudart.lib;cudadevrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\ArrayFire\v3\lib;C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalDependencies>afcuda.lib;cuda.lib;cudart.lib;opencv_world452d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_52,sm_52;%(CodeGeneration)</CodeGeneration>
+      <CodeGeneration>arch_52, compute_52</CodeGeneration>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <Optimization>Od</Optimization>
       <Runtime>MT</Runtime>
       <RuntimeChecks>Default</RuntimeChecks>
       <TypeInfo>true</TypeInfo>
       <Warning>W3</Warning>
+      <NvccCompilation>compile</NvccCompilation>
+      <HostDebugInfo>false</HostDebugInfo>
     </CudaCompile>
     <CudaLink>
       <DebugInformationFormat>InheritFromHost</DebugInformationFormat>
@@ -132,27 +138,30 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <EnableModules>true</EnableModules>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\include;C:\Program Files\ArrayFire\v3\include;C:\c++ libraries\opencv GPU\build\install\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\demos\on_vision\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>-std:c++20 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies);cudart.lib;cudadevrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\ArrayFire\v3\lib;C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalDependencies>afcuda.lib;cuda.lib;cudart.lib;opencv_world452d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_52,sm_52;%(CodeGeneration)</CodeGeneration>
+      <CodeGeneration>arch_52, compute_52</CodeGeneration>
       <GPUDebugInfo>true</GPUDebugInfo>
-      <HostDebugInfo>true</HostDebugInfo>
+      <HostDebugInfo>false</HostDebugInfo>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <Optimization>Od</Optimization>
       <Runtime>MT</Runtime>
       <RuntimeChecks>Default</RuntimeChecks>
       <TypeInfo>true</TypeInfo>
       <Warning>W3</Warning>
+      <NvccCompilation>compile</NvccCompilation>
     </CudaCompile>
     <CudaLink>
       <DebugInformationFormat>InheritFromHost</DebugInformationFormat>
@@ -167,29 +176,32 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\demos\on_vision\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\on_library\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\on_language\include;C:\Users\Thelonious\source\repos\Omega null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\include;C:\Program Files\ArrayFire\v3\include;C:\c++ libraries\opencv GPU\build\install\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\demos\on_vision\include</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>false</OmitFramePointers>
+      <AdditionalOptions>-std:c++20 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>cuda.lib;cudart.lib;afcuda.lib;OpenCL.lib;opencv_world452d.lib;%(AdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\ArrayFire\v3\lib;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\lib\x64;%(AdditionalLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\ArrayFire\v3\lib;C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <AdditionalDependencies>afcuda.lib;cuda.lib;cudart.lib;opencv_world452d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_86,sm_86;%(CodeGeneration)</CodeGeneration>
+      <CodeGeneration>arch_52, compute_52</CodeGeneration>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <Optimization>Od</Optimization>
       <Runtime>MT</Runtime>
       <RuntimeChecks>Default</RuntimeChecks>
       <TypeInfo>true</TypeInfo>
       <Warning>W3</Warning>
+      <NvccCompilation>compile</NvccCompilation>
+      <HostDebugInfo>false</HostDebugInfo>
     </CudaCompile>
     <CudaLink>
       <DebugInformationFormat>InheritFromHost</DebugInformationFormat>
@@ -205,26 +217,29 @@
       <LanguageStandard_C>Default</LanguageStandard_C>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableModules>true</EnableModules>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\common\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\include;C:\Program Files\ArrayFire\v3\include;C:\c++ libraries\opencv GPU\build\install\include;C:\Users\Thelonious\source\repos\Omega-null\Omega null\demos\on_vision\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>-std:c++20 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies);cudart.lib;cudadevrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\ArrayFire\v3\lib;C:\c++ libraries\opencv GPU\build\install\x64\vc16\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>afcuda.lib;cuda.lib;cudart.lib;opencv_world452d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_52,sm_52;%(CodeGeneration)</CodeGeneration>
+      <CodeGeneration>arch_52, compute_52</CodeGeneration>
       <GPUDebugInfo>true</GPUDebugInfo>
-      <HostDebugInfo>true</HostDebugInfo>
+      <HostDebugInfo>false</HostDebugInfo>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <Optimization>Od</Optimization>
       <Runtime>MT</Runtime>
       <RuntimeChecks>Default</RuntimeChecks>
       <TypeInfo>true</TypeInfo>
       <Warning>W3</Warning>
+      <NvccCompilation>compile</NvccCompilation>
     </CudaCompile>
     <CudaLink>
       <DebugInformationFormat>InheritFromHost</DebugInformationFormat>
@@ -237,9 +252,10 @@
     <ClInclude Include="demos\on_vision\src\vision.h" />
     <ClCompile Include="on_library\src\objects\Launch.cpp" />
     <ClCompile Include="on_language\src\compile.cpp" />
-    <CudaCompile Include="main.cu">
+    <ClCompile Include="main.cu">
       <FileType>Document</FileType>
-    </CudaCompile>
+    </ClCompile>
+    <ClCompile Include="util\pugixml.cpp" />
     <ClCompile Include="util\pugixml.cpp" />
     <ClCompile Include="on_language\src\xml translator\Loader.cpp" />
     <ClCompile Include="on_language\src\xml translator\Reader.cpp" />
@@ -285,9 +301,13 @@
     <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
     <CudaCompile Include="demos\on_substrate\src\substrate_main.cu" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="demos\on_vision\data\000000411.png" />
+    <Image Include="demos\on_vision\data\000000421.png" />
+    <Image Include="demos\on_vision\data\000000460.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.7.targets" />
     <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
