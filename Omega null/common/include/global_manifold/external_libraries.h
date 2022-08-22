@@ -14,8 +14,8 @@ typedef std::ofstream Filestream;
 
 //TODO find a new way to navigate the filesystem
 //filesystem
-//#include<filesystem>
-//namespace fs = std::experimental::filesystem;
+#include<filesystem>
+namespace fs = std::filesystem;
 
 //xml
 #include<pugixml.hpp>
@@ -31,3 +31,5 @@ typedef pugi::xml_node Node;
 //opencv
 #include<opencv2/core.hpp>
 #include<opencv2/core/cuda.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>

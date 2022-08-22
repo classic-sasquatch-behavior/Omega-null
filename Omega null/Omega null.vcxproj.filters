@@ -98,6 +98,15 @@
     <ClInclude Include="on_library\include\library_manifold\objects\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="demos\on_vision\include\vision_manifold\vision_typedefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="demos\on_vision\include\vision_manifold\objects\VisionMeta.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="demos\on_vision\src\vision.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="util\.gitignore" />

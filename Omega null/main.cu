@@ -19,16 +19,12 @@
 
 int main() {
 
-	cv::Mat test_mat(cv::Size{10,10}, CV_32SC1, 5);
-	on::Tensor<int> test_tensor({10,10}, 7);
-	cv::cuda::GpuMat test_gpu_mat; //0
-	test_gpu_mat.upload(test_mat);
+	on::Vision::Clip frames;
+	on::Vision::Load::clip(frames, on::Vision::Meta::Parameter::data_path );
 
-	test_gpu_mat = test_tensor;
 
-	on::Debug::Print::d_Mat<int>(test_gpu_mat);
-	on::Debug::Print::h_Mat<int>(test_mat);
-	on::Debug::Print::tensor(test_tensor);
+
+
 	on::Debug::wait();
 	return 0;
 }
