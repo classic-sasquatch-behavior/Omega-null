@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="on_language\src\interface\examples\SLIC.on" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />

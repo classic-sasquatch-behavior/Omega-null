@@ -19,23 +19,18 @@
 
 int main() {
 
-	af::array test_array(10, 10, s32);
-	test_array = 5;
-	on::Tensor<int> test_tensor;
+	cv::Mat test_mat(cv::Size{10,10}, CV_32SC1, 5);
+	on::Tensor<int> test_tensor({10,10}, 7);
+	cv::cuda::GpuMat test_gpu_mat; //5
+	test_gpu_mat.upload(test_mat);
 
-	//test array to tensor
-	test_tensor = test_array;
-
-	//test tensor to array
-
+	//test_tensor;
+	test_tensor = test_gpu_mat;
 
 
-	//print array
-	on::Debug::Print::af_array("test array", test_array);
-
-	//print tensor
+	on::Debug::Print::d_Mat<int>(test_gpu_mat);
+	on::Debug::Print::h_Mat<int>(test_mat);
 	on::Debug::Print::tensor(test_tensor);
-
 	on::Debug::wait();
 	return 0;
 }

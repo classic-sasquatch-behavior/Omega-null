@@ -45,15 +45,14 @@ namespace on {
 		On_Process Print{
 			template <typename ElementType>
 			static void tensor(on::Tensor<ElementType> &input, uint max_depth = 10) {
-				input.sync(); //is this necessary?
 				std::cout << std::endl << input.num_dims << " dimensional matrix:" << std::endl;
 				
-				for (int i = 0; (i < max_depth) && (i < input.spans[1]); i++) {
+				for (int i = 0; (i < max_depth) && (i < input.spans[0]); i++) {
 					std::cout << std::endl;
-					for (int j = 0; (j < max_depth) && (j < input.spans[0]); j++) {
+					for (int j = 0; (j < max_depth) && (j < input.spans[1]); j++) {
 						std::cout << input(i, j) << ", ";
 					}
-					if (input.spans[0] > max_depth) {
+					if (input.spans[1] > max_depth) {
 						std::cout << "..." << std::endl;
 					}
 				}
@@ -79,6 +78,44 @@ namespace on {
 				af::print(message, input);
 			}
 
+			template <typename ElementType>
+			static void h_Mat(cv::Mat& input, uint max_depth = 10) {
+				std::cout << std::endl << "printing cv::Mat" << std::endl;
+
+				int num_channels = input.channels();
+				
+				std::cout << std::endl;
+
+				for (int row = 0; (row < input.rows) && (row < max_depth); row++) {
+					for (int col = 0; (col < input.cols) && (col < max_depth); col++) {
+
+						ElementType element = input.at<ElementType>(row, col);
+
+						std::cout << element << ", ";
+
+
+						//for (int channel = 0; channel < num_channels; channel++) {
+						//}
+					}
+					if (input.cols > max_depth) {
+						std::cout << "...";
+					}
+					std::cout << std::endl;
+					
+				}
+
+
+
+
+			}
+
+			template <typename ElementType>
+			static void d_Mat(cv::cuda::GpuMat& input) {
+				std::cout << std::endl << "printing device mat";
+				cv::Mat temp;
+				input.download(temp);
+				Print::h_Mat<ElementType>(temp);
+			}
 
 		};
 

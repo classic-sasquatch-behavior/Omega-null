@@ -4,7 +4,6 @@
 
 
 
-
 namespace on {
 
 	template<typename Number>
@@ -145,7 +144,7 @@ namespace on {
 
 	#pragma endregion
 
-	#pragma region fetching functions
+	#pragma region fetching data
 
 		//get data
 		__host__ __device__ Number& operator ()(int maj, int min = 0, int cub = 0, int hyp = 0) {
@@ -198,8 +197,9 @@ namespace on {
 			maj_span = input.dims(0);
 			min_span = input.dims(1);
 			desync(device);
-			device_data = input.device<Number>();
+			device_data = input.device<Number>(); //would cause problems with arrayfire backend, which is why we call unlock below
 			sync();
+			input.unlock(); //probably a sloppy way to do this, but oh well
 		}
 
 		//to array
@@ -209,22 +209,43 @@ namespace on {
 
 		#pragma region OpenCV
 
-		//from Mat
+		//from Mat to Tensor
 		void operator=(cv::Mat input) {
+			num_dims = input.dims;
+			spans[0] = input.rows;
+			spans[1] = input.cols;
 
+			desync(host);
+			host_data = (Number*)input.data;
+			sync();
 		}
 
-		//to Mat
+		//from Tensor to Mat
 		operator cv::Mat() {
-		
+			return cv::Mat(spans[0], spans[1], cv::DataType<Number>::type, host_data);
 		}
 
-		//from GpuMat
+		//from GpuMat to Tensor
 		void operator=(cv::cuda::GpuMat input) {
+			num_dims = 2; //GpuMat is always 2 dimensional
+			spans[0] = input.rows;
+			spans[1] = input.cols;
 
+			//copying the device data directly got complicated, so we're going with the host data
+			//cv::Mat temp;
+			//input.download(temp);
+
+			//desync(host);
+			//host_data = (Number*)input.data;
+			//sync();
+
+
+			desync(device);
+			device_data = (Number*)input.data; //that's weird. GpuMat's data must not be stored linearly.
+			sync();
 		}
 
-		//to GpuMat
+		//from Tensor to GpuMat
 		operator cv::cuda::GpuMat() {
 		
 		}
