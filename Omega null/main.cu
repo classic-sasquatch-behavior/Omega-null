@@ -21,12 +21,10 @@ int main() {
 
 	cv::Mat test_mat(cv::Size{10,10}, CV_32SC1, 5);
 	on::Tensor<int> test_tensor({10,10}, 7);
-	cv::cuda::GpuMat test_gpu_mat; //5
+	cv::cuda::GpuMat test_gpu_mat; //0
 	test_gpu_mat.upload(test_mat);
 
-	//test_tensor;
-	test_tensor = test_gpu_mat;
-
+	test_gpu_mat = test_tensor;
 
 	on::Debug::Print::d_Mat<int>(test_gpu_mat);
 	on::Debug::Print::h_Mat<int>(test_mat);

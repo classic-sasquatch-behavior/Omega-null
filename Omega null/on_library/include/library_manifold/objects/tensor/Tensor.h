@@ -225,29 +225,33 @@ namespace on {
 			return cv::Mat(spans[0], spans[1], cv::DataType<Number>::type, host_data);
 		}
 
+		#ifdef GPUMAT_TO_TENSOR_FIXED
 		//from GpuMat to Tensor
 		void operator=(cv::cuda::GpuMat input) {
-			num_dims = 2; //GpuMat is always 2 dimensional
-			spans[0] = input.rows;
-			spans[1] = input.cols;
+			cv::Mat temp;
+			input.download(temp);
 
-			//copying the device data directly got complicated, so we're going with the host data
-			//cv::Mat temp;
-			//input.download(temp);
+			num_dims = temp.dims;
+			spans[0] = temp.rows;
+			spans[1] = temp.cols;
 
-			//desync(host);
-			//host_data = (Number*)input.data;
-			//sync();
-
-
-			desync(device);
-			device_data = (Number*)input.data; //that's weird. GpuMat's data must not be stored linearly.
+			desync(host);
+			std::copy((Number*)temp.data, (Number *)temp.data[temp.rows * temp.cols], host_data);
 			sync();
+		}
+		#endif
+
+		cv::cuda::GpuMat make_gpumat() {
+			cv::Mat temp;
+			temp = *this;
+			cv::cuda::GpuMat result = *new cv::cuda::GpuMat();
+			result.upload(temp);
+			return result;
 		}
 
 		//from Tensor to GpuMat
 		operator cv::cuda::GpuMat() {
-		
+			return make_gpumat();
 		}
 		#pragma endregion
 
