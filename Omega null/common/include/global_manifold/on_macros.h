@@ -18,6 +18,13 @@ inline int now_ms() { return std::chrono::time_point_cast<std::chrono::milliseco
 //a namespace which contains both data and functions
 #define On_Structure namespace
 
+#define On_Sync(_name_)\
+cudaDeviceSynchronize();\
+cudaError_t error = cudaGetLastError();\
+if(error != cudaSuccess){\
+	std::cout << std::endl << "CUDA ERROR AT " << #_name_ << ": " << cudaGetErrorName(error) << ", " << cudaGetErrorString(error) << std::endl;\
+}
+
 namespace on {
 	enum host_or_device { //find a better name
 		host = 0,

@@ -19,4 +19,6 @@ namespace on {
 			static void conf_1d(int maj_span);
 		};
 	}
+
+	#define LAUNCH on::Launch::Parameter::num_blocks, on::Launch::Parameter::threads_per_block
 }
