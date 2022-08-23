@@ -94,7 +94,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega Null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\demos\on_vision\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\on_library\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_vision\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -115,7 +115,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega Null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\demos\on_vision\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega Null\Omega Null\on_library\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_vision\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

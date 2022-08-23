@@ -19,11 +19,13 @@
 
 int main() {
 
-	on::Vision::Clip frames;
-	on::Vision::Load::clip(frames, on::Vision::Meta::Parameter::data_path );
+	on::Vision::Clip source;
+	on::Vision::Clip SLIC;
+	on::Vision::Load::clip(source, on::Vision::Meta::Parameter::data_path );
 
+	on::Vision::Algorithm::SLIC::run(source, SLIC);
 
-
+	on::Vision::Display::clip(SLIC);
 
 	on::Debug::wait();
 	return 0;

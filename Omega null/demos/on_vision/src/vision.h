@@ -21,7 +21,6 @@ namespace on {
 				fs::path resource_dir = source_path;
 				for (const auto& file : fs::recursive_directory_iterator(source_path)) {
 					if (file.path().extension() == ".png") {
-						//std::cout << file.path().string() << std::endl;
 						h_Mat new_frame = cv::imread(file.path().string(), cv::IMREAD_COLOR);
 						input.frames.push_back(new_frame);
 					}
@@ -29,7 +28,31 @@ namespace on {
 			}
 		};
 
+		On_Process Display{
+			static void clip(Clip & input) {
 
+			}
+		};
+
+		On_Structure Algorithm {
+
+			On_Process SLIC {
+
+				static void run(Clip& input, Clip& output) {
+
+				}
+
+			};
+
+			On_Process AP{
+
+				static void run(Clip& input, Clip& output) {
+
+				}
+
+			};
+
+		}
 
 
 
