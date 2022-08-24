@@ -35,11 +35,12 @@ namespace on {
 
 				On_Structure SLIC {
 					
+					//user parameters
+					const static int displacement_threshold = 1;
+					const static float density = 0.5;
+					const static int superpixel_size_factor = 10;
 
-					static int displacement_threshold = 1;
-					static float density = 0.5;
-					static int superpixel_size_factor = 10;
-					static int size_threshold = (superpixel_size_factor * superpixel_size_factor) / 2;
+					const static int size_threshold = (superpixel_size_factor * superpixel_size_factor) / 2;
 
 					static int source_maj, source_min, num_pixels;
 					static int SP_maj, SP_min, num_superpixels;
