@@ -38,18 +38,16 @@ namespace on {
 			#endif
 		}
 
-		int num_elements() { return maj_span * min_span; }
+		int num_elements() { return maj_span * min_span * cub_span * hyp_span; }
 		int bytesize() { return (num_elements() * sizeof(Number)); }
 
 #pragma endregion
 
 	#pragma region structors
 
-		
-
-		Tensor() {
+		Tensor(Number constant = 0) {
 			initialize_memory();
-			fill_memory(0);
+			fill_memory(constant);
 			ready();
 		}
 
@@ -97,14 +95,6 @@ namespace on {
 			current = changing;
 			synced = false;
 		}
-
-		//void copy(on::direction input) {
-		//	switch (input) {
-		//	case on::host_to_device:
-		//	case on::device_to_host:
-		//	default: break; //TODO add error message
-		//	}
-		//}
 
 	#pragma endregion
 

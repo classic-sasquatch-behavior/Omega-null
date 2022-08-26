@@ -27,7 +27,7 @@
 
 #pragma region assign_pixels_to_centers
 
-	__global__ void assign_pixels_to_centers(on::Tensor<int> source, on::Tensor<int> center_pos, int distance_modifier, on::Tensor<int> flags) {
+	__global__ void pixels_to_centers(on::Tensor<int> source, on::Tensor<int> center_pos, int distance_modifier, on::Tensor<int> flags) {
 		GET_DIMS(maj, min);
 		CHECK_BOUNDS(source.maj_span, source.min_span);
 
@@ -154,11 +154,14 @@ namespace on {
 
 				void SLIC::assign_pixels_to_centers(Tensor<int>& source, Tensor<int>& center_pos, Tensor<int>& flags) {
 
-					Launch::Kernel::conf_2d();
+					Launch::Kernel::conf_2d(source.maj_span, source.min_span);
+					pixels_to_centers<<<LAUNCH>>>(source, center_pos, , flags);
+					On_Sync(pixels_to_centers);
 
 				}
 
 				void SLIC::update_centers(Tensor<int>& flags, Tensor<int>& center_pos) {
+
 					//0 = maj sum , 1 = min sum, 2 = count
 					on::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
 
@@ -166,13 +169,16 @@ namespace on {
 					tally_centers<<<LAUNCH>>>(flags, tally);
 					On_Sync(tally_centers);
 
-
 					int* temp_d_displacement;
 					cudaMalloc(&temp_d_displacement, sizeof(int));
+
+					set_flag(temp_displacement);
 
 					Launch::Kernel::conf_1d(tally.maj_span);
 					move_centers<<<LAUNCH>>>(tally, center_pos, temp_d_displacement); 
 					On_Sync(update_centers);
+
+					get_flag(temp_displacement);
 
 					int temp_h_displacement;
 					cudaMemcpy(&temp_h_displacement, temp_d_displacement, sizeof(int), cudaMemcpyDeviceToHost);
