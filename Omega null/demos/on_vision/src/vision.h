@@ -12,43 +12,23 @@ namespace on {
 
 		template <typename Number>
 		On_Being Clip {
-
 			Clip() {}
-
-				On_Being Frame {
-
-					Frame() {}
-
-					std::vector<Tensor<Number>> channels;
-
-				};
-
-			std::vector<Frame> frames;
-
+			std::vector<on::Tensor<Number>> frames;
 		};
 
 		On_Process Load{
-			static void clip(Clip<int>& input, const std::string source_path) {
+
+			template <typename Number>
+			static void clip(Clip<Number>& input, const std::string source_path) {
 
 				fs::path resource_dir = source_path;
 				for (const auto& file : fs::recursive_directory_iterator(source_path)) {
+
 					if (file.path().extension() == ".png") {
-						h_Mat new_frame_bgr = cv::imread(file.path().string(), cv::IMREAD_COLOR);
-						//convert frame to LAB*
-						cv::cvtColor(new_frame_bgr, new_frame_bgr, cv::COLOR_BGR2Lab);
-						std::vector<h_Mat> split_frame_lab;
-						cv::split(new_frame_bgr,split_frame_lab);
-						
-						Clip<int>::Frame new_frame;
 
-						for (int i = 0; i < split_frame_lab.size(); i++) {
-							on::Tensor<int> channel;
-							
-							channel = split_frame_lab[i];
-
-							new_frame.channels.push_back(channel);
-						}
-
+						h_Mat new_mat = cv::imread(file.path().string(), cv::IMREAD_COLOR);
+						cv::cvtColor(new_mat, new_frame, cv::COLOR_BGR2Lab);
+						on::Tensor<Number> new_frame = new_mat;
 						input.frames.push_back(new_frame);
 
 					}
@@ -56,13 +36,28 @@ namespace on {
 			}
 		};
 
-		On_Process Display{
-			static void clip(Clip<int> & input) {
+		On_Structure Window {
+			
+			const static std::string name = "Window";
 
-			}
-		};
+			On_Process Display {
 
+				template<typename Number>
+				static void frame(on::Tensor<Number>& input) {
+					cv::Mat display = input;
+					cv::imshow(Window::name, display);
+				}
 
+				template<typename Number>
+				static void clip(Clip<Number>& input) {
+					
+					for (on::Tensor<Number> frame : input.frames) {
+						Display::frame(frame);
+						on::Debug::wait();
+					}
 
+				}
+			};
+		}
 	}
 }

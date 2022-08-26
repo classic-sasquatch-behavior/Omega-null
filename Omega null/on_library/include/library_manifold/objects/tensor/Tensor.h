@@ -27,6 +27,22 @@ namespace on {
 
 	#pragma endregion
 
+	#pragma region get data
+
+		//get data
+		__host__ __device__ Number& operator ()(int maj, int min = 0, int cub = 0, int hyp = 0) {
+			#ifdef __CUDA_ARCH__			
+				return device_data[(((((maj * min_span) + min) * cub_span) + cub) * hyp_span) + hyp];
+			#else
+				return host_data[(((((maj * min_span) + min) * cub_span) + cub) * hyp_span) + hyp];
+			#endif
+		}
+
+		int num_elements() { return maj_span * min_span; }
+		int bytesize() { return (num_elements() * sizeof(Number)); }
+
+#pragma endregion
+
 	#pragma region structors
 
 		
@@ -144,115 +160,109 @@ namespace on {
 
 	#pragma endregion
 
-	#pragma region fetching data
 
-		//get data
-		__host__ __device__ Number& operator ()(int maj, int min = 0, int cub = 0, int hyp = 0) {
-			#ifdef __CUDA_ARCH__			
-			return device_data[(maj * min_span) + min];
-			#else
-			return host_data[(maj * min_span) + min];
-			#endif
-		}
-
-		int num_elements() { return maj_span * min_span; }
-		int bytesize() { return (num_elements() * sizeof(Number)); }
-
-	#pragma endregion
 
 	#pragma region interop
 
-		//omega null
-		//is this actually already implicit?
-		void operator=(Tensor input) {
-			maj_span = input.maj_span;
-			min_span = input.min_span;
-			host_data = input.host_data;
-			device_data = input.device_data;
-		}
-		 
+		#pragma region omega null
+
+			//is this actually already implicit?
+			void operator=(Tensor input) {
+				maj_span = input.maj_span;
+				min_span = input.min_span;
+				host_data = input.host_data;
+				device_data = input.device_data;
+			}
+
+		#pragma endregion
+
 		#pragma region vector
 
-		//from vector
-		void operator=(std::vector<Number> input) {
-			desync(host);
-			num_dims = 1;
-			spans[0] = input.size();
+			//from vector
+			void operator=(std::vector<Number> input) {
+				desync(host);
+				num_dims = 1;
+				spans[0] = input.size();
 
-			//careful with this one, something about how it handles memory could be throwing things off with the destructor
-			std::copy(input.begin(), input.end(), host_data);
+				//careful with this one, something about how it handles memory could be throwing things off with the destructor
+				std::copy(input.begin(), input.end(), host_data);
 
-			sync();
-		}
+				sync();
+			}
 
-		//to vector
-		operator std::vector<Number>() { return std::vector<Number>(host_data, host_data + num_elements()); }
+			//to vector
+			operator std::vector<Number>() { return std::vector<Number>(host_data, host_data + num_elements()); }
 
 		#pragma endregion
 
 		#pragma region ArrayFire
 
-		//from array
-		void operator=(af::array& input) {
-			maj_span = input.dims(0);
-			min_span = input.dims(1);
-			desync(device);
-			device_data = input.device<Number>(); //would cause problems with arrayfire backend, which is why we call unlock below
-			sync();
-			input.unlock(); //probably a sloppy way to do this, but oh well
-		}
+			//from array
+			void operator=(af::array& input) {
+				maj_span = input.dims(0);
+				min_span = input.dims(1);
+				desync(device);
+				device_data = input.device<Number>(); //would cause problems with arrayfire backend, which is why we call unlock below
+				sync();
+				input.unlock(); //probably a sloppy way to do this, but oh well
+			}
 
-		//to array
-		operator af::array() { return af::array((dim_t)maj_span, (dim_t)min_span, host_data); }
+			//to array
+			operator af::array() { return af::array((dim_t)maj_span, (dim_t)min_span, host_data); }
 
 		#pragma endregion
 
 		#pragma region OpenCV
 
-		//from Mat to Tensor
-		void operator=(cv::Mat input) {
-			num_dims = input.dims;
-			spans[0] = input.rows;
-			spans[1] = input.cols;
+			//from Mat to Tensor
+			void operator=(cv::Mat input) {
+				num_dims = input.dims;
+				bool has_channels = (input.channels > 1);
+				num_dims += has_channels;
 
-			desync(host);
-			host_data = (Number*)input.data;
-			sync();
-		}
+				spans[0] = input.dims;
+				spans[1] = input.cols;
+				spans[2] = input.channels;
 
-		//from Tensor to Mat
-		operator cv::Mat() {
-			return cv::Mat(spans[0], spans[1], cv::DataType<Number>::type, host_data);
-		}
+				desync(host);
+				host_data = (Number*)input.data;
+				sync();
+			}
 
-		#ifdef GPUMAT_TO_TENSOR_FIXED
-		//from GpuMat to Tensor
-		void operator=(cv::cuda::GpuMat input) {
-			cv::Mat temp;
-			input.download(temp);
+			//from Tensor to Mat
+			operator cv::Mat() {
+				return cv::Mat(spans[0], spans[1], cv::DataType<Number>::type, host_data);
+			}
 
-			num_dims = temp.dims;
-			spans[0] = temp.rows;
-			spans[1] = temp.cols;
+			#ifdef GPUMAT_TO_TENSOR_FIXED
+			//from GpuMat to Tensor
+			void operator=(cv::cuda::GpuMat input) {
+				cv::Mat temp;
+				input.download(temp);
 
-			desync(host);
-			std::copy((Number*)temp.data, (Number *)temp.data[temp.rows * temp.cols], host_data);
-			sync();
-		}
-		#endif
+				num_dims = temp.dims;
+				spans[0] = temp.rows;
+				spans[1] = temp.cols;
 
-		cv::cuda::GpuMat make_gpumat() {
-			cv::Mat temp;
-			temp = *this;
-			cv::cuda::GpuMat result = *new cv::cuda::GpuMat();
-			result.upload(temp);
-			return result;
-		}
+				desync(host);
+				std::copy((Number*)temp.data, (Number *)temp.data[temp.rows * temp.cols], host_data);
+				sync();
+			}
 
-		//from Tensor to GpuMat
-		operator cv::cuda::GpuMat() {
-			return make_gpumat();
-		}
+			cv::cuda::GpuMat make_gpumat() {
+				cv::Mat temp;
+				temp = *this;
+				cv::cuda::GpuMat result = *new cv::cuda::GpuMat();
+				result.upload(temp);
+				return result;
+			}
+
+			//from Tensor to GpuMat
+			operator cv::cuda::GpuMat() {
+				return make_gpumat();
+			}
+			#endif
+
 		#pragma endregion
 
 	#pragma endregion

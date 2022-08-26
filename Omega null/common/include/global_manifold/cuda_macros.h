@@ -4,7 +4,6 @@
 
 typedef unsigned int uint;
 typedef unsigned char uchar;
-typedef void kernel;
 
 //aquire the coordinates of the thread. works on 2d kernels as well as 1d, if youre okay with ignoring one of the dimensions.
 #define GET_DIMS(_maj_dim_, _min_dim_)							\
@@ -35,6 +34,38 @@ typedef void kernel;
 			_content_;																				    \
 		}																							    \
 	}
+
+#define FOR_MXN_INCLUSIVE(_new_maj_, _new_min_, _M_, _N_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, ...)				 \
+int _maj_limit_ = (_M_ - (_M_ % 2)) / 2;																			   			 \
+int _min_limit_ = (_N_ - (_N_ % 2)) / 2;																						 \
+	__pragma(unroll) for (int _neighbor_maj_ = -_maj_limit_; _neighbor_maj_ < (_maj_limit_ + (_M_ % 2)); _neighbor_maj_++) {	 \
+		__pragma(unroll) for (int _neighbor_min_ = -_min_limit_; _neighbor_min_ < (_min_limit_ + (_N_ % 2)); _neighbor_min_++) { \
+			int _new_maj_ = _origin_maj_ + _neighbor_maj_;																		 \
+			int _new_min_ = _origin_min_ + _neighbor_min_;																	     \
+			if((_new_maj_ < 0)||(_new_min_ < 0)||(_new_maj_ >= _maj_max_)||(_new_min_ >= _min_max_ )){continue;}				 \
+			__VA_ARGS__;																										 \
+		}																														 \
+	}
+
+#define FOR_MXN_EXCLUSIVE(_new_maj_, _new_min_, _M_, _N_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, ...)				 \
+int _maj_limit_ = (_M_ - (_M_ % 2)) / 2;																						 \
+int _min_limit_ = (_N_ - (_N_ % 2)) / 2;																						 \
+	__pragma(unroll) for (int _neighbor_maj_ = -_maj_limit_; _neighbor_maj_ < (_maj_limit_ + (_M_ % 2)); _neighbor_maj_++) {	 \
+		__pragma(unroll) for (int _neighbor_min_ = -_min_limit_; _neighbor_min_ < (_min_limit_ + (_N_ % 2)); _neighbor_min_++) { \
+			int _new_maj_ = _origin_maj_ + _neighbor_maj_;																		 \
+			int _new_min_ = _origin_min_ + _neighbor_min_;																		 \
+			if((_new_maj_ < 0)||(_new_min_ < 0)||(_new_maj_ >= _maj_max_)||(_new_min_ >= _min_max_ )							 \
+							  ||((_new_maj_ == _origin_maj_)&&(_new_min_ == _origin_min_))) {continue;}							 \
+			__VA_ARGS__;																										 \
+		}																														 \
+	}
+
+	#define FOR_3X3_INCLUSIVE(_new_maj_, _new_min_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, ...) \
+	FOR_MXN_INCLUSIVE(_new_maj_, _new_min_, 3, 3, _maj_max_, _min_max_, _origin_maj_, _origin_min_, __VA_ARGS__)
+
+	#define FOR_NEIGHBOR(_new_maj_, _new_min_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, ...) \
+	FOR_MXN_EXCLUSIVE(_new_maj_, _new_min_, 3, 3, _maj_max_, _min_max_, _origin_max_, _origin_min_, __CA_ARGS__)
+
 
 //virtually transform a 2d tensor into a 1d tensor, and return the resulting linear id of the element pointed to by the given coordinates
 #define LINEAR_CAST(_maj_dim_, _min_dim_, _min_max_) \

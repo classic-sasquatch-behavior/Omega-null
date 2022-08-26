@@ -15,7 +15,7 @@
     <CudaCompile Include="demos\on_vision\src\algorithms\AP\AP.cu" />
     <CudaCompile Include="demos\on_vision\src\algorithms\SLIC\SLIC.cu" />
     <CudaCompile Include="main.cu" />
-    <CudaCompile Include="on_library\src\objects\tensor\Tensor.cu" />
+    <CudaCompile Include="on_library\src\objects\tensor\Random.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="on_language\src\compile.cpp" />
