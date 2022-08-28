@@ -67,6 +67,14 @@ int _min_limit_ = (_N_ - (_N_ % 2)) / 2;																						 \
 	FOR_MXN_EXCLUSIVE(_new_maj_, _new_min_, 3, 3, _maj_max_, _min_max_, _origin_max_, _origin_min_, __CA_ARGS__)
 
 
+
+
+
+
+
+
+
+
 //virtually transform a 2d tensor into a 1d tensor, and return the resulting linear id of the element pointed to by the given coordinates
 #define LINEAR_CAST(_maj_dim_, _min_dim_, _min_max_) \
 	((_maj_dim_ * _min_max_) + _min_dim_)

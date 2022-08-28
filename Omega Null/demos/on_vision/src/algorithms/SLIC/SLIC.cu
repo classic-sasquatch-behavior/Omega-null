@@ -118,9 +118,19 @@
 #pragma region separate_blobs
 
 
+
+
+
+
+
 #pragma endregion
 
 #pragma region absorb_small_blobs
+
+
+
+
+
 
 
 #pragma endregion
@@ -128,18 +138,22 @@
 #pragma region produce_ordered_labels
 
 
+
+
+
+
+
 #pragma endregion
 
 namespace on {
 
-	On_Structure Vision{
+	On_Structure Vision {
 
 		On_Structure Algorithm {
 			
 			using namespace Parameter::SLIC;
 			On_Process SLIC {
 				
-
 				void SLIC::sample_centers(Tensor<int>& source, Tensor<int>& center_pos) {
 
 					Launch::Kernel::conf_2d(center_pos.maj_span, center_pos.min_span);
@@ -169,35 +183,39 @@ namespace on {
 					tally_centers<<<LAUNCH>>>(flags, tally);
 					On_Sync(tally_centers);
 
-					int* temp_d_displacement;
-					cudaMalloc(&temp_d_displacement, sizeof(int));
-
-					set_flag(temp_displacement);
-
+					on::Tensor<int> temp_displacement;
 					Launch::Kernel::conf_1d(tally.maj_span);
-					move_centers<<<LAUNCH>>>(tally, center_pos, temp_d_displacement); 
+					move_centers<<<LAUNCH>>>(tally, center_pos, temp_displacement); 
 					On_Sync(update_centers);
-
-					get_flag(temp_displacement);
-
-					int temp_h_displacement;
-					cudaMemcpy(&temp_h_displacement, temp_d_displacement, sizeof(int), cudaMemcpyDeviceToHost);
-					cudaFree(temp_d_displacement);
-
-					Parameter::SLIC::displacement = temp_h_displacement;
+					Parameter::SLIC::displacement = temp_displacement;
 					
 				}
 
 				#pragma region enforce connectivity
 					void SLIC::separate_blobs() {
 
+
+
+
+
+
 					}
 
 					void SLIC::absorb_small_blobs() {
 
+
+
+
+
+
 					}
 
 					void SLIC::produce_ordered_labels() {
+
+
+
+
+
 
 					}
 				#pragma endregion
@@ -224,9 +242,7 @@ namespace on {
 
 						Tensor<int> flags({ (uint)source_maj, (uint)source_min }, 0);
 
-						//z = 0 is maj, z = 1 is min
-						Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0);
-
+						Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0);						//z = 0 is maj, z = 1 is min
 
 						sample_centers(center_pos, source);
 
@@ -236,7 +252,7 @@ namespace on {
 
 							update_centers(flags, center_pos);
 
-						} while (Parameter::SLIC::displacement < Parameter::SLIC::displacement_threshold);
+						} while (displacement < displacement_threshold);
 
 						enforce_connectivity(flags);
 

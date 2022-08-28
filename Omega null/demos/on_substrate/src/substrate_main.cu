@@ -1,9 +1,9 @@
-#include"global_manifold.h"
-#include"omega_null.h"
+//#include"global_manifold.h"
+//#include"omega_null.h"
 
 
 
-
+//deprecated for now
 
 
 
@@ -66,3 +66,17 @@ int substrate_main() {
 	return 0;
 }
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+

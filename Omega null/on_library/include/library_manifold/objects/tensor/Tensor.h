@@ -166,7 +166,7 @@ namespace on {
 
 		#pragma endregion
 
-		#pragma region vector
+		#pragma region std
 
 			//from vector
 			void operator=(std::vector<Number> input) {
@@ -182,6 +182,11 @@ namespace on {
 
 			//to vector
 			operator std::vector<Number>() { return std::vector<Number>(host_data, host_data + num_elements()); }
+
+			//from numerical type
+
+
+			//to numerical type - maybe this could take the sum of the array? would therefore be consistent with the use case I want it for (casting a 0 dim Tensor to a number)
 
 		#pragma endregion
 

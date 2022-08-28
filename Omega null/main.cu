@@ -18,19 +18,23 @@
 
 	*/
 
-using namespace on;
-using namespace Vision::Meta;
-int main() {
 
-	Vision::Clip<int> source;
-	Vision::Clip<int> SLIC;
+#pragma region run
 
-	Vision::Load::clip(source, Parameter::data_path);
+	using namespace on;
+	using namespace Vision::Meta;
+	int main() {
 
-	Vision::Algorithm::SLIC::run(source, SLIC);
+		Vision::Clip<int> source;
+		Vision::Clip<int> SLIC;
+		Vision::Load::clip(source, Parameter::data_path);
 
-	Vision::Window::Display::clip(SLIC);
-	on::Debug::wait();
+		Vision::Algorithm::SLIC::run(source, SLIC);
 
-	return 0;
-}
+		Vision::Window::Display::clip(SLIC);
+		on::Debug::wait(); //conflict here between on::wait and opencv equivalent
+
+		return 0;
+	}
+
+#pragma endregion

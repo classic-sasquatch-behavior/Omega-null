@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="demos\on_substrate\src\substrate_main.cu" />
     <CudaCompile Include="demos\on_vision\src\algorithms\AP\AP.cu" />
     <CudaCompile Include="demos\on_vision\src\algorithms\SLIC\SLIC.cu" />
     <CudaCompile Include="main.cu" />
@@ -39,6 +38,8 @@
     <ClInclude Include="common\include\omega_null.h" />
     <ClInclude Include="demos\on_substrate\include\on_substrate.h" />
     <ClInclude Include="demos\on_substrate\include\substrate_manifold.h" />
+    <ClInclude Include="demos\on_substrate\src\Objects\Planar_Life.h" />
+    <ClInclude Include="demos\on_substrate\src\Substrate.h" />
     <ClInclude Include="demos\on_vision\include\on_vision.h" />
     <ClInclude Include="demos\on_vision\include\vision_manifold.h" />
     <ClInclude Include="demos\on_vision\include\vision_manifold\objects\VisionMeta.h" />
