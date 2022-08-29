@@ -16,17 +16,17 @@ namespace on {
 
 		On_Process Kernel {
 			static void conf_2d(int maj_span, int min_span);
-			static void conf_1d(int maj_span);
+ 
+
+		static void conf_1d(int maj_span);
+
 		};
 
-		
-		On_Process Flag {
-			template <typename Type>
-			static void get(Type* flag);
-			template <typename Type>
-			static void set(Type* flag);
-		};
+
+
 	}
 
 	#define LAUNCH on::Launch::Parameter::num_blocks, on::Launch::Parameter::threads_per_block
+
+
 }

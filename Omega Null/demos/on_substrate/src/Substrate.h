@@ -23,6 +23,15 @@ namespace on {
 			std::vector<Display_Flag> flags;
 		};
 
+		On_Process Draw{
+			template<typename Type>
+			static Frame<Type> frame(std::vector<on::Tensor<Type>> input) {
+				Frame<Type> result;
+
+				return result;
+			}
+		};
+
 		On_Process Display {
 			template <typename Type>
 			static void frame(Frame<Type>& input) {
@@ -43,6 +52,13 @@ namespace on {
 			}
 		};
 
+		On_Process Listen{
+
+			static void for_input() {
+
+			}
+
+		}
 
 
 	}

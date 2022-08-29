@@ -76,6 +76,9 @@ namespace on {
 
 	#pragma region core functions
 
+		//need to find a way to make sync automatic when tensor is passed to CUDA kernel. I would prefer to do this without creating another type, which is one solution.
+
+
 		void ready() {
 			synced = true;
 		}
