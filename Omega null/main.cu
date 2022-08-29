@@ -11,10 +11,14 @@
 	on_language: a framework for describing kernels, and code for the associated precompiler. //usable
 	
 	on_library: a matrix manipulation library designed for interoperability with other libraries and CUDA //in progress
+
+	on_display: window and display backend //just added
 	
 	on_substrate: cellular automaton demonstration //on the backburner
 	
 	on_vision: computer vision demonstration //SLIC in progress
+
+	on_signals: signal processing library //just added
 
 	*/
 
