@@ -36,10 +36,11 @@
     <ClInclude Include="common\include\global_manifold\external_libraries.h" />
     <ClInclude Include="common\include\global_manifold\on_macros.h" />
     <ClInclude Include="common\include\omega_null.h" />
-    <ClInclude Include="demos\on_signals\include\on_signals.h" />
+    <ClInclude Include="common\include\omega_null\vision.h" />
+    <ClInclude Include="common\include\omega_null\substrate.h" />
+    <ClInclude Include="common\include\omega_null\signals.h" />
     <ClInclude Include="demos\on_signals\include\signals_manifold.h" />
     <ClInclude Include="demos\on_signals\include\signals_manifold\objects\Signals.h" />
-    <ClInclude Include="demos\on_substrate\include\on_substrate.h" />
     <ClInclude Include="demos\on_substrate\include\substrate_manifold.h" />
     <ClInclude Include="demos\on_substrate\src\objects\Planar_Life.h" />
     <ClInclude Include="demos\on_substrate\src\Substrate.h" />
@@ -49,9 +50,12 @@
     <ClInclude Include="demos\on_vision\include\vision_manifold\vision_typedefs.h" />
     <ClInclude Include="demos\on_vision\src\algorithms\AP\AP.h" />
     <ClInclude Include="demos\on_vision\src\algorithms\SLIC\SLIC.h" />
-    <ClInclude Include="demos\on_vision\src\vision.h" />
+    <ClInclude Include="demos\on_vision\src\Vision.h" />
+    <ClInclude Include="on_display\include\display_manifold.h" />
+    <ClInclude Include="on_display\include\display_manifold\objects\Display.h" />
+    <ClInclude Include="common\include\omega_null\display.h" />
     <ClInclude Include="on_language\include\language_manifold.h" />
-    <ClInclude Include="on_language\include\on_language.h" />
+    <ClInclude Include="common\include\omega_null\language.h" />
     <ClInclude Include="on_language\include\translator\KernelData.h" />
     <ClInclude Include="on_language\include\translator\Loader.h" />
     <ClInclude Include="on_language\include\translator\Meta.h" />
@@ -63,7 +67,7 @@
     <ClInclude Include="on_library\include\library_manifold\objects\Debug.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\Launch.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\tensor\Tensor.h" />
-    <ClInclude Include="on_library\include\on_library.h" />
+    <ClInclude Include="common\include\omega_null\library.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{376A68A6-57B9-4CE2-ACDD-623315FC64E7}</ProjectGuid>
@@ -102,7 +106,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_signals\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_vision\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_display\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_signals\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_vision\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -123,7 +127,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_signals\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_vision\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_display\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_signals\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\common\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_language\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\on_library\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_substrate\include;C:\Users\Thelonious\source\repos\Omega-null\Omega Null\demos\on_vision\include;C:\c++ libraries\pugixml-1.12\pugixml-1.12\src;C:\c++ libraries\opencv GPU\build\install\include;C:\Program Files\ArrayFire\v3\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

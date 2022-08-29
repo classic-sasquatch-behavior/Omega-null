@@ -3,7 +3,6 @@
 #include"../../vision.h"
 #include"SLIC.h"
 
-
 #pragma region sample_centers
 
 	__global__ void sample_centers(on::Tensor<int> source, on::Tensor<int> center_pos) {
@@ -117,31 +116,45 @@
 
 #pragma region separate_blobs
 
+	__global__ void separate_blobs() {
 
-
-
-
-
+	}
 
 #pragma endregion
 
 #pragma region absorb_small_blobs
+	
+	__global__ void find_sizes() {
 
+	}
 
+	__global__ void find_weak_labels() {
 
+	}
 
+	__global__ void absorb_small_blobs() {
 
-
+	}
 
 #pragma endregion
 
 #pragma region produce_ordered_labels
 
+	__global__ void raise_flags() {
 
+	}
 
+	__global__ void init_map() {
 
+	}
 
+	__global__ void invert_map() {
 
+	}
+
+	__global__ void assign_new_labels() {
+
+	}
 
 #pragma endregion
 
@@ -193,29 +206,44 @@ namespace on {
 
 				#pragma region enforce connectivity
 					void SLIC::separate_blobs() {
-
-
-
-
-
+						
+						do {
+							separate_blobs<<<LAUNCH>>>();
+							On_Sync(separate_blobs);
+						} while ();
 
 					}
 
 					void SLIC::absorb_small_blobs() {
+						
+						find_sizes<<<LAUNCH>>>();
+						On_Sync(find_sizes);
 
+						find_weak_labels<<<LAUNCH>>>();
+						On_Sync(find_weak_labels);
 
+						do {
 
+							absorb_small_blobs<<<LAUNCH>>>();
+							On_Sync(absorb_small_blobs);
 
-
+						} while ();
 
 					}
 
 					void SLIC::produce_ordered_labels() {
 
+						raise_flags<<<LAUNCH>>>();
+						On_Sync(raise_flags);
 
+						init_map<<<LAUNCH>>>();
+						On_Sync(init_map);
 
+						invert_map<<<LAUNCH>>>();
+						On_Sync(invert_map);
 
-
+						assign_new_labels<<<LAUNCH>>>();
+						On_Sync(assign_new_labels);
 
 					}
 				#pragma endregion
@@ -242,7 +270,7 @@ namespace on {
 
 						Tensor<int> flags({ (uint)source_maj, (uint)source_min }, 0);
 
-						Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0);						//z = 0 is maj, z = 1 is min
+						Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0); //z = 0 is maj, z = 1 is min
 
 						sample_centers(center_pos, source);
 

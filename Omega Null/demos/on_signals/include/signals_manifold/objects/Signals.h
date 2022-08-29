@@ -15,5 +15,13 @@ namespace on {
 		On_Structure Wavelet_Transform {
 
 		}
+
+		On_Process Load {
+
+			static void audio() {
+
+			}
+
+		};
 	}
 }

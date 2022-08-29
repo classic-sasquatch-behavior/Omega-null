@@ -1,5 +1,8 @@
 
 #include"omega_null.h"
+#include"omega_null/vision.h"
+#include"omega_null/signals.h"
+#include"omega_null/substrate.h"
 
 
 	/****************************************OMEGA NULL****************************************

@@ -1,4 +1,4 @@
 #pragma once
 
-#include"on_library.h"
-#include"on_language.h"
+#include"omega_null/language.h"
+#include"omega_null/library.h"
