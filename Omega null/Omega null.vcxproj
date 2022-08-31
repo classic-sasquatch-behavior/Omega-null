@@ -68,6 +68,7 @@
     <ClInclude Include="on_library\include\library_manifold.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\Debug.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\Launch.h" />
+    <ClInclude Include="on_library\include\library_manifold\objects\Random.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\tensor\Tensor.h" />
     <ClInclude Include="common\include\omega_null\library.h" />
   </ItemGroup>

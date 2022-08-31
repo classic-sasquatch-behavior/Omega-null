@@ -47,7 +47,7 @@ __global__ void draw(on::Tensor<int> input, on::Tensor<uchar> output) {
 	int value = input(maj, min, 0);
 	int attractor = input(maj, min, 1);
 
-	std::vector<uchar>color;
+	uchar color[3] = {0,0,0};
 
 	int first_parity = (input(min, maj, 0) > 0);
 	int second_parity = (input(min, maj, 1) > 0);
@@ -57,16 +57,21 @@ __global__ void draw(on::Tensor<int> input, on::Tensor<uchar> output) {
 
 	int zeroes = first_zero + second_zero;
 
+	const uchar red[3] = {255, 0, 0};
+	const uchar green[3] = {0, 255, 0};
+	const uchar blue[3] = {0, 0, 255};
+	const uchar purple[3] = {255, 0, 255};
+
 
 	switch (first_parity) {
-	case 0: switch (second_parity) {
-	case 0: color = { 0, 0, 255 }; break;
-	case 1: color = { 255, 0, 255 }; break;
-	} break;
-	case 1: switch (second_parity) {
-	case 0: color = { 255, 255, 0 }; break;
-	case 1: color = { 255, 0, 0 }; break;
-	} break;
+		case 0: switch (second_parity) {
+			case 0: On_Copy(color, blue, 3); break;
+			case 1: On_Copy(color, purple, 3); break;
+		} break;
+		case 1: switch (second_parity) {
+			case 0: On_Copy(color, green, 3); break;
+			case 1: On_Copy(color, red, 3); break;
+		} break;
 	}
 
 	for (int channel = 0; channel < 3; channel++) {
@@ -105,15 +110,18 @@ namespace on {
 
 					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height});
 					af::array af_mask = (af::randu(Parameter::environment_width, Parameter::environment_height) > 0.5).as(s32);
-					on::Tensor<int> mask = af_mask;
+					on::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height});
+					mask = af_mask;
 
-					curandState* states;
-					on::Launch::Initialize::curand_xor((Parameter::environment_width*Parameter::environment_height), value, states);
+
+					curandState* states = new curandState[Parameter::environment_area];
+					on::Random::Initialize::curand_xor(Parameter::environment_area, value, &states);
 
 					on::Launch::Kernel::conf_2d(result.maj_span, result.min_span);
 					spawn<<<LAUNCH>>>(mask, states, result);
 					On_Sync(spawn); 
 
+					delete states;
 					return result;
 
 				}
@@ -123,7 +131,7 @@ namespace on {
 					on::Tensor<uchar> output({cells.maj_span, cells.min_span, 3}, 0);
 
 					on::Launch::Kernel::conf_2d(cells.maj_span, cells.min_span);
-					draw << <LAUNCH >>> (cells, output);
+					draw <<<LAUNCH>>> (cells, output);
 					On_Sync(draw);
 
 					return output;

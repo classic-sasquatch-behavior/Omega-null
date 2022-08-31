@@ -11,7 +11,7 @@ namespace on {
 
 		On_Structure Forge {
 
-			af::Window window;
+			static af::Window window;
 
 			On_Process Initialize {
 

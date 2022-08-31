@@ -98,12 +98,12 @@ __global__ void seed_curand_xor( int size, int seed, curandState* states) {
 
 namespace on {
 	
-	On_Structure Launch {
+	On_Structure Random {
 
-		void Launch::Initialize::curand_xor(int size, int seed, curandState* states) {
+		void Initialize::curand_xor(int size, int seed, curandState** states) {
 		
 			on::Launch::Kernel::conf_1d(size);
-			seed_curand_xor<<<LAUNCH>>>(size, seed, states);
+			seed_curand_xor<<<LAUNCH>>>(size, seed, *states);
 			On_Sync(seed_curand_xor);
 
 		}

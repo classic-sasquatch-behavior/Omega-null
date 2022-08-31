@@ -45,6 +45,8 @@ namespace on {
 
 	#pragma region structors
 
+
+
 		Tensor(Number constant = 0) {
 			initialize_memory();
 			fill_memory(constant);
@@ -67,7 +69,8 @@ namespace on {
 
 		~Tensor() {
 			cudaFree(device_data);
-			free(host_data); //should be free, because I used malloc in initialize memory... right? 
+			delete []host_data;
+			//free(host_data); //should be free, because I used malloc in initialize memory... right? 
 							 //evidently not, because I still get that heap error. that or theres another problem.
 							 //the fact that I'm just cutting and running in the main function probbaly doesnt help.
 		}
@@ -110,7 +113,7 @@ namespace on {
 		}
 
 		void initialize_host_memory() {
-			host_data = (Number*)malloc(bytesize());
+			host_data = new Number[bytesize()];
 		}
 
 		void initialize_device_memory() {
@@ -159,13 +162,21 @@ namespace on {
 
 		#pragma region omega null
 
-			//is this actually already implicit?
-			void operator=(Tensor input) {
-				maj_span = input.maj_span;
-				min_span = input.min_span;
-				host_data = input.host_data;
-				device_data = input.device_data;
-			}
+		Tensor(const Tensor& input) {
+			spans = input.spans;
+			num_dims = input.num_dims;
+			host_data = input.host_data;
+			device_data = input.device_data;
+			ready();
+		}
+
+		void operator=(const Tensor& input){
+			spans = input.spans;
+			num_dims = input.num_dims;
+			host_data = input.host_data;
+			device_data = input.device_data;
+		}
+
 
 		#pragma endregion
 
@@ -186,10 +197,33 @@ namespace on {
 			//to vector
 			operator std::vector<Number>() { return std::vector<Number>(host_data, host_data + num_elements()); }
 
+			//to pointer
+			operator Number* () {
+				#ifdef __CUDA_ARCH__
+				return device_data;
+				#else
+				return host_data;
+				#endif
+			}
+
 			//from numerical type
 
+			operator Number () {
+				#ifdef __CUDA_ARCH__
+				return device_data[0];
+				#else 
+				return host_data[0];
+				#endif
+			}
 
 			//to numerical type - maybe this could take the sum of the array? would therefore be consistent with the use case I want it for (casting a 0 dim Tensor to a number)
+
+			//comparison to numerical type
+			bool operator ==(Number compare){
+				Number self = host_data[0];
+				return compare == self;
+			}
+
 
 		#pragma endregion
 

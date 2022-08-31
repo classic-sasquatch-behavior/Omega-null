@@ -11,13 +11,13 @@
 	be used in other projects. The other two are demo projects, intended to provide a testing
 	ground for the library as it develops. To be specific:
 	
-	on_language: a framework for describing kernels, and code for the associated precompiler. //usable
+	on_language: a framework for describing kernels, and code for the associated precompiler. //unusable
 	
 	on_library: a matrix manipulation library designed for interoperability with other libraries and CUDA //in progress
 
-	on_display: window and display backend //just added
+	on_display: window and display backend //in progress
 	
-	on_substrate: cellular automaton demonstration //added Planar_Life, needs testing
+	on_substrate: cellular automaton demonstration //debugging and testing Planar_Life
 	
 	on_vision: computer vision demonstration //SLIC in progress
 
@@ -25,6 +25,7 @@
 
 	*/
 
+//#define TESTING_VISION
 #define TESTING_SUBSTRATE
 
 

@@ -25,6 +25,15 @@ if(on::Debug::cuda_error != cudaSuccess){\
 	std::cout << std::endl << "CUDA ERROR AT " << #_name_ << ": " << cudaGetErrorName(on::Debug::cuda_error) << ", " << cudaGetErrorString(on::Debug::cuda_error) << std::endl;\
 }
 
+
+#define On_Copy(_to_, _from_, _length_)\
+ __pragma(unroll) for (int i = 0; i < _length_; i++){\
+	_to_[i] = _from_[i];\
+ }
+
+
+
+
 namespace on {
 	enum host_or_device { //find a better name
 		host = 0,

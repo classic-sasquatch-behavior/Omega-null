@@ -4,6 +4,11 @@
 
 namespace on {
 	On_Structure Debug {
+
+
+
+
+
 		enum strangeness {
 			likely = 0,
 			plausible = 1,
@@ -45,6 +50,17 @@ namespace on {
 
 		
 		On_Process Print{
+			static void launch_parameters(std::string place) {
+				std::cout <<std::endl << "launch parameters at " << place << ": " << std::endl;
+				std::cout << "num_blocks: " << on::Launch::Parameter::num_blocks.x << ", " << on::Launch::Parameter::num_blocks.y << ", " << on::Launch::Parameter::num_blocks.z << std::endl;
+				std::cout << "threads_per_block: " << on::Launch::Parameter::threads_per_block.x << ", " << on::Launch::Parameter::threads_per_block.y << ", " << on::Launch::Parameter::threads_per_block.z << std::endl;
+			}
+
+
+
+
+
+
 			template <typename ElementType>
 			static void tensor(on::Tensor<ElementType> &input, uint max_depth = 10) {
 				std::cout << std::endl << input.num_dims << " dimensional matrix:" << std::endl;

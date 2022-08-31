@@ -28,6 +28,7 @@ namespace on {
 					static bool running = false;
 					const int environment_width = 512;
 					const int environment_height = 512;
+					const int environment_area = environment_width * environment_height; 
 				}
 
 				On_Process Step {
