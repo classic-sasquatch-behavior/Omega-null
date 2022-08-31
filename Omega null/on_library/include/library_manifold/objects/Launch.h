@@ -15,14 +15,15 @@ namespace on {
 		}
 
 		On_Process Kernel {
+
 			static void conf_2d(int maj_span, int min_span);
  
-
-		static void conf_1d(int maj_span);
-
+			static void conf_1d(int maj_span);
 		};
 
-
+		On_Process Initialize {
+			static void curand_xor(int size, int seed, curandState* states);
+		};
 
 	}
 

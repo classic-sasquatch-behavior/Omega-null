@@ -1,6 +1,6 @@
 #pragma once
-#include"global_manifold.h"
-#include"on_language.h"
+#include"language_manifold.h"
+#include"omega_null.h"
 
 namespace on {
 	On_Structure Meta{

@@ -5,7 +5,6 @@
 #include<iostream>
 #include<fstream>
 #include<sstream>
-using std::endl;
 typedef std::ofstream Filestream;
 
 //standard lib
@@ -26,6 +25,10 @@ typedef pugi::xml_node Node;
 #include<cuda_runtime.h>
 #include<device_functions.h>
 #include<device_launch_parameters.h>
+
+//curand
+#include<curand.h>
+#include<curand_kernel.h>
 
 //arrayfire
 #include<arrayfire.h>

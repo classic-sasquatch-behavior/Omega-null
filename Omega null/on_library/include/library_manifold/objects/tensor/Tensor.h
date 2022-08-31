@@ -215,12 +215,12 @@ namespace on {
 			//from Mat to Tensor
 			void operator=(cv::Mat input) {
 				num_dims = input.dims;
-				bool has_channels = (input.channels > 1);
+				bool has_channels = (input.channels() > 1);
 				num_dims += has_channels;
 
-				spans[0] = input.dims;
+				spans[0] = input.rows;
 				spans[1] = input.cols;
-				spans[2] = input.channels;
+				spans[2] = input.channels();
 
 				desync(host);
 				host_data = (Number*)input.data;

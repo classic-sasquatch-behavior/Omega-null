@@ -1,7 +1,7 @@
 #include"global_manifold.h"
-#include"on_library.h"
+#include"omega_null.h"
 
-#ifdef ON_USE_RANDOM
+#ifdef DEPRECATED
 namespace on {
 
 
@@ -80,3 +80,36 @@ namespace on {
 
 }
 #endif
+
+
+
+
+
+
+__global__ void seed_curand_xor( int size, int seed, curandState* states) {
+	GET_DIMS(id, zero);
+	CHECK_BOUNDS(size, 1);
+
+	curand_init(seed, id, 0, &states[id]);
+}
+
+
+
+
+namespace on {
+	
+	On_Structure Launch {
+
+		void Launch::Initialize::curand_xor(int size, int seed, curandState* states) {
+		
+			on::Launch::Kernel::conf_1d(size);
+			seed_curand_xor<<<LAUNCH>>>(size, seed, states);
+			On_Sync(seed_curand_xor);
+
+		}
+
+	}
+
+
+
+}

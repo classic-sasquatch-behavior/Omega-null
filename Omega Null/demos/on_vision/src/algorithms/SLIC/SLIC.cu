@@ -1,11 +1,12 @@
 
 #include"vision_manifold.h"
+#include"omega_null.h"
 #include"../../vision.h"
 #include"SLIC.h"
 
 #pragma region sample_centers
 
-	__global__ void sample_centers(on::Tensor<int> source, on::Tensor<int> center_pos) {
+	__global__ void sample_centers_kernel(on::Tensor<int> source, on::Tensor<int> center_pos) {
 		GET_DIMS(maj, min);
 		CHECK_BOUNDS(center_pos.maj_span, center_pos.min_span);
 
@@ -116,8 +117,28 @@
 
 #pragma region separate_blobs
 
-	__global__ void separate_blobs() {
+	__global__ void separate_blobs_kernel(on::Tensor<int> labels, on::Tensor<int> flag, on::Tensor<int> blobs) {
+		GET_DIMS(maj, min);
+		CHECK_BOUNDS(labels.maj_span, labels.min_span);
 
+		int id = LINEAR_CAST(maj, min, labels.min_span);
+		int label = labels(maj, min);
+		int blob = blobs(maj, min);
+
+		FOR_NEIGHBOR(n_maj, n_min, labels.maj_span, labels.min_span, maj, min,		
+			int neighbor_label = labels(maj, min);
+			int neighbor_blob = blobs(maj, min);
+			if (neighbor_label != label) {continue;}
+			
+			if (neighbor_blob > blob) { 
+				blob = neighbor_blob;
+			}
+		);
+
+		if (blob != blobs(maj, min)) {
+			blobs(maj, min) = blob;
+			flag(0) = 1; //devise a way to assign a flag from the device without parentheses
+		}
 	}
 
 #pragma endregion
@@ -132,7 +153,7 @@
 
 	}
 
-	__global__ void absorb_small_blobs() {
+	__global__ void absorb_small_blobs_kernel() {
 
 	}
 
@@ -162,133 +183,138 @@ namespace on {
 
 	On_Structure Vision {
 
+		using namespace Algorithm::Parameter::SLIC;
 		On_Structure Algorithm {
 			
-			using namespace Parameter::SLIC;
-			On_Process SLIC {
-				
-				void SLIC::sample_centers(Tensor<int>& source, Tensor<int>& center_pos) {
+			void SLIC::sample_centers(Tensor<int>& source, Tensor<int>& center_pos) {
 
-					Launch::Kernel::conf_2d(center_pos.maj_span, center_pos.min_span);
-					sample_centers<<<LAUNCH>>>(source, center_pos);
-					On_Sync(sample_centers);
+				Launch::Kernel::conf_2d(center_pos.maj_span, center_pos.min_span);
+				sample_centers_kernel<<<LAUNCH>>>(source, center_pos);
+				On_Sync(sample_centers);
 
-					Launch::Kernel::conf_2d(center_pos.maj_span, center_pos.min_span);
-					gradient_descent<<<LAUNCH>>>(source, center_pos);
-					On_Sync(gradient_descent);
+				Launch::Kernel::conf_2d(center_pos.maj_span, center_pos.min_span);
+				gradient_descent<<<LAUNCH>>>(source, center_pos);
+				On_Sync(gradient_descent);
 
-				}
+			}
 
-				void SLIC::assign_pixels_to_centers(Tensor<int>& source, Tensor<int>& center_pos, Tensor<int>& flags) {
+			void SLIC::assign_pixels_to_centers(Tensor<int>& source, Tensor<int>& center_pos, Tensor<int>& labels) {
 
-					Launch::Kernel::conf_2d(source.maj_span, source.min_span);
-					pixels_to_centers<<<LAUNCH>>>(source, center_pos, , flags);
-					On_Sync(pixels_to_centers);
+				Launch::Kernel::conf_2d(source.maj_span, source.min_span);
+				pixels_to_centers<<<LAUNCH>>>(source, center_pos, density_modifier, labels);
+				On_Sync(pixels_to_centers);
 
-				}
+			}
 
-				void SLIC::update_centers(Tensor<int>& flags, Tensor<int>& center_pos) {
+			void SLIC::update_centers(Tensor<int>& labels, Tensor<int>& center_pos) {
 
-					//0 = maj sum , 1 = min sum, 2 = count
-					on::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
+				//0 = maj sum , 1 = min sum, 2 = count
+				on::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
 
-					Launch::Kernel::conf_2d(flags.maj_span, flags.min_span);
-					tally_centers<<<LAUNCH>>>(flags, tally);
-					On_Sync(tally_centers);
+				Launch::Kernel::conf_2d(labels.maj_span, labels.min_span);
+				tally_centers<<<LAUNCH>>>(labels, tally);
+				On_Sync(tally_centers);
 
-					on::Tensor<int> temp_displacement;
-					Launch::Kernel::conf_1d(tally.maj_span);
-					move_centers<<<LAUNCH>>>(tally, center_pos, temp_displacement); 
-					On_Sync(update_centers);
-					Parameter::SLIC::displacement = temp_displacement;
+				on::Tensor<int> temp_displacement;
+				Launch::Kernel::conf_1d(tally.maj_span);
+				move_centers<<<LAUNCH>>>(tally, center_pos, temp_displacement); 
+				On_Sync(move_centers);
+				Parameter::SLIC::displacement = temp_displacement;
 					
-				}
+			}
 
-				#pragma region enforce connectivity
-					void SLIC::separate_blobs() {
+			#pragma region enforce connectivity
+			void SLIC::separate_blobs(on::Tensor<int>& labels) {
+
+				on::Tensor<int> flag;
+				on::Tensor<int> blobs({labels.maj_span, labels.min_span}, 0);
+				blobs = labels;
+
+				Launch::Kernel::conf_2d(labels.maj_span, labels.min_span);
+
+				do {
+					separate_blobs_kernel<<<LAUNCH>>>(labels, flag, blobs);
+					On_Sync(separate_blobs);
+
+				} while (flag == 1);
+
+				labels = blobs;
+			}
+				
+			void SLIC::absorb_small_blobs(on::Tensor<int>& labels) {
 						
-						do {
-							separate_blobs<<<LAUNCH>>>();
-							On_Sync(separate_blobs);
-						} while ();
+				find_sizes<<<LAUNCH>>>();
+				On_Sync(find_sizes);
 
-					}
+				find_weak_labels<<<LAUNCH>>>();
+				On_Sync(find_weak_labels);
 
-					void SLIC::absorb_small_blobs() {
-						
-						find_sizes<<<LAUNCH>>>();
-						On_Sync(find_sizes);
+				do {
 
-						find_weak_labels<<<LAUNCH>>>();
-						On_Sync(find_weak_labels);
+					absorb_small_blobs_kernel<<<LAUNCH>>>();
+					On_Sync(absorb_small_blobs);
 
-						do {
+				} while (0);
 
-							absorb_small_blobs<<<LAUNCH>>>();
-							On_Sync(absorb_small_blobs);
+			}
 
-						} while ();
+			void SLIC::produce_ordered_labels(on::Tensor<int>& labels) {
 
-					}
+				raise_flags<<<LAUNCH>>>();
+				On_Sync(raise_flags);
 
-					void SLIC::produce_ordered_labels() {
+				init_map<<<LAUNCH>>>();
+				On_Sync(init_map);
 
-						raise_flags<<<LAUNCH>>>();
-						On_Sync(raise_flags);
+				invert_map<<<LAUNCH>>>();
+				On_Sync(invert_map);
 
-						init_map<<<LAUNCH>>>();
-						On_Sync(init_map);
+				assign_new_labels<<<LAUNCH>>>();
+				On_Sync(assign_new_labels);
 
-						invert_map<<<LAUNCH>>>();
-						On_Sync(invert_map);
+			}
+			#pragma endregion
 
-						assign_new_labels<<<LAUNCH>>>();
-						On_Sync(assign_new_labels);
+			void SLIC::enforce_connectivity(on::Tensor<int>& labels) {
+				separate_blobs(labels);
+				absorb_small_blobs(labels);
+				produce_ordered_labels(labels);
+			}
 
-					}
-				#pragma endregion
+			void SLIC::run(Clip<int>& input, Clip<int>& output) {
+				for (Tensor source : input.frames) {
 
-				void SLIC::enforce_connectivity(on::Tensor<int>& flags) {
-					separate_blobs();
-					absorb_small_blobs();
-					produce_ordered_labels();
+					source_maj = source.maj_span;
+					source_min = source.min_span;
+					num_pixels = source_maj * source_min;
+
+					SP_maj;
+					SP_min;
+					num_superpixels;
+
+					space_between_centers;
+					density_modifier;
+
+					Tensor<int> labels({ (uint)source_maj, (uint)source_min }, 0);
+
+					Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0); //z = 0 is maj, z = 1 is min
+
+					sample_centers(center_pos, source);
+
+					do {
+
+						assign_pixels_to_centers(source, center_pos, labels);
+
+						update_centers(labels, center_pos);
+
+					} while (displacement < displacement_threshold);
+
+					enforce_connectivity(labels);
+
+					output.frames.push_back(labels);
 				}
-
-				void SLIC::run(Clip<int>& input, Clip<int>& output) {
-					for (Tensor source : input.frames) {
-
-						source_maj = source.maj_span;
-						source_min = source.min_span;
-						num_pixels = source_maj * source_min;
-
-						SP_maj;
-						SP_min;
-						num_superpixels;
-
-						space_between_centers;
-						density_modifier;
-
-						Tensor<int> flags({ (uint)source_maj, (uint)source_min }, 0);
-
-						Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0); //z = 0 is maj, z = 1 is min
-
-						sample_centers(center_pos, source);
-
-						do {
-
-							assign_pixels_to_centers(source, center_pos, flags);
-
-							update_centers(flags, center_pos);
-
-						} while (displacement < displacement_threshold);
-
-						enforce_connectivity(flags);
-
-						output.frames.push_back(flags);
-					}
-					return;
-				}
-			};
+				return;
+			}
 		}
 	}
 

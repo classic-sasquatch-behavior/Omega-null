@@ -1,6 +1,6 @@
 #pragma once
 #include"global_manifold.h"
-#include"on_library.h"
+#include"omega_null.h"
 
 namespace on {
 	On_Structure Debug {
@@ -11,6 +11,8 @@ namespace on {
 			unlikely = 3,
 			impossible = 4
 		};
+
+		static cudaError_t cuda_error;
 
 		On_Being Error {
 			Debug::strangeness strangeness;

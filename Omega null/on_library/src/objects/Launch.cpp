@@ -1,5 +1,5 @@
 #include"global_manifold.h"
-#include"on_library.h"
+#include"omega_null.h"
 
 
 namespace on {
@@ -24,6 +24,7 @@ namespace on {
 		Launch::Parameter::num_blocks = { Launch::Parameter::grid_dim_x, 1, 1 };
 		Launch::Parameter::threads_per_block = { Launch::Parameter::block_dim_x, 1, 1 };
 	}
+
 
 
 

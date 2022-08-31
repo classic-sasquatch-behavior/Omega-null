@@ -17,7 +17,7 @@
 
 	on_display: window and display backend //just added
 	
-	on_substrate: cellular automaton demonstration //on the backburner
+	on_substrate: cellular automaton demonstration //added Planar_Life, needs testing
 	
 	on_vision: computer vision demonstration //SLIC in progress
 
@@ -25,23 +25,51 @@
 
 	*/
 
+#define TESTING_SUBSTRATE
+
 
 #pragma region run
 
-	using namespace on;
-	using namespace Vision::Meta;
-	int main() {
+	#ifdef TESTING_VISION
 
-		Vision::Clip<int> source;
-		Vision::Clip<int> SLIC;
-		Vision::Load::clip(source, Parameter::data_path);
+		using namespace on;
+		using namespace Vision::Meta;
+		int main() {
 
-		Vision::Algorithm::SLIC::run(source, SLIC);
+			Vision::Clip<int> source;
+			Vision::Clip<int> SLIC;
+			Vision::Load::clip(source, Parameter::data_path);
 
-		Vision::Window::Display::clip(SLIC);
-		on::Debug::wait(); //conflict here between on::wait and opencv equivalent
+			Vision::Algorithm::SLIC::run(source, SLIC);
 
-		return 0;
-	}
+			Vision::Window::Display::clip(SLIC); //move to Display::OpenCV
+			on::Debug::wait(); //potential conflict here between on::wait and opencv equivalent
+
+			return 0;
+		}
+
+	#endif
+
+
+	#ifdef TESTING_SUBSTRATE
+		
+		using namespace on;
+		using On_Structure Substrate::Species;
+		int main() {
+			srand(time(NULL));
+
+			on::Tensor<int> seed = Planar_Life::Seed::cells(rand());
+
+			Planar_Life::run(seed);
+
+			return 0;
+		}
+
+	#endif
+
+
+
+
+
 
 #pragma endregion

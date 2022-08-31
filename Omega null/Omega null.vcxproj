@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="demos\on_substrate\src\objects\Planar_Life.cu" />
+    <CudaCompile Include="demos\on_substrate\src\Substrate.cu" />
     <CudaCompile Include="demos\on_vision\src\algorithms\AP\AP.cu" />
     <CudaCompile Include="demos\on_vision\src\algorithms\SLIC\SLIC.cu" />
     <CudaCompile Include="main.cu" />

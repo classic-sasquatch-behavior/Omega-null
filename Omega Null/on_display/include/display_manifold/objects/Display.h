@@ -11,23 +11,25 @@ namespace on {
 
 		On_Structure Forge {
 
+			af::Window window;
+
 			On_Process Initialize {
 
-				static void window() {
-
-				}
 			};
 
 			On_Process Listen {
 
 				static void for_input() {
+					
+					
 
 				}
 			};
 
-			static void render(on::Tensor<uchar>) {
+			static void render(on::Tensor<uchar>& input) {
 				
-
+				af::array frame = input;
+				Forge::window.image(input);
 
 			}
 		}

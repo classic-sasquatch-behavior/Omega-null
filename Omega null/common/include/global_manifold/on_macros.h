@@ -20,9 +20,9 @@ inline int now_ms() { return std::chrono::time_point_cast<std::chrono::milliseco
 
 #define On_Sync(_name_)\
 cudaDeviceSynchronize();\
-cudaError_t error = cudaGetLastError();\
-if(error != cudaSuccess){\
-	std::cout << std::endl << "CUDA ERROR AT " << #_name_ << ": " << cudaGetErrorName(error) << ", " << cudaGetErrorString(error) << std::endl;\
+on::Debug::cuda_error = cudaGetLastError();\
+if(on::Debug::cuda_error != cudaSuccess){\
+	std::cout << std::endl << "CUDA ERROR AT " << #_name_ << ": " << cudaGetErrorName(on::Debug::cuda_error) << ", " << cudaGetErrorString(on::Debug::cuda_error) << std::endl;\
 }
 
 namespace on {

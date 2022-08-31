@@ -64,16 +64,7 @@ int _min_limit_ = (_N_ - (_N_ % 2)) / 2;																						 \
 	FOR_MXN_INCLUSIVE(_new_maj_, _new_min_, 3, 3, _maj_max_, _min_max_, _origin_maj_, _origin_min_, __VA_ARGS__)
 
 	#define FOR_NEIGHBOR(_new_maj_, _new_min_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, ...) \
-	FOR_MXN_EXCLUSIVE(_new_maj_, _new_min_, 3, 3, _maj_max_, _min_max_, _origin_max_, _origin_min_, __CA_ARGS__)
-
-
-
-
-
-
-
-
-
+	FOR_MXN_EXCLUSIVE(_new_maj_, _new_min_, 3, 3, _maj_max_, _min_max_, _origin_maj_, _origin_min_, __VA_ARGS__)
 
 //virtually transform a 2d tensor into a 1d tensor, and return the resulting linear id of the element pointed to by the given coordinates
 #define LINEAR_CAST(_maj_dim_, _min_dim_, _min_max_) \
@@ -84,7 +75,7 @@ int _min_limit_ = (_N_ - (_N_ % 2)) / 2;																						 \
 #define SYNC_AND_CHECK_FOR_ERRORS(_kernel_)											 \
 {																					 \
 	cudaDeviceSynchronize();														 \
-	cudaError_t error = cudaGetLastError();											 \
+	error = cudaGetLastError();														 \
 	if(error != cudaSuccess) {														 \
 		std::cout << "Error in kernel " << #_kernel_								 \
 		<< " at " << __FILE__ << ":" << __LINE__ << ": "							 \
@@ -94,6 +85,6 @@ int _min_limit_ = (_N_ - (_N_ % 2)) / 2;																						 \
 }		
 
 #define ON_CUDA_ERROR_CHECK(_where_) { \
-cudaError_t error = cudaGetLastError(); if(error != cudaSuccess) std::cout << std::endl << "CUDA error " << cudaGetErrorName(error) \
-<< " at " << #_where_ <<": " << cudaGetErrorString(error) << std::endl;}
+on::Debug::cuda_error = cudaGetLastError(); if(on::Debug::cuda_error != cudaSuccess) std::cout << std::endl << "CUDA error " << cudaGetErrorName(on::Debug::cuda_error) \
+<< " at " << #_where_ <<": " << cudaGetErrorString(on::Debug::cuda_error) << std::endl;}
 
