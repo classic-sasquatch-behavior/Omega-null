@@ -231,10 +231,15 @@ namespace on {
 
 			//from array
 			void operator=(af::array& input) {
-				maj_span = input.dims(0);
-				min_span = input.dims(1);
+				
+				num_dims = input.numdims();
+				for (int i = 0; i < num_dims; i++) {
+					spans[i] = input.dims(i);
+				}
+
 				desync(device);
-				device_data = input.device<Number>(); //would cause problems with arrayfire backend, which is why we call unlock below
+				initialize_device_memory();
+				cudaMemcpy(device_data, input.device<Number>(), bytesize(), cudaMemcpyDeviceToDevice);
 				sync();
 				input.unlock(); //probably a sloppy way to do this, but oh well
 			}

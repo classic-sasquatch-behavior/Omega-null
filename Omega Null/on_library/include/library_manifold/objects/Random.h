@@ -15,7 +15,7 @@ namespace on {
 		
 		On_Process Initialize {
 			
-			static void curand_xor(int size, int seed, curandState** states);
+			static void curand_xor(int size, int seed, curandState* states);
 		};
 	}
 }

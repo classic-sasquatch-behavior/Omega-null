@@ -82,16 +82,18 @@ __global__ void draw(on::Tensor<int> input, on::Tensor<uchar> output) {
 	}
 }
 
-__global__ void spawn(on::Tensor<int> mask, curandState_t* random_states, on::Tensor<int> result) {
+__global__ void spawn(on::Tensor<int> mask, curandState* random_states, on::Tensor<int> result) {
 	GET_DIMS(maj, min);
 	CHECK_BOUNDS(result.maj_span, result.min_span);
-	if (!mask(maj, min)) { return; }
+	if (mask(maj, min) == 0) { return; }
 
 	int id = LINEAR_CAST(maj, min, result.min_span);
-	int random_0 = curand(&random_states[id]);
-	int random_1 = curand(&random_states[id]);
 
-	int cell_value = (random_0 % 10) - 20;
+	curandState local_state = random_states[id];
+	int random_0 = curand(&local_state);
+	int random_1 = curand(&local_state);
+
+	int cell_value = (random_0 % 20) - 10;
 	int attractor_value = (2*(random_1 % 2)) - 1;
 	
 	result(maj, min, 0) = cell_value;
@@ -106,22 +108,23 @@ namespace on {
 
 			On_Structure Planar_Life {
 
-				on::Tensor<int> Seed::cells(int value) {
+				on::Tensor<int> Seed::cells(int value = 0) {
 
-					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height});
+					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height, 3});
 					af::array af_mask = (af::randu(Parameter::environment_width, Parameter::environment_height) > 0.5).as(s32);
 					on::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height});
-					mask = af_mask;
+					mask = af_mask; //this is likely what's not working
 
 
-					curandState* states = new curandState[Parameter::environment_area];
-					on::Random::Initialize::curand_xor(Parameter::environment_area, value, &states);
+					curandState* states = nullptr;
+					on::Random::Initialize::curand_xor(Parameter::environment_area, value, states);
 
 					on::Launch::Kernel::conf_2d(result.maj_span, result.min_span);
 					spawn<<<LAUNCH>>>(mask, states, result);
 					On_Sync(spawn); 
 
-					delete states;
+					cudaFree(states); //bad way of doing this, because it's not clear that one would have to call cudafree on curand_xor. should at least put it in on::Random::Delete
+
 					return result;
 
 				}
