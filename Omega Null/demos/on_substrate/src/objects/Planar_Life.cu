@@ -85,19 +85,19 @@ __global__ void draw(on::Tensor<int> input, on::Tensor<uchar> output) {
 __global__ void spawn(on::Tensor<int> mask, curandState* random_states, on::Tensor<int> result) {
 	GET_DIMS(maj, min);
 	CHECK_BOUNDS(result.maj_span, result.min_span);
-	if (mask(maj, min) == 0) { return; }
+	if (mask(maj, min) == 0) { return; } //possible failure here
 
 	int id = LINEAR_CAST(maj, min, result.min_span);
 
-	curandState local_state = random_states[id];
+	curandState local_state = random_states[id]; //possible failure here (unlikely)
 	int random_0 = curand(&local_state);
 	int random_1 = curand(&local_state);
 
 	int cell_value = (random_0 % 20) - 10;
 	int attractor_value = (2*(random_1 % 2)) - 1;
 	
-	result(maj, min, 0) = cell_value;
-	result(maj, min, 1) = attractor_value;
+	result(maj, min, 0) = cell_value; //possible failure here
+	result(maj, min, 1) = attractor_value; //possible failure here
 }
 
 namespace on {
@@ -110,11 +110,10 @@ namespace on {
 
 				on::Tensor<int> Seed::cells(int value = 0) {
 
-					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height, 3});
+					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height, 2}, 0);
 					af::array af_mask = (af::randu(Parameter::environment_width, Parameter::environment_height) > 0.5).as(s32);
-					on::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height});
-					mask = af_mask; //this is likely what's not working
-
+					on::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height}, 0);
+					mask = af_mask; //possible failure here
 
 					curandState* states = nullptr;
 					on::Random::Initialize::curand_xor(Parameter::environment_area, value, states);

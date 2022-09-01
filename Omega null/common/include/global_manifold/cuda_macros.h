@@ -24,16 +24,16 @@ typedef unsigned char uchar;
 	((_old_coord_*(_new_max_/_old_max_))+(((_new_max_/_old_max_)-((_new_max_/_old_max_)%2))/2))
 
 //iterates through the elements directly adjacent to the given coordinates in a 2d plane, excluding self
-#define FOR_NEIGHBOR(_new_maj_, _new_min_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, _content_)	\
-	__pragma(unroll) for (int _neighbor_maj_ = -1; _neighbor_maj_ < 2; _neighbor_maj_++) {				\
-		__pragma(unroll) for (int _neighbor_min_ = -1; _neighbor_min_ < 2; _neighbor_min_++) {			\
-			int _new_maj_ = _origin_maj_ + _neighbor_maj_;											    \
-			int _new_min_ = _origin_min_ + _neighbor_min_;												\
-			if((_new_maj_ < 0)||(_new_min_ < 0)||(_new_maj_ >= _maj_max_)||(_new_min_ >= _min_max_ )	\
-							  ||((_new_maj_ == _origin_maj_)&&(_new_min_ == _origin_min_))) {continue;} \
-			_content_;																				    \
-		}																							    \
-	}
+//#define FOR_NEIGHBOR(_new_maj_, _new_min_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, _content_)	\
+//	__pragma(unroll) for (int _neighbor_maj_ = -1; _neighbor_maj_ < 2; _neighbor_maj_++) {				\
+//		__pragma(unroll) for (int _neighbor_min_ = -1; _neighbor_min_ < 2; _neighbor_min_++) {			\
+//			int _new_maj_ = _origin_maj_ + _neighbor_maj_;											    \
+//			int _new_min_ = _origin_min_ + _neighbor_min_;												\
+//			if((_new_maj_ < 0)||(_new_min_ < 0)||(_new_maj_ >= _maj_max_)||(_new_min_ >= _min_max_ )	\
+//							  ||((_new_maj_ == _origin_maj_)&&(_new_min_ == _origin_min_))) {continue;} \
+//			_content_;																				    \
+//		}																							    \
+//	}
 
 #define FOR_MXN_INCLUSIVE(_new_maj_, _new_min_, _M_, _N_, _maj_max_, _min_max_, _origin_maj_, _origin_min_, ...)				 \
 int _maj_limit_ = (_M_ - (_M_ % 2)) / 2;																			   			 \

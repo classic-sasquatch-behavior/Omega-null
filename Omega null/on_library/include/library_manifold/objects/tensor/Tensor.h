@@ -23,7 +23,7 @@ namespace on {
 		uint& hyp_span = spans[3];
 
 		bool synced = false;
-		on::host_or_device current = host;
+		on::host_or_device current = on::host;
 
 	#pragma endregion
 
