@@ -100,14 +100,16 @@ namespace on {
 	
 	On_Structure Random {
 
-		void Initialize::curand_xor(int size, int seed, curandState* states) {
-
+		curandState* Initialize::curand_xor(int size, int seed) {
+			
+			curandState* states;
 			cudaMalloc((void**)&states, size * sizeof(curandState));
 		
 			on::Launch::Kernel::conf_1d(size);
 			seed_curand_xor<<<LAUNCH>>>(size, seed, states);
 			On_Sync(seed_curand_xor);
 
+			return states;
 		}
 
 	}

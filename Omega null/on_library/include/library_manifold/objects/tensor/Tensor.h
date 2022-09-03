@@ -15,12 +15,38 @@ namespace on {
 		Number* host_data = nullptr;
 
 		uint num_dims = 0;
-		std::vector<uint> spans = { 1, 1, 1, 1 };
 
-		uint& maj_span = spans[0];
-		uint& min_span = spans[1];
-		uint& cub_span = spans[2];
-		uint& hyp_span = spans[3];
+		uint* host_spans = nullptr;
+		uint* device_spans = nullptr;
+
+		__device__ __host__ uint maj_span(){
+			#ifdef __CUDA_ARCH__
+				return device_spans[0];
+			#else
+				return host_spans[0];
+			#endif
+		}
+		__device__ __host__ uint min_span() {
+			#ifdef __CUDA_ARCH__
+				return device_spans[1];
+			#else
+				return host_spans[1];
+			#endif
+		}
+		__device__ __host__ uint cub_span() {
+			#ifdef __CUDA_ARCH__
+				return device_spans[2];
+			#else
+				return host_spans[2];
+			#endif
+		}
+		__device__ __host__ uint hyp_span() {
+			#ifdef __CUDA_ARCH__
+				return device_spans[3];
+			#else
+				return host_spans[3];
+			#endif
+		}
 
 		bool synced = false;
 		on::host_or_device current = on::host;
@@ -32,13 +58,13 @@ namespace on {
 		//get data
 		__host__ __device__ Number& operator ()(int maj, int min = 0, int cub = 0, int hyp = 0) {
 			#ifdef __CUDA_ARCH__			
-				return device_data[(((((maj * min_span) + min) * cub_span) + cub) * hyp_span) + hyp];
+				return device_data[(((((maj * min_span()) + min) * cub_span()) + cub) * hyp_span()) + hyp];
 			#else
-				return host_data[(((((maj * min_span) + min) * cub_span) + cub) * hyp_span) + hyp];
+				return host_data[(((((maj * min_span()) + min) * cub_span()) + cub) * hyp_span()) + hyp];
 			#endif
 		}
 
-		int num_elements() { return maj_span * min_span * cub_span * hyp_span; }
+		int num_elements() { return maj_span() * min_span() * cub_span() * hyp_span(); }
 		int bytesize() { return (num_elements() * sizeof(Number)); }
 
 #pragma endregion
@@ -48,17 +74,20 @@ namespace on {
 
 
 		Tensor(Number constant = 0) {
+			initialize_spans();
 			initialize_memory();
 			fill_memory(constant);
 			ready();
 		}
 
 		Tensor(std::vector<uint> in_spans, Number constant = 0) {
+			initialize_spans();
 			int num_dims_in = in_spans.size();
+			num_dims = 0;
 			for (int i = 0; i < num_dims_in; i++) {
 				int current_span = in_spans[i];
 				if (current_span > 1) {
-					spans[i] = in_spans[i];
+					host_spans[i] = in_spans[i];
 					num_dims++;
 				}
 			}
@@ -69,7 +98,7 @@ namespace on {
 
 		~Tensor() {
 			cudaFree(device_data);
-			delete []host_data;
+			delete host_data;
 			//free(host_data); //should be free, because I used malloc in initialize memory... right? 
 							 //evidently not, because I still get that heap error. that or theres another problem.
 							 //the fact that I'm just cutting and running in the main function probbaly doesnt help.
@@ -107,17 +136,26 @@ namespace on {
 	#pragma region memory functions
 
 		#pragma region initialize memory
+		void initialize_spans() {
+			host_spans = new uint[4];
+			std::fill_n(host_spans, 4, 1);
+			cudaMalloc((void**)&device_spans, 4 * sizeof(uint));
+			cudaMemcpy(device_spans, host_spans, 4 * sizeof(uint), cudaMemcpyHostToDevice);
+		}
+
 		void initialize_memory() {
 			initialize_host_memory();
 			initialize_device_memory();
 		}
 
 		void initialize_host_memory() {
-			host_data = new Number[bytesize()];
+			host_data = new Number[num_elements()];
+
 		}
 
 		void initialize_device_memory() {
 			cudaMalloc((void**)&device_data, bytesize());
+
 		}
 		#pragma endregion
 
@@ -134,6 +172,7 @@ namespace on {
 
 		void fill_device_memory(Number input) {
 			cudaMemset(device_data, input, bytesize());
+			cudaMemset(device_spans, 1, 4*sizeof(uint));
 		}
 
 		#pragma endregion
@@ -146,10 +185,12 @@ namespace on {
 		//I guess device memory leaks, start here by controlling the memory more carefully.
 		void upload() {
 			cudaMemcpy(device_data, host_data, bytesize(), cudaMemcpyHostToDevice);
+			cudaMemcpy(device_spans, host_spans, 4*sizeof(uint), cudaMemcpyHostToDevice);
 		}
 
 		void download() {
 			cudaMemcpy(host_data, device_data, bytesize(), cudaMemcpyDeviceToHost);
+			cudaMemcpy(host_spans, device_spans, 4*sizeof(uint), cudaMemcpyDeviceToHost);
 		}
 
 		#pragma endregion
@@ -163,7 +204,10 @@ namespace on {
 		#pragma region omega null
 
 		Tensor(const Tensor& input) {
-			spans = input.spans;
+			initialize_spans();
+			initialize_memory();
+			On_Copy(host_spans, input.host_spans, 4);
+			cudaMemcpy(device_spans, host_spans, 4 * sizeof(uint), cudaMemcpyHostToDevice);
 			num_dims = input.num_dims;
 			host_data = input.host_data;
 			device_data = input.device_data;
@@ -171,7 +215,8 @@ namespace on {
 		}
 
 		void operator=(const Tensor& input){
-			spans = input.spans;
+			On_Copy(host_spans, input.host_spans, 4);
+			cudaMemcpy(device_spans, host_spans, 4 * sizeof(uint), cudaMemcpyHostToDevice);
 			num_dims = input.num_dims;
 			host_data = input.host_data;
 			device_data = input.device_data;
@@ -186,7 +231,7 @@ namespace on {
 			void operator=(std::vector<Number> input) {
 				desync(host);
 				num_dims = 1;
-				spans[0] = input.size();
+				host_spans[0] = input.size();
 
 				//careful with this one, something about how it handles memory could be throwing things off with the destructor
 				std::copy(input.begin(), input.end(), host_data);
@@ -198,7 +243,7 @@ namespace on {
 			operator std::vector<Number>() { return std::vector<Number>(host_data, host_data + num_elements()); }
 
 			//to pointer
-			operator Number* () {
+			__host__ __device__ operator Number* () {
 				#ifdef __CUDA_ARCH__
 				return device_data;
 				#else
@@ -208,7 +253,7 @@ namespace on {
 
 			//from numerical type
 
-			operator Number () {
+			__host__ __device__ operator Number () {
 				#ifdef __CUDA_ARCH__
 				return device_data[0];
 				#else 
@@ -232,20 +277,21 @@ namespace on {
 			//from array
 			void operator=(af::array& input) {
 				
+				desync(host);
 				num_dims = input.numdims();
 				for (int i = 0; i < num_dims; i++) {
-					spans[i] = input.dims(i);
+					host_spans[i] = input.dims(i);
 				}
+				sync();
 
 				desync(device);
-				initialize_device_memory();
-				cudaMemcpy(device_data, input.device<Number>(), bytesize(), cudaMemcpyDeviceToDevice);
-				sync();
+				cudaMemcpy((void*)device_data, (void*)input.device<Number>(), bytesize(), cudaMemcpyDeviceToDevice);
 				input.unlock(); //probably a sloppy way to do this, but oh well
+				sync();
 			}
 
 			//to array
-			operator af::array() { return af::array((dim_t)maj_span, (dim_t)min_span, host_data); }
+			operator af::array() { return af::array((dim_t)maj_span(), (dim_t)min_span(), host_data); }
 
 		#pragma endregion
 
@@ -257,18 +303,19 @@ namespace on {
 				bool has_channels = (input.channels() > 1);
 				num_dims += has_channels;
 
-				spans[0] = input.rows;
-				spans[1] = input.cols;
-				spans[2] = input.channels();
-
 				desync(host);
+
+				host_spans[0] = input.rows;
+				host_spans[1] = input.cols;
+				host_spans[2] = input.channels();
+
 				host_data = (Number*)input.data;
 				sync();
 			}
 
 			//from Tensor to Mat
 			operator cv::Mat() {
-				return cv::Mat(spans[0], spans[1], cv::DataType<Number>::type, host_data);
+				return cv::Mat(host_spans[0], host_spans[1], cv::DataType<Number>::type, host_data);
 			}
 
 			#ifdef GPUMAT_TO_TENSOR_FIXED
