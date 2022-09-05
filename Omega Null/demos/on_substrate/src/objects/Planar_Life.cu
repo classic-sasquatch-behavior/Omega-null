@@ -4,19 +4,19 @@
 #include"Planar_Life.h"
 
 
-__global__ void change_environment(on::Tensor<int> environment, on::Tensor<int> cells) {
+__global__ void change_environment(on::Device_Ptr<int> environment, on::Device_Ptr<int> cells) {
 	GET_DIMS(maj, min);
-	CHECK_BOUNDS(environment.maj_span, environment.min_span);
+	CHECK_BOUNDS(environment.maj(), environment.min());
 
 	int affect = cells(maj, min, 0) * cells(maj, min, 1);
-	FOR_3X3_INCLUSIVE(n_maj, n_min, environment.maj_span, environment.min_span, maj, min,
+	FOR_3X3_INCLUSIVE(n_maj, n_min, environment.maj(), environment.min(), maj, min,
 		atomicAdd(&environment(maj, min), affect);
 	);
 }
 
-__global__ void move(on::Tensor<int> environment, on::Tensor<int> cells, on::Tensor<int> future_cells) {
+__global__ void move(on::Device_Ptr<int> environment, on::Device_Ptr<int> cells, on::Device_Ptr<int> future_cells) {
 	GET_DIMS(maj, min);
-	CHECK_BOUNDS(environment.maj_span, environment.min_span);
+	CHECK_BOUNDS(environment.maj(), environment.min());
 
 	int attractor = cells(maj, min, 1);
 	int self_attraction = environment(maj, min) * attractor;
@@ -25,7 +25,7 @@ __global__ void move(on::Tensor<int> environment, on::Tensor<int> cells, on::Ten
 	int largest_neighbor_maj = maj;
 	int largest_neighbor_min = min;
 
-	FOR_3X3_INCLUSIVE(n_maj, n_min, environment.maj_span, environment.min_span, maj, min,
+	FOR_3X3_INCLUSIVE(n_maj, n_min, environment.maj(), environment.min(), maj, min,
 		int target_value = environment(n_maj, n_min) * attractor;
 	if (target_value > highest_value) {
 		highest_value = target_value;
@@ -40,9 +40,9 @@ __global__ void move(on::Tensor<int> environment, on::Tensor<int> cells, on::Ten
 }
 
 //pretty goofy way to do this to be honest. But let's see how fast or slow it runs.
-__global__ void draw(on::Tensor<int> input, on::Tensor<uchar> output) {
+__global__ void draw(on::Device_Ptr<int> input, on::Device_Ptr<uchar> output) {
 	GET_DIMS(maj, min);
-	CHECK_BOUNDS(input.maj_span, input.min_span);
+	CHECK_BOUNDS(input.maj(), input.min());
 
 	int value = input(maj, min, 0);
 	int attractor = input(maj, min, 1);
@@ -82,12 +82,12 @@ __global__ void draw(on::Tensor<int> input, on::Tensor<uchar> output) {
 	}
 }
 
-__global__ void spawn(on::Tensor<int> mask, curandState* random_states, on::Tensor<int> result) {
+__global__ void spawn(on::Device_Ptr<int> mask, curandState* random_states, on::Device_Ptr<int> result) {
 	GET_DIMS(maj, min);
-	CHECK_BOUNDS(result.maj_span, result.min_span);
+	CHECK_BOUNDS(result.maj(), result.min());
 	//if (mask(maj, min) == 0) { return; } //possible failure here
 
-	int id = LINEAR_CAST(maj, min, result.min_span);
+	int id = LINEAR_CAST(maj, min, result.min());
 
 	curandState local_state = random_states[id]; //possible failure here (unlikely)
 	int random_0 = curand(&local_state);
@@ -110,14 +110,14 @@ namespace on {
 
 				on::Tensor<int> Seed::cells(int value = 0) {
 
-					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height, 2}, 0);
+					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height, 2}, 0, "result");
 					af::array af_mask = (af::randu(Parameter::environment_width, Parameter::environment_height) > 0.5).as(s32);
-					on::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height}, 0);
+					on::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height}, 0, "mask");
 					mask = af_mask; //possible failure here
 
 					curandState* states = on::Random::Initialize::curand_xor(Parameter::environment_area, value);
 
-					on::Launch::Kernel::conf_2d(result.maj_span, result.min_span);
+					on::Launch::Kernel::conf_2d(result.maj(), result.min());
 					spawn<<<LAUNCH>>>(mask, states, result); //try using the nvidia debugger
 					On_Sync(spawn); 
 
@@ -129,9 +129,9 @@ namespace on {
 
 				on::Tensor<uchar> Draw::frame(on::Tensor<int>& cells) {
 
-					on::Tensor<uchar> output({cells.maj_span, cells.min_span, 3}, 0);
+					on::Tensor<uchar> output({cells.maj(), cells.min(), 3}, 0);
 
-					on::Launch::Kernel::conf_2d(cells.maj_span, cells.min_span);
+					on::Launch::Kernel::conf_2d(cells.maj(), cells.min());
 					draw <<<LAUNCH>>> (cells, output);
 					On_Sync(draw);
 
@@ -141,7 +141,7 @@ namespace on {
 
 				void Planar_Life::Step::polar(Tensor<int>& environment, Tensor<int>& cells) {
 
-					on::Launch::Kernel::conf_2d(environment.maj_span, environment.min_span);
+					on::Launch::Kernel::conf_2d(environment.maj(), environment.min());
 
 					change_environment<<<LAUNCH>>> (environment, cells);
 					On_Sync(change_environment);

@@ -26,12 +26,16 @@ if(on::Debug::cuda_error != cudaSuccess){\
 }
 
 
-#define On_Copy(_to_, _from_, _length_)\
+#define On_Copy_Unroll(_to_, _from_, _length_)\
  __pragma(unroll) for (int i = 0; i < _length_; i++){\
 	_to_[i] = _from_[i];\
  }
 
 
+#define On_Copy(_to_, _from_, _length_)\
+ for (int i = 0; i < _length_; i++){\
+	_to_[i] = _from_[i];\
+ }
 
 
 namespace on {

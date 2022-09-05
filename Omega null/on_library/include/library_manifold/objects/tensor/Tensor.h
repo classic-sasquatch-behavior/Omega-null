@@ -6,21 +6,68 @@
 
 namespace on {
 
+	template <typename Number>
+	struct Device_Ptr {
+		
+		Device_Ptr(uint spans_in[4], Number* device_data_in) {
+			
+			for(int i = 0; i < 4; i++) {
+				spans[i] = spans_in[i];
+				if (spans[i] > 1) num_dims++;
+			}
+			device_data = device_data_in;
+		}
+
+		uint num_dims = 0;
+		uint spans[4] = {1, 1, 1, 1};
+
+		__device__ uint maj() const {return spans[0]; }
+		__device__ uint min() const {return spans[1]; }
+		__device__ uint cub() const {return spans[2]; }
+		__device__ uint hyp() const {return spans[3]; }
+
+		Number* device_data = nullptr;
+
+		__device__ Number& operator ()(int maj_pos, int min_pos = 0, int cub_pos = 0, int hyp_pos = 0) { return device_data[(((((maj_pos * min()) + min_pos) * cub()) + cub_pos) * hyp()) + hyp_pos]; }
+
+	};
+
+
+
+
+
 	template<typename Number>
 	struct Tensor {
+
+		operator Device_Ptr<Number>() { 
+			switch(synced) {
+				case true: desync(device); break;
+				case false: switch(current){
+					case host: sync();
+					default: break;
+				} break;
+			}
+			return(Device_Ptr<Number>(spans, device_data)); 
+		}
+
+
 
 	#pragma region data	
 
 		Number* device_data = nullptr;
 		Number* host_data = nullptr;
 
-		uint num_dims = 0;
-		std::vector<uint> spans = { 1, 1, 1, 1 };
+		//for debug purposes
+		std::string name = "uninitialized";
 
-		uint& maj_span = spans[0];
-		uint& min_span = spans[1];
-		uint& cub_span = spans[2];
-		uint& hyp_span = spans[3];
+		uint num_dims = 0;
+
+		uint spans[4] = {1, 1, 1, 1};
+
+		__host__ uint maj() const { return spans[0]; }
+		__host__ uint min() const { return spans[1]; }
+		__host__ uint cub() const { return spans[2]; }
+		__host__ uint hyp() const { return spans[3]; }
 
 		bool synced = false;
 		on::host_or_device current = on::host;
@@ -30,15 +77,19 @@ namespace on {
 	#pragma region get data
 
 		//get data
-		__host__ __device__ Number& operator ()(int maj, int min = 0, int cub = 0, int hyp = 0) {
-			#ifdef __CUDA_ARCH__			
-				return device_data[(((((maj * min_span) + min) * cub_span) + cub) * hyp_span) + hyp];
-			#else
-				return host_data[(((((maj * min_span) + min) * cub_span) + cub) * hyp_span) + hyp];
-			#endif
+		__host__ Number& operator ()(int maj, int min = 0, int cub = 0, int hyp = 0) {
+			switch(synced){
+				case true: desync(host); break;
+				case false: switch(current){
+					case device: sync(); break;
+					default: break;
+				} break;
+			}
+
+			return host_data[(((((maj * min) + min) * cub) + cub) * hyp) + hyp];
 		}
 
-		int num_elements() { return maj_span * min_span * cub_span * hyp_span; }
+		int num_elements() { return maj() * min() * cub() * hyp(); }
 		int bytesize() { return (num_elements() * sizeof(Number)); }
 
 #pragma endregion
@@ -53,7 +104,8 @@ namespace on {
 			ready();
 		}
 
-		Tensor(std::vector<uint> in_spans, Number constant = 0) {
+		Tensor(std::vector<uint> in_spans, Number constant = 0, std::string in_name = "default") {
+			name = in_name;
 			int num_dims_in = in_spans.size();
 			num_dims = 0;
 			for (int i = 0; i < num_dims_in; i++) {
@@ -164,7 +216,9 @@ namespace on {
 		#pragma region omega null
 
 		Tensor(const Tensor& input) {
-			spans = input.spans;
+			name = input.name + "_copy";
+			On_Copy(spans, input.spans, 4);
+			//spans = input.spans;
 			num_dims = input.num_dims;
 			host_data = input.host_data;
 			device_data = input.device_data;
@@ -172,7 +226,9 @@ namespace on {
 		}
 
 		void operator=(const Tensor& input){
-			spans = input.spans;
+			name = input.name + "_copy";
+			On_Copy(spans, input.spans, 4);
+			//spans = input.spans;
 			num_dims = input.num_dims;
 			host_data = input.host_data;
 			device_data = input.device_data;
@@ -199,30 +255,22 @@ namespace on {
 			operator std::vector<Number>() { return std::vector<Number>(host_data, host_data + num_elements()); }
 
 			//to pointer
-			__host__ __device__ operator Number* () {
-				#ifdef __CUDA_ARCH__
-				return device_data;
-				#else
-				return host_data;
-				#endif
+			__host__ operator Number* () {
+				return &((*this)(0));
 			}
 
 			//from numerical type
 
-			__host__ __device__ operator Number () {
-				#ifdef __CUDA_ARCH__
-				return device_data[0];
-				#else 
-				return host_data[0];
-				#endif
+			__host__ operator Number () {
+				return (*this)(0);
 			}
 
 			//to numerical type - maybe this could take the sum of the array? would therefore be consistent with the use case I want it for (casting a 0 dim Tensor to a number)
 
 			//comparison to numerical type
-			bool operator ==(Number compare){
-				Number self = host_data[0];
-				return compare == self;
+			bool operator ==(Number to_compare){
+				Number self = (*this)(0);
+				return to_compare == self;
 			}
 
 
@@ -246,7 +294,7 @@ namespace on {
 			}
 
 			//to array
-			operator af::array() { return af::array((dim_t)maj_span, (dim_t)min_span, host_data); }
+			operator af::array() { return af::array((dim_t)maj(), (dim_t)min(), host_data); }
 
 		#pragma endregion
 

@@ -6,9 +6,9 @@
 template <typename Type>
 __global__ void touch(on::Tensor<Type> input, on::Tensor<Type> debug) {
 	GET_DIMS(maj, min);
-	CHECK_BOUNDS(input.maj_span, input.min_span);
+	CHECK_BOUNDS(input.maj, input.min);
 
-	for (int i = 0; i < input.cub_span; i++) {
+	for (int i = 0; i < input.cub; i++) {
 		debug(maj, min, i) = input(maj, min, i);
 	}
 }
@@ -107,9 +107,9 @@ namespace on {
 
 				switch (direction) {
 					case host: 
-						for (int maj = 0; maj < input.maj_span; maj++) {
-							for (int min = 0; min < input.min_span; min++) {
-								for (int cub = 0; cub < input.cub_span; cub++) {
+						for (int maj = 0; maj < input.maj; maj++) {
+							for (int min = 0; min < input.min; min++) {
+								for (int cub = 0; cub < input.cub; cub++) {
 									debug(maj, min, cub) = input(maj, min, cub);
 								}
 							}
@@ -118,7 +118,7 @@ namespace on {
 						break;
 
 					case device: 
-						on::Launch::Kernel::conf_2d(input.maj_span, input.min_span);
+						on::Launch::Kernel::conf_2d(input.maj, input.min);
 						touch<<<LAUNCH>>>(input, debug);
 						On_Sync(touch_device_tensor);
 						break;

@@ -6,18 +6,18 @@
 
 #pragma region sample_centers
 
-	__global__ void sample_centers_kernel(on::Tensor<int> source, on::Tensor<int> center_pos) {
+	__global__ void sample_centers_kernel(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos) {
 		GET_DIMS(maj, min);
-		CHECK_BOUNDS(center_pos.maj_span, center_pos.min_span);
+		CHECK_BOUNDS(center_pos.maj(), center_pos.min());
 
-		center_pos(maj, min, 0) = CAST_UP(maj, center_pos.maj_span, source.maj_span);
-		center_pos(maj, min, 1) = CAST_UP(min, center_pos.min_span, source.min_span);
+		center_pos(maj, min, 0) = CAST_UP(maj, center_pos.maj(), source.maj());
+		center_pos(maj, min, 1) = CAST_UP(min, center_pos.min(), source.min());
 
 	}
 
-	__global__ void gradient_descent(on::Tensor<int> source, on::Tensor<int> center_pos) {
+	__global__ void gradient_descent(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos) {
 		GET_DIMS(maj, min);
-		CHECK_BOUNDS(center_pos.maj_span, center_pos.min_span);
+		CHECK_BOUNDS(center_pos.maj(), center_pos.min());
 
 		//gradient descent
 
@@ -27,12 +27,12 @@
 
 #pragma region assign_pixels_to_centers
 
-	__global__ void pixels_to_centers(on::Tensor<int> source, on::Tensor<int> center_pos, int distance_modifier, on::Tensor<int> flags) {
+	__global__ void pixels_to_centers(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos, int distance_modifier, on::Device_Ptr<int> flags) {
 		GET_DIMS(maj, min);
-		CHECK_BOUNDS(source.maj_span, source.min_span);
+		CHECK_BOUNDS(source.maj(), source.min());
 
-		int sector_maj = CAST_DOWN(maj, center_pos.maj_span);
-		int sector_min = CAST_DOWN(min, center_pos.min_span);
+		int sector_maj = CAST_DOWN(maj, center_pos.maj());
+		int sector_min = CAST_DOWN(min, center_pos.min());
 
 		int self_channels[3] = {source(maj, min, 0), source(maj, min, 1), source(maj, min, 2)};
 		int self_position[2] = {maj, min};
@@ -40,8 +40,8 @@
 		int closest_center = -1;
 		int smallest_distance = INT_MAX;
 
-		FOR_3X3_INCLUSIVE(n_maj, n_min, center_pos.maj_span, center_pos.min_span, maj, min, 
-			int center_id = LINEAR_CAST(n_maj, n_min, center_pos.min_span);
+		FOR_3X3_INCLUSIVE(n_maj, n_min, center_pos.maj(), center_pos.min(), maj, min, 
+			int center_id = LINEAR_CAST(n_maj, n_min, center_pos.min());
 			int neighbor_maj = center_pos(n_maj, n_min, 0);
 			int neighbor_min = center_pos(n_maj, n_min, 1);
 
@@ -75,9 +75,9 @@
 
 #pragma region update_centers
 	
-	__global__ void tally_centers(on::Tensor<int> flags, on::Tensor<int> tally) {
+	__global__ void tally_centers(on::Device_Ptr<int> flags, on::Device_Ptr<int> tally) {
 		GET_DIMS(maj, min);
-		CHECK_BOUNDS(flags.maj_span, flags.min_span);
+		CHECK_BOUNDS(flags.maj(), flags.min());
 
 		int id = flags(maj, min);
 
@@ -87,12 +87,12 @@
 
 	}
 
-	__global__ void move_centers(on::Tensor<int> tally, on::Tensor<int> center_pos, int* displacement) {
+	__global__ void move_centers(on::Device_Ptr<int> tally, on::Device_Ptr<int> center_pos, int* displacement) {
 		GET_DIMS(id, ZERO);
-		CHECK_BOUNDS(tally.maj_span, 1);
+		CHECK_BOUNDS(tally.maj(), 1);
 		
-		int maj = id % center_pos.min_span;
-		int min = (id - min) / center_pos.min_span;
+		int min = id % center_pos.min();
+		int maj = (id - min) / center_pos.min();
 
 		int old_maj = center_pos(maj, min, 0);
 		int old_min = center_pos(maj, min, 1);
@@ -117,15 +117,15 @@
 
 #pragma region separate_blobs
 
-	__global__ void separate_blobs_kernel(on::Tensor<int> labels, on::Tensor<int> flag, on::Tensor<int> blobs) {
+	__global__ void separate_blobs_kernel(on::Device_Ptr<int> labels, on::Device_Ptr<int> flag, on::Device_Ptr<int> blobs) {
 		GET_DIMS(maj, min);
-		CHECK_BOUNDS(labels.maj_span, labels.min_span);
+		CHECK_BOUNDS(labels.maj(), labels.min());
 
-		int id = LINEAR_CAST(maj, min, labels.min_span);
+		int id = LINEAR_CAST(maj, min, labels.min());
 		int label = labels(maj, min);
 		int blob = blobs(maj, min);
 
-		FOR_NEIGHBOR(n_maj, n_min, labels.maj_span, labels.min_span, maj, min,		
+		FOR_NEIGHBOR(n_maj, n_min, labels.maj(), labels.min(), maj, min,		
 			int neighbor_label = labels(maj, min);
 			int neighbor_blob = blobs(maj, min);
 			if (neighbor_label != label) {continue;}
@@ -186,21 +186,21 @@ namespace on {
 		using namespace Algorithm::Parameter::SLIC;
 		On_Structure Algorithm {
 			
-			void SLIC::sample_centers(Tensor<int>& source, Tensor<int>& center_pos) {
+			void SLIC::sample_centers(on::Tensor<int>& source, on::Tensor<int>& center_pos) {
 
-				Launch::Kernel::conf_2d(center_pos.maj_span, center_pos.min_span);
+				Launch::Kernel::conf_2d(center_pos.maj(), center_pos.min());
 				sample_centers_kernel<<<LAUNCH>>>(source, center_pos);
 				On_Sync(sample_centers);
 
-				Launch::Kernel::conf_2d(center_pos.maj_span, center_pos.min_span);
+				Launch::Kernel::conf_2d(center_pos.maj(), center_pos.min());
 				gradient_descent<<<LAUNCH>>>(source, center_pos);
 				On_Sync(gradient_descent);
 
 			}
 
-			void SLIC::assign_pixels_to_centers(Tensor<int>& source, Tensor<int>& center_pos, Tensor<int>& labels) {
+			void SLIC::assign_pixels_to_centers(on::Tensor<int>& source, on::Tensor<int>& center_pos, on::Tensor<int>& labels) {
 
-				Launch::Kernel::conf_2d(source.maj_span, source.min_span);
+				Launch::Kernel::conf_2d(source.maj(), source.min());
 				pixels_to_centers<<<LAUNCH>>>(source, center_pos, density_modifier, labels);
 				On_Sync(pixels_to_centers);
 
@@ -211,12 +211,12 @@ namespace on {
 				//0 = maj sum , 1 = min sum, 2 = count
 				on::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
 
-				Launch::Kernel::conf_2d(labels.maj_span, labels.min_span);
+				Launch::Kernel::conf_2d(labels.maj(), labels.min());
 				tally_centers<<<LAUNCH>>>(labels, tally);
 				On_Sync(tally_centers);
 
 				on::Tensor<int> temp_displacement;
-				Launch::Kernel::conf_1d(tally.maj_span);
+				Launch::Kernel::conf_1d(tally.maj());
 				move_centers<<<LAUNCH>>>(tally, center_pos, temp_displacement); 
 				On_Sync(move_centers);
 				Parameter::SLIC::displacement = temp_displacement;
@@ -227,10 +227,10 @@ namespace on {
 			void SLIC::separate_blobs(on::Tensor<int>& labels) {
 
 				on::Tensor<int> flag;
-				on::Tensor<int> blobs({labels.maj_span, labels.min_span}, 0);
+				on::Tensor<int> blobs({labels.maj(), labels.min()}, 0);
 				blobs = labels;
 
-				Launch::Kernel::conf_2d(labels.maj_span, labels.min_span);
+				Launch::Kernel::conf_2d(labels.maj(), labels.min());
 
 				do {
 					separate_blobs_kernel<<<LAUNCH>>>(labels, flag, blobs);
@@ -284,8 +284,8 @@ namespace on {
 			void SLIC::run(Clip<int>& input, Clip<int>& output) {
 				for (Tensor source : input.frames) {
 
-					source_maj = source.maj_span;
-					source_min = source.min_span;
+					source_maj = source.maj();
+					source_min = source.min();
 					num_pixels = source_maj * source_min;
 
 					SP_maj;
