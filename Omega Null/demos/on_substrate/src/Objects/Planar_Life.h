@@ -35,22 +35,41 @@ namespace on {
 					static void polar(Tensor<int>& environment, Tensor<int>& cells);
 				};
 
-
 				static void run(on::Tensor<int> seed = Planar_Life::Seed::cells(rand())) {
 
-					//Display::Forge::Initialize::window();
 					Planar_Life::Parameter::running = true;
 
 					on::Tensor<int> environment({Parameter::environment_width, Parameter::environment_height},0);
 					on::Tensor<int> cells = seed; //channel 0: values //channel 1: attractors
 
-					on::Tensor<uchar> frame({Parameter::environment_width, Parameter::environment_height}, 3);
+					on::Tensor<uchar> frame({Parameter::environment_width, Parameter::environment_height, 3}, 0);
 
+					af::Window window(Parameter::environment_width, Parameter::environment_height);
+
+					int start_time = now_ms();
+					int FPS = 20;
 					do {
-						//Display::Forge::Listen::for_input();
-						Step::polar(environment, cells);
-						frame = Draw::frame(cells); //probably want to make the whole frame drawing system static somehow
-						Display::Forge::render(frame);
+						int current_time = now_ms();
+						int wait_time = (1000 / FPS) - (current_time - start_time);
+
+
+
+						Step::polar(environment, cells); 
+						//conversion from tensor to device_ptr
+						//creation and destruction of tensor
+						//tensor copy assignment operator
+
+						frame = Draw::frame(cells); 
+						//conversion from tensor to device_ptr
+						//creation and destruction of tensor 
+						//tensor copy assignment operator
+
+
+						window.image(frame); //conversion from tensor to af::array 
+
+						std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
+						start_time = now_ms();
+						//std::cout << "FPS: " << 1000 / wait_time << std::endl;
 					} while (Planar_Life::Parameter::running);
 
 				}

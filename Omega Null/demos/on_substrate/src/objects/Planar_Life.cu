@@ -140,19 +140,17 @@ namespace on {
 				}
 
 				void Planar_Life::Step::polar(Tensor<int>& environment, Tensor<int>& cells) {
-
+					
 					on::configure::kernel_2d(environment.maj(), environment.min());
-
-					change_environment<<<LAUNCH>>> (environment, cells);
+					change_environment<<<LAUNCH>>> (environment, cells); //conversion from tensor to device_ptr
 					SYNC_KERNEL(change_environment);
 
-					on::Tensor<int> future_cells({cells.spans[0], cells.spans[1], cells.spans[2]}, 0);
+					on::Tensor<int> future_cells({cells.spans[0], cells.spans[1], cells.spans[2]}, 0); //creation of tensor, therefore subsequent destruction
 
-					move<<<LAUNCH>>> (environment, cells, future_cells);
+					move<<<LAUNCH>>> (environment, cells, future_cells); //more conversion from tensor to device_ptr
 					SYNC_KERNEL(move);
 
-					cells = future_cells;
-
+					cells = future_cells; //copy assignment operator
 				}
 			}
 		}
