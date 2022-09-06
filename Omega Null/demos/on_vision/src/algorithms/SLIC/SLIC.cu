@@ -7,8 +7,8 @@
 #pragma region sample_centers
 
 	__global__ void sample_centers_kernel(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos) {
-		GET_DIMS(maj, min);
-		CHECK_BOUNDS(center_pos.maj(), center_pos.min());
+		DIMS_2D(maj, min);
+		BOUNDS_2D(center_pos.maj(), center_pos.min());
 
 		center_pos(maj, min, 0) = CAST_UP(maj, center_pos.maj(), source.maj());
 		center_pos(maj, min, 1) = CAST_UP(min, center_pos.min(), source.min());
@@ -16,8 +16,8 @@
 	}
 
 	__global__ void gradient_descent(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos) {
-		GET_DIMS(maj, min);
-		CHECK_BOUNDS(center_pos.maj(), center_pos.min());
+		DIMS_2D(maj, min);
+		BOUNDS_2D(center_pos.maj(), center_pos.min());
 
 		//gradient descent
 
@@ -28,8 +28,8 @@
 #pragma region assign_pixels_to_centers
 
 	__global__ void pixels_to_centers(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos, int distance_modifier, on::Device_Ptr<int> flags) {
-		GET_DIMS(maj, min);
-		CHECK_BOUNDS(source.maj(), source.min());
+		DIMS_2D(maj, min);
+		BOUNDS_2D(source.maj(), source.min());
 
 		int sector_maj = CAST_DOWN(maj, center_pos.maj());
 		int sector_min = CAST_DOWN(min, center_pos.min());
@@ -76,8 +76,8 @@
 #pragma region update_centers
 	
 	__global__ void tally_centers(on::Device_Ptr<int> flags, on::Device_Ptr<int> tally) {
-		GET_DIMS(maj, min);
-		CHECK_BOUNDS(flags.maj(), flags.min());
+		DIMS_2D(maj, min);
+		BOUNDS_2D(flags.maj(), flags.min());
 
 		int id = flags(maj, min);
 
@@ -88,8 +88,8 @@
 	}
 
 	__global__ void move_centers(on::Device_Ptr<int> tally, on::Device_Ptr<int> center_pos, int* displacement) {
-		GET_DIMS(id, ZERO);
-		CHECK_BOUNDS(tally.maj(), 1);
+		DIMS_2D(id, ZERO);
+		BOUNDS_2D(tally.maj(), 1);
 		
 		int min = id % center_pos.min();
 		int maj = (id - min) / center_pos.min();
@@ -118,8 +118,8 @@
 #pragma region separate_blobs
 
 	__global__ void separate_blobs_kernel(on::Device_Ptr<int> labels, on::Device_Ptr<int> flag, on::Device_Ptr<int> blobs) {
-		GET_DIMS(maj, min);
-		CHECK_BOUNDS(labels.maj(), labels.min());
+		DIMS_2D(maj, min);
+		BOUNDS_2D(labels.maj(), labels.min());
 
 		int id = LINEAR_CAST(maj, min, labels.min());
 		int label = labels(maj, min);
@@ -188,21 +188,21 @@ namespace on {
 			
 			void SLIC::sample_centers(on::Tensor<int>& source, on::Tensor<int>& center_pos) {
 
-				Launch::Kernel::conf_2d(center_pos.maj(), center_pos.min());
+				on::configure::kernel_2d(center_pos.maj(), center_pos.min());
 				sample_centers_kernel<<<LAUNCH>>>(source, center_pos);
-				On_Sync(sample_centers);
+				SYNC_KERNEL(sample_centers);
 
-				Launch::Kernel::conf_2d(center_pos.maj(), center_pos.min());
+				on::configure::kernel_2d(center_pos.maj(), center_pos.min());
 				gradient_descent<<<LAUNCH>>>(source, center_pos);
-				On_Sync(gradient_descent);
+				SYNC_KERNEL(gradient_descent);
 
 			}
 
 			void SLIC::assign_pixels_to_centers(on::Tensor<int>& source, on::Tensor<int>& center_pos, on::Tensor<int>& labels) {
 
-				Launch::Kernel::conf_2d(source.maj(), source.min());
+				on::configure::kernel_2d(source.maj(), source.min());
 				pixels_to_centers<<<LAUNCH>>>(source, center_pos, density_modifier, labels);
-				On_Sync(pixels_to_centers);
+				SYNC_KERNEL(pixels_to_centers);
 
 			}
 
@@ -211,14 +211,14 @@ namespace on {
 				//0 = maj sum , 1 = min sum, 2 = count
 				on::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
 
-				Launch::Kernel::conf_2d(labels.maj(), labels.min());
+				on::configure::kernel_2d(labels.maj(), labels.min());
 				tally_centers<<<LAUNCH>>>(labels, tally);
-				On_Sync(tally_centers);
+				SYNC_KERNEL(tally_centers);
 
 				on::Tensor<int> temp_displacement;
-				Launch::Kernel::conf_1d(tally.maj());
+				on::configure::kernel_1d(tally.maj());
 				move_centers<<<LAUNCH>>>(tally, center_pos, temp_displacement); 
-				On_Sync(move_centers);
+				SYNC_KERNEL(move_centers);
 				Parameter::SLIC::displacement = temp_displacement;
 					
 			}
@@ -230,11 +230,11 @@ namespace on {
 				on::Tensor<int> blobs({labels.maj(), labels.min()}, 0);
 				blobs = labels;
 
-				Launch::Kernel::conf_2d(labels.maj(), labels.min());
+				on::configure::kernel_2d(labels.maj(), labels.min());
 
 				do {
 					separate_blobs_kernel<<<LAUNCH>>>(labels, flag, blobs);
-					On_Sync(separate_blobs);
+					SYNC_KERNEL(separate_blobs);
 
 				} while (flag == 1);
 
@@ -244,15 +244,15 @@ namespace on {
 			void SLIC::absorb_small_blobs(on::Tensor<int>& labels) {
 						
 				find_sizes<<<LAUNCH>>>();
-				On_Sync(find_sizes);
+				SYNC_KERNEL(find_sizes);
 
 				find_weak_labels<<<LAUNCH>>>();
-				On_Sync(find_weak_labels);
+				SYNC_KERNEL(find_weak_labels);
 
 				do {
 
 					absorb_small_blobs_kernel<<<LAUNCH>>>();
-					On_Sync(absorb_small_blobs);
+					SYNC_KERNEL(absorb_small_blobs);
 
 				} while (0);
 
@@ -261,16 +261,16 @@ namespace on {
 			void SLIC::produce_ordered_labels(on::Tensor<int>& labels) {
 
 				raise_flags<<<LAUNCH>>>();
-				On_Sync(raise_flags);
+				SYNC_KERNEL(raise_flags);
 
 				init_map<<<LAUNCH>>>();
-				On_Sync(init_map);
+				SYNC_KERNEL(init_map);
 
 				invert_map<<<LAUNCH>>>();
-				On_Sync(invert_map);
+				SYNC_KERNEL(invert_map);
 
 				assign_new_labels<<<LAUNCH>>>();
-				On_Sync(assign_new_labels);
+				SYNC_KERNEL(assign_new_labels);
 
 			}
 			#pragma endregion

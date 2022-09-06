@@ -11,7 +11,7 @@ namespace on {
 
 		On_Structure Forge {
 
-			static af::Window window;
+			inline af::Window window;
 
 			On_Process Initialize {
 
@@ -29,7 +29,7 @@ namespace on {
 			static void render(on::Tensor<uchar>& input) {
 				
 				af::array frame = input;
-				Forge::window.image(input);
+				Forge::window.image(frame);
 
 			}
 		}

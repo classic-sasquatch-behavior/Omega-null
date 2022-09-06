@@ -16,14 +16,13 @@
     <CudaCompile Include="demos\on_vision\src\algorithms\AP\AP.cu" />
     <CudaCompile Include="demos\on_vision\src\algorithms\SLIC\SLIC.cu" />
     <CudaCompile Include="main.cu" />
-    <CudaCompile Include="on_library\src\objects\tensor\Random.cu" />
+    <CudaCompile Include="on_library\include\library_manifold\objects\Random.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="on_language\src\compile.cpp" />
     <ClCompile Include="on_language\src\xml translator\Loader.cpp" />
     <ClCompile Include="on_language\src\xml translator\Reader.cpp" />
     <ClCompile Include="on_language\src\xml translator\Writer.cpp" />
-    <ClCompile Include="on_library\src\objects\Launch.cpp" />
     <ClCompile Include="util\pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,7 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\include\global_manifold.h" />
-    <ClInclude Include="common\include\global_manifold\cuda_macros.h" />
     <ClInclude Include="common\include\global_manifold\external_libraries.h" />
     <ClInclude Include="common\include\global_manifold\on_macros.h" />
     <ClInclude Include="common\include\omega_null.h" />
@@ -67,9 +65,7 @@
     <ClInclude Include="on_language\src\interface\output\SLIC_launch.h" />
     <ClInclude Include="on_library\include\library_manifold.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\Debug.h" />
-    <ClInclude Include="on_library\include\library_manifold\objects\Launch.h" />
     <ClInclude Include="on_library\include\library_manifold\objects\Random.h" />
-    <ClInclude Include="on_library\include\library_manifold\objects\tensor\Tensor.h" />
     <ClInclude Include="common\include\omega_null\library.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -103,6 +99,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Thelonious\source\repos\Omega Null - Header Lib\Omega Null - Header Lib;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\Thelonious\source\repos\Omega Null - Header Lib\Omega Null - Header Lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

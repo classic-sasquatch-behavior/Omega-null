@@ -1,6 +1,9 @@
 #pragma once
 
 
+//omega null
+
+
 //filestreams
 #include<iostream>
 #include<fstream>
@@ -39,3 +42,5 @@ typedef pugi::xml_node Node;
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+
+#include<on_header_lib.h>

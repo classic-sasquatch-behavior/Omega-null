@@ -5,8 +5,8 @@
 
 template <typename Type>
 __global__ void touch(on::Tensor<Type> input, on::Tensor<Type> debug) {
-	GET_DIMS(maj, min);
-	CHECK_BOUNDS(input.maj, input.min);
+	DIMS_2D(maj, min);
+	BOUNDS_2D(input.maj, input.min);
 
 	for (int i = 0; i < input.cub; i++) {
 		debug(maj, min, i) = input(maj, min, i);
@@ -20,11 +20,11 @@ namespace on {
 		inline cudaError_t cuda_error;
 
 		On_Process Print {
-			static void launch_parameters(std::string place) {
-				std::cout << std::endl << "launch parameters at " << place << ": " << std::endl;
-				std::cout << "num_blocks: " << on::Launch::Parameter::num_blocks.x << ", " << on::Launch::Parameter::num_blocks.y << ", " << on::Launch::Parameter::num_blocks.z << std::endl;
-				std::cout << "threads_per_block: " << on::Launch::Parameter::threads_per_block.x << ", " << on::Launch::Parameter::threads_per_block.y << ", " << on::Launch::Parameter::threads_per_block.z << std::endl;
-			}
+			//static void launch_parameters(std::string place) {
+			//	std::cout << std::endl << "launch parameters at " << place << ": " << std::endl;
+			//	std::cout << "num_blocks: " << on::Launch::Parameter::num_blocks.x << ", " << on::Launch::Parameter::num_blocks.y << ", " << on::Launch::Parameter::num_blocks.z << std::endl;
+			//	std::cout << "threads_per_block: " << on::Launch::Parameter::threads_per_block.x << ", " << on::Launch::Parameter::threads_per_block.y << ", " << on::Launch::Parameter::threads_per_block.z << std::endl;
+			//}
 
 			template <typename ElementType>
 			static void tensor(on::Tensor<ElementType> &input, uint max_depth = 10) {
@@ -114,13 +114,13 @@ namespace on {
 								}
 							}
 						}
-						On_Sync(touch_host_tensor);
+						SYNC_KERNEL(touch_host_tensor);
 						break;
 
 					case device: 
-						on::Launch::Kernel::conf_2d(input.maj, input.min);
+						on::configure::kernel_2d(input.maj, input.min);
 						touch<<<LAUNCH>>>(input, debug);
-						On_Sync(touch_device_tensor);
+						SYNC_KERNEL(touch_device_tensor);
 						break;
 
 					default: break;

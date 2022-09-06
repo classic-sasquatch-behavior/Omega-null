@@ -1,5 +1,6 @@
 #include"global_manifold.h"
 #include"omega_null.h"
+#include"Random.h"
 
 #ifdef DEPRECATED
 namespace on {
@@ -87,8 +88,8 @@ namespace on {
 
 
 __global__ void seed_curand_xor( int size, int seed, curandState* states) {
-	GET_DIMS(id, zero);
-	CHECK_BOUNDS(size, 1);
+	DIMS_1D(id);
+	BOUNDS_1D(size);
 
 	curand_init(seed, id, 0, &states[id]);
 }
@@ -105,9 +106,9 @@ namespace on {
 			curandState* states;
 			cudaMalloc((void**)&states, size * sizeof(curandState));
 		
-			on::Launch::Kernel::conf_1d(size);
+			on::configure::kernel_1d(size);
 			seed_curand_xor<<<LAUNCH>>>(size, seed, states);
-			On_Sync(seed_curand_xor);
+			//SYNC_KERNEL(seed_curand_xor);
 
 			return states;
 		}
