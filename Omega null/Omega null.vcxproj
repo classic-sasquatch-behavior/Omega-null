@@ -99,10 +99,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Thelonious\source\repos\Omega Null - Header Lib\Omega Null - Header Lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Thelonious\source\repos\skeleton key\skeleton key;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\Thelonious\source\repos\Omega Null - Header Lib\Omega Null - Header Lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Thelonious\source\repos\skeleton key\skeleton key;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
