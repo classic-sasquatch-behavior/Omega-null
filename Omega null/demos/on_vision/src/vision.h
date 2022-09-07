@@ -13,7 +13,7 @@ namespace on {
 		template <typename Number>
 		On_Being Clip {
 			Clip() {}
-			std::vector<on::Tensor<Number>> frames;
+			std::vector<sk::Tensor<Number>> frames;
 		};
 
 		On_Process Load{
@@ -28,7 +28,7 @@ namespace on {
 
 						h_Mat new_mat = cv::imread(file.path().string(), cv::IMREAD_COLOR);
 						cv::cvtColor(new_mat, new_frame, cv::COLOR_BGR2Lab);
-						on::Tensor<Number> new_frame = new_mat;
+						sk::Tensor<Number> new_frame = new_mat;
 						input.frames.push_back(new_frame);
 
 					}
@@ -43,7 +43,7 @@ namespace on {
 			On_Process Display {
 
 				template<typename Number>
-				static void frame(on::Tensor<Number>& input) {
+				static void frame(sk::Tensor<Number>& input) {
 					cv::Mat display = input;
 					cv::imshow(Window::name, display);
 				}
@@ -51,7 +51,7 @@ namespace on {
 				template<typename Number>
 				static void clip(Clip<Number>& input) {
 					
-					for (on::Tensor<Number> frame : input.frames) {
+					for (sk::Tensor<Number> frame : input.frames) {
 						Display::frame(frame);
 						on::Debug::wait();
 					}

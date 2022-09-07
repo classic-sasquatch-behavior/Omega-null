@@ -13,19 +13,19 @@ namespace on {
 
 			On_Process SLIC {
 
-				static void sample_centers(Tensor<int>& source, Tensor<int>& center_pos);
+				static void sample_centers(sk::Tensor<int>& source, sk::Tensor<int>& center_pos);
 
-				static void assign_pixels_to_centers(Tensor<int>& source, Tensor<int>& center_pos, Tensor<int>& labels);
+				static void assign_pixels_to_centers(sk::Tensor<int>& source, sk::Tensor<int>& center_pos, sk::Tensor<int>& labels);
 
-				static void update_centers(Tensor<int>& labels, Tensor<int>& center_pos);
+				static void update_centers(sk::Tensor<int>& labels, sk::Tensor<int>& center_pos);
 
-				static void separate_blobs(on::Tensor<int>& labels);
+				static void separate_blobs(sk::Tensor<int>& labels);
 
-				static void absorb_small_blobs(on::Tensor<int>& labels);
+				static void absorb_small_blobs(sk::Tensor<int>& labels);
 
-				static void produce_ordered_labels(on::Tensor<int>& labels);
+				static void produce_ordered_labels(sk::Tensor<int>& labels);
 
-				static void enforce_connectivity(on::Tensor<int>& labels);
+				static void enforce_connectivity(sk::Tensor<int>& labels);
 
 				static void run(Clip<int> & input, Clip<int>& output);
 

@@ -28,7 +28,7 @@ namespace on {
 				}
 			};
 
-			static void render(on::Tensor<uchar>& input) {
+			static void render(sk::Tensor<uchar>& input) {
 				
 				af::array frame = input;
 			
@@ -54,7 +54,7 @@ namespace on {
 				}
 			};
 
-			static void render(std::string window_name, on::Tensor<uchar>& input) {
+			static void render(std::string window_name, sk::Tensor<uchar>& input) {
 
 			}
 		}

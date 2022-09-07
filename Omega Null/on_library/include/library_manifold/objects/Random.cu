@@ -106,7 +106,7 @@ namespace on {
 			curandState* states;
 			cudaMalloc((void**)&states, size * sizeof(curandState));
 		
-			on::configure::kernel_1d(size);
+			sk::configure::kernel_1d(size);
 			seed_curand_xor<<<LAUNCH>>>(size, seed, states);
 			//SYNC_KERNEL(seed_curand_xor);
 

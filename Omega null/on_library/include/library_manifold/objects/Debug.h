@@ -4,7 +4,7 @@
 
 
 template <typename Type>
-__global__ void touch(on::Tensor<Type> input, on::Tensor<Type> debug) {
+__global__ void touch(sk::Tensor<Type> input, sk::Tensor<Type> debug) {
 	DIMS_2D(maj, min);
 	BOUNDS_2D(input.maj, input.min);
 
@@ -27,7 +27,7 @@ namespace on {
 			//}
 
 			template <typename ElementType>
-			static void tensor(on::Tensor<ElementType> &input, uint max_depth = 10) {
+			static void tensor(sk::Tensor<ElementType> &input, uint max_depth = 10) {
 				std::cout << std::endl << input.num_dims << " dimensional matrix:" << std::endl;
 
 				for (int i = 0; (i < max_depth) && (i < input.spans[0]); i++) {
@@ -101,15 +101,15 @@ namespace on {
 		On_Process Touch {
 			
 			template <typename Type>
-			static void tensor(on::Tensor<Type>& input, on::host_or_device direction) {
+			static void tensor(sk::Tensor<Type>& input, sk::host_or_device direction) {
 				
-				on::Tensor<Type> debug(input.spans, 0);
+				sk::Tensor<Type> debug(input.spans, 0);
 
 				switch (direction) {
 					case host: 
-						for (int maj = 0; maj < input.maj; maj++) {
-							for (int min = 0; min < input.min; min++) {
-								for (int cub = 0; cub < input.cub; cub++) {
+						for (int maj = 0; maj < input.maj(); maj++) {
+							for (int min = 0; min < input.min(); min++) {
+								for (int cub = 0; cub < input.cub(); cub++) {
 									debug(maj, min, cub) = input(maj, min, cub);
 								}
 							}
@@ -118,7 +118,7 @@ namespace on {
 						break;
 
 					case device: 
-						on::configure::kernel_2d(input.maj, input.min);
+						sk::configure::kernel_2d(input.maj(), input.min());
 						touch<<<LAUNCH>>>(input, debug);
 						SYNC_KERNEL(touch_device_tensor);
 						break;

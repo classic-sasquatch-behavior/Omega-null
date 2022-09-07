@@ -4,7 +4,71 @@
 #include"Planar_Life.h"
 
 
-__global__ void change_environment(on::Device_Ptr<int> environment, on::Device_Ptr<int> cells) {
+//pretty goofy way to do this to be honest. But let's see how fast or slow it runs.
+__global__ void draw(sk::Device_Ptr<int> input, sk::Device_Ptr<uchar> output) {
+	DIMS_2D(maj, min);
+	BOUNDS_2D(input.maj(), input.min());
+
+	int value = input(maj, min, 0);
+	int attractor = input(maj, min, 1);
+
+	uchar color[3] = { 50,50,50 };
+
+	int first_parity = (input(min, maj, 0) > 0);
+	int second_parity = (input(min, maj, 1) > 0);
+
+	int zero = (value == 0) && (attractor == 0);
+
+
+	const uchar red[3] = { 255, 100, 100 };
+	const uchar green[3] = { 100, 255, 100 };
+	const uchar blue[3] = { 100, 100, 255 };
+	const uchar purple[3] = { 255, 30, 255 };
+	const uchar black[3] = {0,0,0};
+
+
+	switch (first_parity) {
+		case 0: switch (second_parity) {
+			case 0: sk_Copy(color, blue, 3); break;
+			case 1: sk_Copy(color, purple, 3); break;
+		} break;
+		case 1: switch (second_parity) {
+			case 0: sk_Copy(color, green, 3); break;
+			case 1: sk_Copy(color, red, 3); break;
+		} break;
+	}
+
+	if(zero){ sk_Copy(color, black, 3); }
+
+	for (int channel = 0; channel < 3; channel++) {
+		int channel_value = color[channel];
+		//int new_value = (channel_value * zeroes) / 2;
+
+		//output(maj, min, channel) = new_value;
+		output.device_data[(((channel * input.maj()) + maj ) * input.min()) + min] = channel_value;
+	}
+}
+
+
+__global__ void spawn(sk::Device_Ptr<int> mask, curandState* random_states, sk::Device_Ptr<int> result) {
+	DIMS_2D(maj, min);
+	BOUNDS_2D(result.maj(), result.min());
+	//if (mask(maj, min) == 0) { return; } //mask is broken somehow, this seems to delete ALL threads rather than just half.
+
+	int id = LINEAR_CAST(maj, min, result.min());
+
+	curandState local_state = random_states[id];
+	int random_0 = curand(&local_state);
+	int random_1 = curand(&local_state);
+
+	int cell_value = (random_0 % 20) - 10;
+	int attractor_value = (2 * (random_1 % 2)) - 1;
+
+	result(maj, min, 0) = cell_value;
+	result(maj, min, 1) = attractor_value;
+}
+
+__global__ void change_environment(sk::Device_Ptr<int> environment, sk::Device_Ptr<int> cells) {
 	DIMS_2D(maj, min);
 	BOUNDS_2D(environment.maj(), environment.min());
 
@@ -14,7 +78,7 @@ __global__ void change_environment(on::Device_Ptr<int> environment, on::Device_P
 	);
 }
 
-__global__ void move(on::Device_Ptr<int> environment, on::Device_Ptr<int> cells, on::Device_Ptr<int> future_cells) {
+__global__ void move(sk::Device_Ptr<int> environment, sk::Device_Ptr<int> cells, sk::Device_Ptr<int> future_cells) {
 	DIMS_2D(maj, min);
 	BOUNDS_2D(environment.maj(), environment.min());
 
@@ -39,66 +103,33 @@ __global__ void move(on::Device_Ptr<int> environment, on::Device_Ptr<int> cells,
 
 }
 
-//pretty goofy way to do this to be honest. But let's see how fast or slow it runs.
-__global__ void draw(on::Device_Ptr<int> input, on::Device_Ptr<uchar> output) {
+__global__ void dampen_environment(const float damping_factor, sk::Device_Ptr<int> environment) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(input.maj(), input.min());
+	BOUNDS_2D(environment.maj(), environment.min());
 
-	int value = input(maj, min, 0);
-	int attractor = input(maj, min, 1);
-
-	uchar color[3] = {0,0,0};
-
-	int first_parity = (input(min, maj, 0) > 0);
-	int second_parity = (input(min, maj, 1) > 0);
-
-	int first_zero = value != 0;
-	int second_zero = attractor != 0;
-
-	int zeroes = first_zero + second_zero;
-
-	const uchar red[3] = {255, 0, 0};
-	const uchar green[3] = {0, 255, 0};
-	const uchar blue[3] = {0, 0, 255};
-	const uchar purple[3] = {255, 0, 255};
+	int value = environment(maj, min);
+	environment(maj, min) = value * damping_factor;
 
 
-	switch (first_parity) {
-		case 0: switch (second_parity) {
-			case 0: On_Copy(color, blue, 3); break;
-			case 1: On_Copy(color, purple, 3); break;
-		} break;
-		case 1: switch (second_parity) {
-			case 0: On_Copy(color, green, 3); break;
-			case 1: On_Copy(color, red, 3); break;
-		} break;
-	}
-
-	for (int channel = 0; channel < 3; channel++) {
-		int channel_value = color[channel];
-		int new_value = (channel_value * zeroes) / 2;
-		color[channel] = new_value;
-		output(maj, min, channel) = color[channel];
-	}
 }
 
-__global__ void spawn(on::Device_Ptr<int> mask, curandState* random_states, on::Device_Ptr<int> result) {
+__global__ void hatch(const int threshold, sk::Device_Ptr<int> cells) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(result.maj(), result.min());
-	//if (mask(maj, min) == 0) { return; } //possible failure here
+	BOUNDS_2D(cells.maj(), cells.min());
 
-	int id = LINEAR_CAST(maj, min, result.min());
+	int value = cells(maj, min, 0);
+	if (value < threshold){return;}
 
-	curandState local_state = random_states[id]; //possible failure here (unlikely)
-	int random_0 = curand(&local_state);
-	int random_1 = curand(&local_state);
+	int attractor = cells(maj, min, 1);
+	int value_out = -roundf(value / 8);
+	int attractor_out = -fabsf(attractor) / attractor;
 
-	int cell_value = (random_0 % 20) - 10;
-	int attractor_value = (2*(random_1 % 2)) - 1;
-	
-	result(maj, min, 0) = cell_value; //possible failure here
-	result(maj, min, 1) = attractor_value; //possible failure here
+	FOR_NEIGHBOR(n_maj, n_min, cells.maj(), cells.min(), maj, min, 
+		atomicAdd(&cells(n_maj, n_min, 0), value_out);
+		atomicAdd(&cells(n_maj, n_min, 1), attractor_out);
+	);
 }
+
 
 namespace on {
 
@@ -108,16 +139,16 @@ namespace on {
 
 			On_Structure Planar_Life {
 
-				on::Tensor<int> Seed::cells(int value = 0) {
+				sk::Tensor<int> Seed::cells(int value = 0) {
 
-					on::Tensor<int> result({Parameter::environment_width, Parameter::environment_height, 2}, 0, "result");
+					sk::Tensor<int> result({Parameter::environment_width, Parameter::environment_height, 2}, 0, "result");
 					af::array af_mask = (af::randu(Parameter::environment_width, Parameter::environment_height) > 0.5).as(s32);
-					on::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height}, 0, "mask");
+					sk::Tensor<int> mask({Parameter::environment_width, Parameter::environment_height}, 0, "mask");
 					//mask = af_mask; //possible failure here
 
 					curandState* states = on::Random::Initialize::curand_xor(Parameter::environment_area, value);
 
-					on::configure::kernel_2d(result.maj(), result.min());
+					sk::configure::kernel_2d(result.maj(), result.min());
 					spawn<<<LAUNCH>>>(mask, states, result); //try using the nvidia debugger
 					SYNC_KERNEL(spawn); 
 
@@ -127,11 +158,11 @@ namespace on {
 
 				}
 
-				on::Tensor<uchar> Draw::frame(on::Tensor<int>& cells) {
+				sk::Tensor<uchar> Draw::frame(sk::Tensor<int>& cells) {
 
-					on::Tensor<uchar> output({cells.maj(), cells.min(), 3}, 0);
+					sk::Tensor<uchar> output({cells.maj(), cells.min(), 3}, 0);
 
-					on::configure::kernel_2d(cells.maj(), cells.min());
+					sk::configure::kernel_2d(cells.maj(), cells.min());
 					draw <<<LAUNCH>>> (cells, output);
 					SYNC_KERNEL(draw);
 
@@ -139,13 +170,21 @@ namespace on {
 
 				}
 
-				void Planar_Life::Step::polar(Tensor<int>& environment, Tensor<int>& cells) {
+				void Planar_Life::Step::polar(sk::Tensor<int>& environment, sk::Tensor<int>& cells) {
+					sk::configure::kernel_2d(environment.maj(), environment.min());
 					
-					on::configure::kernel_2d(environment.maj(), environment.min());
+					//const int threshold = 8;
+					//hatch<<<LAUNCH>>>(threshold, cells);
+					//SYNC_KERNEL(hatch);
+
 					change_environment<<<LAUNCH>>> (environment, cells); //conversion from tensor to device_ptr
 					SYNC_KERNEL(change_environment);
 
-					on::Tensor<int> future_cells({cells.spans[0], cells.spans[1], cells.spans[2]}, 0); //creation of tensor, therefore subsequent destruction
+					//const float damping_factor = 0.99;
+					//dampen_environment<<<LAUNCH>>>(damping_factor, environment);
+					//SYNC_KERNEL(dampen_environment);
+
+					sk::Tensor<int> future_cells({cells.spans[0], cells.spans[1], cells.spans[2]}, 0); //creation of tensor, therefore subsequent destruction
 
 					move<<<LAUNCH>>> (environment, cells, future_cells); //more conversion from tensor to device_ptr
 					SYNC_KERNEL(move);

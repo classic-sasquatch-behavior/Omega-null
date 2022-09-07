@@ -6,7 +6,7 @@
 
 #pragma region sample_centers
 
-	__global__ void sample_centers_kernel(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos) {
+	__global__ void sample_centers_kernel(sk::Device_Ptr<int> source, sk::Device_Ptr<int> center_pos) {
 		DIMS_2D(maj, min);
 		BOUNDS_2D(center_pos.maj(), center_pos.min());
 
@@ -15,7 +15,7 @@
 
 	}
 
-	__global__ void gradient_descent(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos) {
+	__global__ void gradient_descent(sk::Device_Ptr<int> source, sk::Device_Ptr<int> center_pos) {
 		DIMS_2D(maj, min);
 		BOUNDS_2D(center_pos.maj(), center_pos.min());
 
@@ -27,7 +27,7 @@
 
 #pragma region assign_pixels_to_centers
 
-	__global__ void pixels_to_centers(on::Device_Ptr<int> source, on::Device_Ptr<int> center_pos, int distance_modifier, on::Device_Ptr<int> flags) {
+	__global__ void pixels_to_centers(sk::Device_Ptr<int> source, sk::Device_Ptr<int> center_pos, int distance_modifier, sk::Device_Ptr<int> flags) {
 		DIMS_2D(maj, min);
 		BOUNDS_2D(source.maj(), source.min());
 
@@ -75,7 +75,7 @@
 
 #pragma region update_centers
 	
-	__global__ void tally_centers(on::Device_Ptr<int> flags, on::Device_Ptr<int> tally) {
+	__global__ void tally_centers(sk::Device_Ptr<int> flags, sk::Device_Ptr<int> tally) {
 		DIMS_2D(maj, min);
 		BOUNDS_2D(flags.maj(), flags.min());
 
@@ -87,7 +87,7 @@
 
 	}
 
-	__global__ void move_centers(on::Device_Ptr<int> tally, on::Device_Ptr<int> center_pos, int* displacement) {
+	__global__ void move_centers(sk::Device_Ptr<int> tally, sk::Device_Ptr<int> center_pos, int* displacement) {
 		DIMS_2D(id, ZERO);
 		BOUNDS_2D(tally.maj(), 1);
 		
@@ -117,7 +117,7 @@
 
 #pragma region separate_blobs
 
-	__global__ void separate_blobs_kernel(on::Device_Ptr<int> labels, on::Device_Ptr<int> flag, on::Device_Ptr<int> blobs) {
+	__global__ void separate_blobs_kernel(sk::Device_Ptr<int> labels, sk::Device_Ptr<int> flag, sk::Device_Ptr<int> blobs) {
 		DIMS_2D(maj, min);
 		BOUNDS_2D(labels.maj(), labels.min());
 
@@ -186,37 +186,37 @@ namespace on {
 		using namespace Algorithm::Parameter::SLIC;
 		On_Structure Algorithm {
 			
-			void SLIC::sample_centers(on::Tensor<int>& source, on::Tensor<int>& center_pos) {
+			void SLIC::sample_centers(sk::Tensor<int>& source, sk::Tensor<int>& center_pos) {
 
-				on::configure::kernel_2d(center_pos.maj(), center_pos.min());
+				sk::configure::kernel_2d(center_pos.maj(), center_pos.min());
 				sample_centers_kernel<<<LAUNCH>>>(source, center_pos);
 				SYNC_KERNEL(sample_centers);
 
-				on::configure::kernel_2d(center_pos.maj(), center_pos.min());
+				sk::configure::kernel_2d(center_pos.maj(), center_pos.min());
 				gradient_descent<<<LAUNCH>>>(source, center_pos);
 				SYNC_KERNEL(gradient_descent);
 
 			}
 
-			void SLIC::assign_pixels_to_centers(on::Tensor<int>& source, on::Tensor<int>& center_pos, on::Tensor<int>& labels) {
+			void SLIC::assign_pixels_to_centers(sk::Tensor<int>& source, sk::Tensor<int>& center_pos, sk::Tensor<int>& labels) {
 
-				on::configure::kernel_2d(source.maj(), source.min());
+				sk::configure::kernel_2d(source.maj(), source.min());
 				pixels_to_centers<<<LAUNCH>>>(source, center_pos, density_modifier, labels);
 				SYNC_KERNEL(pixels_to_centers);
 
 			}
 
-			void SLIC::update_centers(Tensor<int>& labels, Tensor<int>& center_pos) {
+			void SLIC::update_centers(sk::Tensor<int>& labels, sk::Tensor<int>& center_pos) {
 
 				//0 = maj sum , 1 = min sum, 2 = count
-				on::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
+				sk::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
 
-				on::configure::kernel_2d(labels.maj(), labels.min());
+				sk::configure::kernel_2d(labels.maj(), labels.min());
 				tally_centers<<<LAUNCH>>>(labels, tally);
 				SYNC_KERNEL(tally_centers);
 
-				on::Tensor<int> temp_displacement;
-				on::configure::kernel_1d(tally.maj());
+				sk::Tensor<int> temp_displacement;
+				sk::configure::kernel_1d(tally.maj());
 				move_centers<<<LAUNCH>>>(tally, center_pos, temp_displacement); 
 				SYNC_KERNEL(move_centers);
 				Parameter::SLIC::displacement = temp_displacement;
@@ -224,13 +224,13 @@ namespace on {
 			}
 
 			#pragma region enforce connectivity
-			void SLIC::separate_blobs(on::Tensor<int>& labels) {
+			void SLIC::separate_blobs(sk::Tensor<int>& labels) {
 
-				on::Tensor<int> flag;
-				on::Tensor<int> blobs({labels.maj(), labels.min()}, 0);
+				sk::Tensor<int> flag;
+				sk::Tensor<int> blobs({labels.maj(), labels.min()}, 0);
 				blobs = labels;
 
-				on::configure::kernel_2d(labels.maj(), labels.min());
+				sk::configure::kernel_2d(labels.maj(), labels.min());
 
 				do {
 					separate_blobs_kernel<<<LAUNCH>>>(labels, flag, blobs);
@@ -241,7 +241,7 @@ namespace on {
 				labels = blobs;
 			}
 				
-			void SLIC::absorb_small_blobs(on::Tensor<int>& labels) {
+			void SLIC::absorb_small_blobs(sk::Tensor<int>& labels) {
 						
 				find_sizes<<<LAUNCH>>>();
 				SYNC_KERNEL(find_sizes);
@@ -258,7 +258,7 @@ namespace on {
 
 			}
 
-			void SLIC::produce_ordered_labels(on::Tensor<int>& labels) {
+			void SLIC::produce_ordered_labels(sk::Tensor<int>& labels) {
 
 				raise_flags<<<LAUNCH>>>();
 				SYNC_KERNEL(raise_flags);
@@ -275,14 +275,14 @@ namespace on {
 			}
 			#pragma endregion
 
-			void SLIC::enforce_connectivity(on::Tensor<int>& labels) {
+			void SLIC::enforce_connectivity(sk::Tensor<int>& labels) {
 				separate_blobs(labels);
 				absorb_small_blobs(labels);
 				produce_ordered_labels(labels);
 			}
 
 			void SLIC::run(Clip<int>& input, Clip<int>& output) {
-				for (Tensor source : input.frames) {
+				for (sk::Tensor source : input.frames) {
 
 					source_maj = source.maj();
 					source_min = source.min();
@@ -295,9 +295,9 @@ namespace on {
 					space_between_centers;
 					density_modifier;
 
-					Tensor<int> labels({ (uint)source_maj, (uint)source_min }, 0);
+					sk::Tensor<int> labels({ (uint)source_maj, (uint)source_min }, 0);
 
-					Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0); //z = 0 is maj, z = 1 is min
+					sk::Tensor<int> center_pos({(uint)SP_maj, (uint)SP_min, (uint)2}, 0); //z = 0 is maj, z = 1 is min
 
 					sample_centers(center_pos, source);
 

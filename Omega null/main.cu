@@ -59,7 +59,7 @@
 		int main() {
 			srand(time(NULL));
 
-			on::Tensor<int> seed = Planar_Life::Seed::cells(rand());
+			sk::Tensor<int> seed = Planar_Life::Seed::cells(rand());
 
 			Planar_Life::run(seed);
 
