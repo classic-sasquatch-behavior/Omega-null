@@ -9,19 +9,31 @@ namespace on {
 
 		On_Structure Fourier_Transform {
 			
-
 		}
 
 		On_Structure Wavelet_Transform {
 
 		}
 
+		On_Structure Principle_Component_Analysis {
+
+		}
+
+		On_Structure Chebyshev_Iteration {
+
+		}
+
 		On_Process Load {
 
-			static void audio() {
+			static sk::Tensor<int> audio(std::string path) {
 
 			}
 
+			static sk::Tensor<int> image(std::string path) {
+
+			}
 		};
+
+
 	}
 }
