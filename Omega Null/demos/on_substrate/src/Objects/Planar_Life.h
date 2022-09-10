@@ -40,13 +40,15 @@ namespace on {
 					Planar_Life::Parameter::running = true;
 
 					sk::Tensor<int> environment({Parameter::environment_width, Parameter::environment_height},0);
-					sk::Tensor<int> cells = seed; //channel 0: values //channel 1: attractors
-					sk::Tensor<int> future_cells({Parameter::environment_width, Parameter::environment_height}, 0);
+					sk::Tensor<int> cells = seed; 
+					sk::Tensor<int> future_cells({Parameter::environment_width, Parameter::environment_height, 9}, 0);
 					sk::Tensor<int> targets({Parameter::environment_width, Parameter::environment_height}, 0);
 
 					sk::Tensor<uchar> frame({Parameter::environment_width, Parameter::environment_height, 3}, 0);
 
 					af::Window window(Parameter::environment_width, Parameter::environment_height);
+
+
 
 					int start_time = now_ms();
 					int FPS = 30;
