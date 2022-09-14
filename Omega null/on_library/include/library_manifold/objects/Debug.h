@@ -107,8 +107,8 @@ namespace on {
 
 				switch (direction) {
 					case host: 
-						for (int maj = 0; maj < input.maj(); maj++) {
-							for (int min = 0; min < input.min(); min++) {
+						for (int maj = 0; maj < input.first_dim(); maj++) {
+							for (int min = 0; min < input.second_dim(); min++) {
 								for (int cub = 0; cub < input.cub(); cub++) {
 									debug(maj, min, cub) = input(maj, min, cub);
 								}
@@ -118,7 +118,7 @@ namespace on {
 						break;
 
 					case device: 
-						sk::configure::kernel_2d(input.maj(), input.min());
+						sk::configure::kernel_2d(input.first_dim(), input.second_dim());
 						touch<<<LAUNCH>>>(input, debug);
 						SYNC_KERNEL(touch_device_tensor);
 						break;

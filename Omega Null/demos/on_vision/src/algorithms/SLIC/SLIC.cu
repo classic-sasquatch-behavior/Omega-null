@@ -8,16 +8,16 @@
 
 	__global__ void sample_centers_kernel(sk::Device_Ptr<int> source, sk::Device_Ptr<int> center_pos) {
 		DIMS_2D(maj, min);
-		BOUNDS_2D(center_pos.maj(), center_pos.min());
+		BOUNDS_2D(center_pos.first_dim(), center_pos.second_dim());
 
-		center_pos(maj, min, 0) = CAST_UP(maj, center_pos.maj(), source.maj());
-		center_pos(maj, min, 1) = CAST_UP(min, center_pos.min(), source.min());
+		center_pos(maj, min, 0) = CAST_UP(maj, center_pos.first_dim(), source.first_dim());
+		center_pos(maj, min, 1) = CAST_UP(min, center_pos.second_dim(), source.second_dim());
 
 	}
 
 	__global__ void gradient_descent(sk::Device_Ptr<int> source, sk::Device_Ptr<int> center_pos) {
 		DIMS_2D(maj, min);
-		BOUNDS_2D(center_pos.maj(), center_pos.min());
+		BOUNDS_2D(center_pos.first_dim(), center_pos.second_dim());
 
 		//gradient descent
 
@@ -29,10 +29,10 @@
 
 	__global__ void pixels_to_centers(sk::Device_Ptr<int> source, sk::Device_Ptr<int> center_pos, int distance_modifier, sk::Device_Ptr<int> flags) {
 		DIMS_2D(maj, min);
-		BOUNDS_2D(source.maj(), source.min());
+		BOUNDS_2D(source.first_dim(), source.second_dim());
 
-		int sector_maj = CAST_DOWN(maj, center_pos.maj());
-		int sector_min = CAST_DOWN(min, center_pos.min());
+		int sector_maj = CAST_DOWN(maj, center_pos.first_dim());
+		int sector_min = CAST_DOWN(min, center_pos.second_dim());
 
 		int self_channels[3] = {source(maj, min, 0), source(maj, min, 1), source(maj, min, 2)};
 		int self_position[2] = {maj, min};
@@ -40,8 +40,8 @@
 		int closest_center = -1;
 		int smallest_distance = INT_MAX;
 
-		FOR_3X3_INCLUSIVE(n_maj, n_min, center_pos.maj(), center_pos.min(), maj, min, 
-			int center_id = LINEAR_CAST(n_maj, n_min, center_pos.min());
+		FOR_3X3_INCLUSIVE(n_maj, n_min, 
+			int center_id = LINEAR_CAST(n_maj, n_min, center_pos.second_dim());
 			int neighbor_maj = center_pos(n_maj, n_min, 0);
 			int neighbor_min = center_pos(n_maj, n_min, 1);
 
@@ -77,7 +77,7 @@
 	
 	__global__ void tally_centers(sk::Device_Ptr<int> flags, sk::Device_Ptr<int> tally) {
 		DIMS_2D(maj, min);
-		BOUNDS_2D(flags.maj(), flags.min());
+		BOUNDS_2D(flags.first_dim(), flags.second_dim());
 
 		int id = flags(maj, min);
 
@@ -89,10 +89,10 @@
 
 	__global__ void move_centers(sk::Device_Ptr<int> tally, sk::Device_Ptr<int> center_pos, int* displacement) {
 		DIMS_2D(id, ZERO);
-		BOUNDS_2D(tally.maj(), 1);
+		BOUNDS_2D(tally.first_dim(), 1);
 		
-		int min = id % center_pos.min();
-		int maj = (id - min) / center_pos.min();
+		int min = id % center_pos.second_dim();
+		int maj = (id - min) / center_pos.second_dim();
 
 		int old_maj = center_pos(maj, min, 0);
 		int old_min = center_pos(maj, min, 1);
@@ -119,13 +119,13 @@
 
 	__global__ void separate_blobs_kernel(sk::Device_Ptr<int> labels, sk::Device_Ptr<int> flag, sk::Device_Ptr<int> blobs) {
 		DIMS_2D(maj, min);
-		BOUNDS_2D(labels.maj(), labels.min());
+		BOUNDS_2D(labels.first_dim(), labels.second_dim());
 
-		int id = LINEAR_CAST(maj, min, labels.min());
+		int id = LINEAR_CAST(maj, min, labels.second_dim());
 		int label = labels(maj, min);
 		int blob = blobs(maj, min);
 
-		FOR_NEIGHBOR(n_maj, n_min, labels.maj(), labels.min(), maj, min,		
+		FOR_NEIGHBOR(n_maj, n_min,		
 			int neighbor_label = labels(maj, min);
 			int neighbor_blob = blobs(maj, min);
 			if (neighbor_label != label) {continue;}
@@ -188,11 +188,11 @@ namespace on {
 			
 			void SLIC::sample_centers(sk::Tensor<int>& source, sk::Tensor<int>& center_pos) {
 
-				sk::configure::kernel_2d(center_pos.maj(), center_pos.min());
+				sk::configure::kernel_2d(center_pos.first_dim(), center_pos.second_dim());
 				sample_centers_kernel<<<LAUNCH>>>(source, center_pos);
 				SYNC_KERNEL(sample_centers);
 
-				sk::configure::kernel_2d(center_pos.maj(), center_pos.min());
+				sk::configure::kernel_2d(center_pos.first_dim(), center_pos.second_dim());
 				gradient_descent<<<LAUNCH>>>(source, center_pos);
 				SYNC_KERNEL(gradient_descent);
 
@@ -200,7 +200,7 @@ namespace on {
 
 			void SLIC::assign_pixels_to_centers(sk::Tensor<int>& source, sk::Tensor<int>& center_pos, sk::Tensor<int>& labels) {
 
-				sk::configure::kernel_2d(source.maj(), source.min());
+				sk::configure::kernel_2d(source.first_dim(), source.second_dim());
 				pixels_to_centers<<<LAUNCH>>>(source, center_pos, density_modifier, labels);
 				SYNC_KERNEL(pixels_to_centers);
 
@@ -211,12 +211,12 @@ namespace on {
 				//0 = maj sum , 1 = min sum, 2 = count
 				sk::Tensor<int> tally({(uint)Parameter::SLIC::num_superpixels, 3});
 
-				sk::configure::kernel_2d(labels.maj(), labels.min());
+				sk::configure::kernel_2d(labels.first_dim(), labels.second_dim());
 				tally_centers<<<LAUNCH>>>(labels, tally);
 				SYNC_KERNEL(tally_centers);
 
 				sk::Tensor<int> temp_displacement;
-				sk::configure::kernel_1d(tally.maj());
+				sk::configure::kernel_1d(tally.first_dim());
 				move_centers<<<LAUNCH>>>(tally, center_pos, temp_displacement); 
 				SYNC_KERNEL(move_centers);
 				Parameter::SLIC::displacement = temp_displacement;
@@ -227,10 +227,10 @@ namespace on {
 			void SLIC::separate_blobs(sk::Tensor<int>& labels) {
 
 				sk::Tensor<int> flag;
-				sk::Tensor<int> blobs({labels.maj(), labels.min()}, 0);
+				sk::Tensor<int> blobs({labels.first_dim(), labels.second_dim()}, 0);
 				blobs = labels;
 
-				sk::configure::kernel_2d(labels.maj(), labels.min());
+				sk::configure::kernel_2d(labels.first_dim(), labels.second_dim());
 
 				do {
 					separate_blobs_kernel<<<LAUNCH>>>(labels, flag, blobs);
@@ -284,8 +284,8 @@ namespace on {
 			void SLIC::run(Clip<int>& input, Clip<int>& output) {
 				for (sk::Tensor source : input.frames) {
 
-					source_maj = source.maj();
-					source_min = source.min();
+					source_maj = source.first_dim();
+					source_min = source.second_dim();
 					num_pixels = source_maj * source_min;
 
 					SP_maj;

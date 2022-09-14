@@ -19,6 +19,13 @@ typedef std::ofstream Filestream;
 #include<filesystem>
 namespace fs = std::filesystem;
 
+//opengl
+//#include<gl/GL.h>
+
+//glfw
+#include<GLFW/glfw3.h>
+
+
 //xml
 #include<pugixml.hpp>
 typedef pugi::xml_node Node;

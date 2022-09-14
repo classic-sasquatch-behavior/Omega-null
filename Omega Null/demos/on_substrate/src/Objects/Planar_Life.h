@@ -12,6 +12,8 @@ namespace on {
 
 	On_Structure Substrate {
 
+
+
 		On_Structure Species {
 
 			On_Structure Planar_Life {
@@ -26,8 +28,8 @@ namespace on {
 				
 				On_Structure Parameter {
 					static bool running = false;
-					const int environment_width = 512;
-					const int environment_height = 512;
+					const int environment_width = 768;
+					const int environment_height = 768;
 					const int environment_area = environment_width * environment_height; 
 				}
 
@@ -47,12 +49,12 @@ namespace on {
 
 					sk::Tensor<uchar> frame({Parameter::environment_width, Parameter::environment_height, 3}, 0);
 
-					af::Window window(Parameter::environment_width, Parameter::environment_height);
-
+					//af::Window window(Parameter::environment_width, Parameter::environment_height);
+					on::Display::Window::open(Parameter::environment_width, Parameter::environment_height, "Substrate");
 
 
 					int start_time = now_ms();
-					int FPS = 30;
+					int FPS = 60;
 					do {
 						int current_time = now_ms();
 						int wait_time = (1000 / FPS) - (current_time - start_time);
@@ -63,13 +65,15 @@ namespace on {
 						targets.fill_device_memory(0);
 						frame = Draw::frame(cells, environment); 
 
-						window.image(frame); //conversion from tensor to af::array 
+						on::Display::Window::render(frame);
+						//window.image(frame); 
 						
 						std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
 						start_time = now_ms();
 						//std::cout << "FPS: " << 1000 / wait_time << std::endl;
 					} while (Planar_Life::Parameter::running);
 
+					on::Display::Window::close();
 				}
 			}
 		}

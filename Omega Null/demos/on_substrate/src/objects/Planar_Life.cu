@@ -23,10 +23,9 @@ namespace Cell {
 
 }; using namespace Cell;
 
-
 __global__ void draw_environment(sk::Device_Ptr<int> environment, sk::Device_Ptr<uchar> output) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(environment.maj(), environment.min());
+	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 	int environment_value = environment(maj, min);
 
@@ -43,78 +42,70 @@ __global__ void draw_environment(sk::Device_Ptr<int> environment, sk::Device_Ptr
 	int magnitude = fabsf(environment_value);
 
 	for (int channel = 0; channel < 3; channel++) {
-		output.device_data[(((channel * environment.maj()) + maj) * environment.min()) + min] = fminf(logf(10 * magnitude), 90) + polarity[channel];
+		output.device_data[(((channel * environment.first_dim()) + maj) * environment.second_dim()) + min] = fminf(logf(10 * magnitude), 90) + polarity[channel];
 	}
 }
-
 
 //pretty goofy way to do this to be honest. But let's see how fast or slow it runs.
 __global__ void draw_cells(sk::Device_Ptr<int> cells, sk::Device_Ptr<uchar> output) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(cells.maj(), cells.min());
+	BOUNDS_2D(cells.first_dim(), cells.second_dim());
 
 	if(cells(SELF, attribute::color_r) == 0 && cells(SELF, attribute::color_g) == 0 && cells(SELF, attribute::color_b) == 0) { return; }
 
 	for (int channel = 0; channel < 3; channel++) {
 		int channel_value = cells(maj, min, channel);
 
-		output.device_data[(((channel * cells.maj()) + maj ) * cells.min()) + min] = channel_value;
+		output.device_data[(((channel * cells.first_dim()) + maj ) * cells.second_dim()) + min] = channel_value;
 	}
 }
-
-
 
 #define Random(_seed_, _min_, _max_) (((_seed_) % ((_max_) - (_min_)))+ (_min_))
 
 __global__ void spawn(sk::Device_Ptr<int> mask, curandState* random_states, sk::Device_Ptr<int> result) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(result.maj(), result.min());
+	BOUNDS_2D(result.first_dim(), result.second_dim());
 	//if (mask(maj, min) == 0) { return; } //mask is broken somehow, this seems to delete ALL threads rather than just half.
 
-	int id = LINEAR_CAST(maj, min, result.min());
+	int id = LINEAR_CAST(maj, min, result.second_dim());
 
 	curandState local_state = random_states[id];
 
 	int random_0 = curand(&local_state);
 	int random_1 = curand(&local_state);
-	//int random_2 = curand(&local_state);
+	int random_2 = curand(&local_state);
 	int random_3 = curand(&local_state);
-	int random_4 = curand(&local_state);
-	int random_5 = curand(&local_state); 
-	int random_6 = curand(&local_state);
+	int random_4 = curand(&local_state); 
+	int random_5 = curand(&local_state);
 
-	int attractor = Random(random_0, -10000, 10000);
-	int weight = Random(random_1, -1000, 1000);
-	int value = 50;
-	int color_r = Random(random_3, 70, 255);
-	int color_g = Random(random_4, 70, 255);
-	int color_b = Random(random_5, 70, 255);
-	int freq_a = Random(random_6, -10000, 10000);
-
-	result(SELF, attribute::value) = value;
-	result(SELF, attribute::attractor) = attractor;
-	result(SELF, attribute::weight) = weight;
+	result(SELF, attribute::color_r) = Random(random_0, 70, 255);
+	result(SELF, attribute::color_g) = Random(random_1, 70, 255);
+	result(SELF, attribute::color_b) = Random(random_2, 70, 255);
+	result(SELF, attribute::value) = 50;
+	result(SELF, attribute::attractor) = Random(random_3, -10000, 10000);
+	result(SELF, attribute::weight) = Random(random_4, -1000, 1000);
+	result(SELF, attribute::freq_a) = Random(random_5, -10000, 10000);
 	result(SELF, attribute::move_maj) = maj;
 	result(SELF, attribute::move_min) = min;
-	result(SELF, attribute::color_r) = color_r;
-	result(SELF, attribute::color_g) = color_g;
-	result(SELF, attribute::color_b) = color_b;
-	result(SELF, attribute::freq_a) = freq_a;
+
+
 }
 
+//~15-16ms
 __global__ void change_environment(sk::Device_Ptr<int> environment, sk::Device_Ptr<int> cells) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(environment.maj(), environment.min());
+	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 	int weight = (cells(SELF, attribute::value) * cells(SELF, attribute::weight))/10;
-	FOR_MXN_INCLUSIVE(n_maj, n_min, 9, 9, environment.maj(), environment.min(), maj, min,
+	//int attraction = (cells(SELF, attribute::value) * cells(SELF, attribute::attractor))/100;
+	FOR_MXN_INCLUSIVE(n_maj, n_min, 9, 9,
 		atomicAdd(&environment(n_maj, n_min), weight);
 	);
 }
 
 __global__ void dampen_environment(const float damping_factor, sk::Device_Ptr<int> environment) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(environment.maj(), environment.min());
+	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 	float value = environment(maj, min);
 	environment(maj, min) = truncf(value * damping_factor);
@@ -124,10 +115,10 @@ __global__ void dampen_environment(const float damping_factor, sk::Device_Ptr<in
 
 __global__ void radiate_environment(sk::Device_Ptr<int> environment) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(environment.maj(), environment.min());
+	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 	int value = environment(SELF);
-	FOR_NEIGHBOR(n_maj, n_min, environment.maj(), environment.min(), maj, min, 
+	FOR_NEIGHBOR(n_maj, n_min, 
 		
 		atomicSub(&environment(n_maj, n_min), value/10);
 	
@@ -136,7 +127,7 @@ __global__ void radiate_environment(sk::Device_Ptr<int> environment) {
 
 __global__ void set_targets(sk::Device_Ptr<int> environment, sk::Device_Ptr<int> cells, sk::Device_Ptr<int> targets) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(environment.maj(), environment.min());
+	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 
 	int attractor = cells(SELF, attribute::attractor);
@@ -144,11 +135,10 @@ __global__ void set_targets(sk::Device_Ptr<int> environment, sk::Device_Ptr<int>
 	if(attractor == 0 && weight == 0){return;}
 
 	int largest_value = environment(maj, min) * attractor;
-	//int largest_value = -1;
 	int target_maj = maj;
 	int target_min = min;
 
-	FOR_NEIGHBOR(n_maj, n_min, environment.maj(), environment.min(), maj, min,
+	FOR_NEIGHBOR(n_maj, n_min,
 		int neighbor_value = environment(n_maj, n_min) * attractor;
 		if ( neighbor_value > largest_value) {
 			largest_value = neighbor_value;
@@ -162,17 +152,18 @@ __global__ void set_targets(sk::Device_Ptr<int> environment, sk::Device_Ptr<int>
 	cells(SELF, attribute::move_min) = target_min;
 }
 
+//~16-17 ms
 __global__ void conflict(sk::Device_Ptr<int>cells, sk::Device_Ptr<int>targets, sk::Device_Ptr<int>future_cells, const int threshold = 3) {
 	
 	DIMS_2D(maj, min);
-	BOUNDS_2D(cells.maj(), cells.min());
+	BOUNDS_2D(cells.first_dim(), cells.second_dim());
 
 	if(targets(maj, min) < 2) {return;}
 
 	int teams[9][Cell::num_attributes - 2] = {0};
 	int num_teams = 0;
 
-	FOR_3X3_INCLUSIVE(n_maj, n_min, cells.maj(), cells.min(), maj, min, 
+	FOR_3X3_INCLUSIVE(n_maj, n_min, 
 		
 		if((cells(n_maj, n_min, attribute::move_maj) != maj)|| (cells(n_maj, n_min, attribute::move_min) != min)) {continue;}
 
@@ -186,8 +177,9 @@ __global__ void conflict(sk::Device_Ptr<int>cells, sk::Device_Ptr<int>targets, s
 			teams[team][attribute::value] += cells(n_maj, n_min, attribute::value);
 
 			for (int attribute = 2; attribute < Cell::num_attributes - 3; attribute++) {
-				teams[team][attribute] += cells(n_maj, n_min, attribute);
-				teams[team][attribute] /= 2;
+				teams[team][attribute] = cells(n_maj, n_min, attribute);
+				//teams[team][attribute] += cells(n_maj, n_min, attribute);
+				//teams[team][attribute] /= 2;
 			}
 
 		}
@@ -218,7 +210,7 @@ __global__ void conflict(sk::Device_Ptr<int>cells, sk::Device_Ptr<int>targets, s
 
 __global__ void move(sk::Device_Ptr<int> environment, sk::Device_Ptr<int> cells, sk::Device_Ptr<int> targets, sk::Device_Ptr<int> future_cells) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(environment.maj(), environment.min());
+	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 	int attractor = cells(SELF, attribute::attractor);
 	int weight = cells(SELF, attribute::weight);
@@ -237,29 +229,28 @@ __global__ void move(sk::Device_Ptr<int> environment, sk::Device_Ptr<int> cells,
 
 __global__ void hatch(const int threshold, curandState* random_states, sk::Device_Ptr<int> cells) {
 	DIMS_2D(maj, min);
-	BOUNDS_2D(cells.maj(), cells.min());
+	BOUNDS_2D(cells.first_dim(), cells.second_dim());
+	if (cells(SELF, attribute::value) < threshold){return;}
 
-	int value = cells(SELF, attribute::value);
-	if (value < threshold){return;} 
-
-	int random[Cell::num_attributes];
-	int id = LINEAR_CAST(maj, min, cells.min());
+	int random[3];
+	int id = LINEAR_CAST(maj, min, cells.second_dim());
 	curandState local_state = random_states[id];
 
-	for (int i = 0; i < Cell::num_attributes; i++) {
+	#pragma unroll
+	for (int i = 0; i < 3; i++) {
 		random[i] = curand(&local_state);
 	}
 
-	FOR_NEIGHBOR(n_maj, n_min, cells.maj(), cells.min(), maj, min, 
+	FOR_NEIGHBOR(n_maj, n_min,
 		if(cells(n_maj, n_min, attribute::attractor) == 0 && cells(n_maj, n_min, attribute::weight) == 0){
 			cells(SELF, attribute::value) -= 5;
 
 			cells(n_maj, n_min, attribute::color_r) = fmaxf( 70, fminf(cells(SELF, attribute::color_r), 255));
 			cells(n_maj, n_min, attribute::color_g) = fmaxf(70, fminf(cells(SELF, attribute::color_g), 255));
 			cells(n_maj, n_min, attribute::color_b) = fmaxf(70, fminf(cells(SELF, attribute::color_b), 255));
-			cells(n_maj, n_min, attribute::attractor) = fmaxf(-10000, fminf(cells(SELF, attribute::attractor) + Random(random[attribute::attractor], -1, 1), 10000 ));
-			cells(n_maj, n_min, attribute::weight) = fmaxf(-1000, fminf(cells(SELF, attribute::weight) + Random(random[attribute::weight], -1, 1), 1000));
-			cells(n_maj, n_min, attribute::freq_a) = fmaxf(-10000, fminf(cells(SELF, attribute::freq_a) + Random(random[attribute::freq_a], -1, 1), 10000) );
+			cells(n_maj, n_min, attribute::attractor) = fmaxf(-10000, fminf(cells(SELF, attribute::attractor) + Random(random[0], -1, 1), 10000 ));
+			cells(n_maj, n_min, attribute::weight) = fmaxf(-1000, fminf(cells(SELF, attribute::weight) + Random(random[1], -1, 1), 1000));
+			cells(n_maj, n_min, attribute::freq_a) = fmaxf(-10000, fminf(cells(SELF, attribute::freq_a) + Random(random[2], -1, 1), 10000) );
 			cells(n_maj, n_min, attribute::value) = 5;
 			return;
 		}
@@ -285,7 +276,7 @@ namespace on {
 
 					curandState* states = on::Random::Initialize::curand_xor(Parameter::environment_area, value);
 
-					sk::configure::kernel_2d(result.maj(), result.min());
+					sk::configure::kernel_2d(result.first_dim(), result.second_dim());
 					spawn<<<LAUNCH>>>(mask, states, result); //try using the nvidia debugger
 					SYNC_KERNEL(spawn); 
 
@@ -297,9 +288,9 @@ namespace on {
 
 				sk::Tensor<uchar> Draw::frame(sk::Tensor<int>& cells, sk::Tensor<int>& environment) {
 
-					sk::Tensor<uchar> output({cells.maj(), cells.min(), 3}, 0);
+					sk::Tensor<uchar> output({cells.first_dim(), cells.second_dim(), 3}, 0);
 
-					sk::configure::kernel_2d(cells.maj(), cells.min());
+					sk::configure::kernel_2d(cells.first_dim(), cells.second_dim());
 					//draw_environment<<<LAUNCH>>>(environment, output);
 					//SYNC_KERNEL(draw_environment);
 
@@ -311,7 +302,7 @@ namespace on {
 				}
 
 				void Planar_Life::Step::polar(sk::Tensor<int>& future_cells, sk::Tensor<int>& environment, sk::Tensor<int>& cells, sk::Tensor<int>& targets, curandState* random) {
-					sk::configure::kernel_2d(environment.maj(), environment.min());
+					sk::configure::kernel_2d(environment.first_dim(), environment.second_dim());
 					
 					const int thresh = 6;
 					hatch << <LAUNCH >> > (thresh, random, cells);
