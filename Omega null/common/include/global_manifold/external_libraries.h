@@ -20,7 +20,13 @@ typedef std::ofstream Filestream;
 namespace fs = std::filesystem;
 
 //opengl
+//#include<Windows.h>
+//#define GL_GLEXT_PROTOTYPES 1
+//#define GL3_PROTOTYPES 1
 //#include<gl/GL.h>
+
+#include<GL/glew.h>
+typedef unsigned int gl_name;
 
 //glfw
 #include<GLFW/glfw3.h>
