@@ -26,6 +26,9 @@
     <ClCompile Include="util\pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="on_display\include\display_manifold\objects\shaders\texture.frag" />
+    <None Include="on_display\include\display_manifold\objects\shaders\texture.vert" />
+    <None Include="on_display\include\display_manifold\objects\shaders\texture_zoom.vert" />
     <None Include="util\.gitignore" />
   </ItemGroup>
   <ItemGroup>
@@ -99,11 +102,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\c++ libraries\glew-2.1.0\include;C:\c++ libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\Thelonious\source\repos\skeleton key\skeleton key;$(IncludePath)</IncludePath>
+    <IncludePath>C:\c++ libraries\glm;C:\c++ libraries\glew-2.1.0\include;C:\c++ libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\Thelonious\source\repos\skeleton key\skeleton key;$(IncludePath)</IncludePath>
     <LibraryPath>C:\c++ libraries\glew-2.1.0\lib\Release\x64;C:\c++ libraries\glfw-3.3.8.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\c++ libraries\glew-2.1.0\include;C:\c++ libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\Thelonious\source\repos\skeleton key\skeleton key;$(IncludePath)</IncludePath>
+    <IncludePath>C:\c++ libraries\glm;C:\c++ libraries\glew-2.1.0\include;C:\c++ libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\Thelonious\source\repos\skeleton key\skeleton key;$(IncludePath)</IncludePath>
     <LibraryPath>C:\c++ libraries\glew-2.1.0\lib\Release\x64;C:\c++ libraries\glfw-3.3.8.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

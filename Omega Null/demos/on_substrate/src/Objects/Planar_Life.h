@@ -12,8 +12,6 @@ namespace on {
 
 	On_Structure Substrate {
 
-
-
 		On_Structure Species {
 
 			On_Structure Planar_Life {
@@ -44,14 +42,13 @@ namespace on {
 
 					sk::Tensor<int> environment({Parameter::environment_width, Parameter::environment_height},0);
 					sk::Tensor<int> cells = seed; 
-					sk::Tensor<int> future_cells({Parameter::environment_width, Parameter::environment_height, 9}, 0);
+					sk::Tensor<int> future_cells({Parameter::environment_width, Parameter::environment_height, 8}, 0);
 					sk::Tensor<int> targets({Parameter::environment_width, Parameter::environment_height}, 0);
 
 					sk::Tensor<uchar> frame({Parameter::environment_width, Parameter::environment_height, 3}, 0);
 
 					//af::Window window(Parameter::environment_width, Parameter::environment_height);
 					on::Display::Window::open(Parameter::environment_width, Parameter::environment_height, "Substrate");
-
 
 					int start_time = now_ms();
 					int FPS = 60;
@@ -68,7 +65,7 @@ namespace on {
 						on::Display::Window::render(frame);
 						//window.image(frame); 
 						
-						std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
+						//std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
 						start_time = now_ms();
 						//std::cout << "FPS: " << 1000 / wait_time << std::endl;
 					} while (Planar_Life::Parameter::running);

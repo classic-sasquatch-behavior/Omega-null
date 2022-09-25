@@ -3,19 +3,19 @@
 #include"display_manifold.h"
 
 
-static const char* vertex_shader_source = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-static const char* fragment_shader_source = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\0";
+//static const char* vertex_shader_source = "#version 330 core\n"
+//"layout (location = 0) in vec3 aPos;\n"
+//"void main()\n"
+//"{\n"
+//"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+//"}\0";
+//
+//static const char* fragment_shader_source = "#version 330 core\n"
+//"out vec4 FragColor;\n"
+//"void main()\n"
+//"{\n"
+//"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+//"}\0";
 
 static const char* texture_vertex_shader = "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;\n"
@@ -40,7 +40,16 @@ static const char* texture_fragment_shader = "#version 330 core\n"
 "	FragColor = texture(ourTexture, TexCoord);\n"
 "}\0";
 
-
+static const char* texture_vertex_shader_zoom = "#version 330 core\n"
+"layout(location = 0) in vec3 aPos;\n"
+"layout(location = 1) in vec2 aTexCoord;\n"
+"out vec2 TexCoord;\n"
+"uniform mat4 transform;\n"
+"void main()\n"
+"{\n"
+"gl_Position = transform * vec4(aPos, 1.0f);\n"
+"TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
+"} \0";
 
 
 
@@ -64,18 +73,18 @@ namespace on {
 
 					static gl_name element_buffer_object;
 
-					static float triangle[] {
-						-0.5f, -0.5f, 0.0f,
-						0.5f, -0.5f, 0.0f,
-						0.0f, 0.5f, 0.0f
-					};
+					//static float triangle[] {
+					//	-0.5f, -0.5f, 0.0f,
+					//	0.5f, -0.5f, 0.0f,
+					//	0.0f, 0.5f, 0.0f
+					//};
 
-					static float square[] = {
-						1.0f,  1.0f, 0.0f,  // top right
-						1.0f, -1.0f, 0.0f,  // bottom right
-						-1.0f, -1.0f, 0.0f,  // bottom left
-						-1.0f,  1.0f, 0.0f   // top left 
-					};
+					//static float square[] = {
+					//	1.0f,  1.0f, 0.0f,  // top right
+					//	1.0f, -1.0f, 0.0f,  // bottom right
+					//	-1.0f, -1.0f, 0.0f,  // bottom left
+					//	-1.0f,  1.0f, 0.0f   // top left 
+					//};
 					static uint square_indices[] = {  // note that we start from 0!
 						0, 1, 3,   // first triangle
 						1, 2, 3    // second triangle
@@ -96,36 +105,35 @@ namespace on {
 						glBindBuffer(GL_ARRAY_BUFFER, Object::vertex_buffer_object);
 						glBufferData(GL_ARRAY_BUFFER, sizeof(Object::texture_vertices), Object::texture_vertices, GL_STATIC_DRAW);
 						glGenTextures(1, &Object::texture);
-
+						glBindTexture(GL_TEXTURE_2D, Object::texture);
 
 					}
 
-					static void triangle() {
-						glGenBuffers(1, &Object::vertex_buffer_object);
-						glBindBuffer(GL_ARRAY_BUFFER, Object::vertex_buffer_object);
-						glBufferData(GL_ARRAY_BUFFER, sizeof(Object::triangle), Object::triangle, GL_STATIC_DRAW);
-					}
+					//static void triangle() {
+					//	glGenBuffers(1, &Object::vertex_buffer_object);
+					//	glBindBuffer(GL_ARRAY_BUFFER, Object::vertex_buffer_object);
+					//	glBufferData(GL_ARRAY_BUFFER, sizeof(Object::triangle), Object::triangle, GL_STATIC_DRAW);
+					//}
 
+					//static void square() {
+					//	glGenBuffers(1, &Object::vertex_buffer_object);
+					//	glBindBuffer(GL_ARRAY_BUFFER, Object::vertex_buffer_object);
+					//	glBufferData(GL_ARRAY_BUFFER, sizeof(Object::square), Object::square, GL_STATIC_DRAW);
+					//}
 
-					static void square() {
-						glGenBuffers(1, &Object::vertex_buffer_object);
-						glBindBuffer(GL_ARRAY_BUFFER, Object::vertex_buffer_object);
-						glBufferData(GL_ARRAY_BUFFER, sizeof(Object::square), Object::square, GL_STATIC_DRAW);
-					}
+					//static void triangle_vao() {
+					//	glGenVertexArrays(1, &Object::vertex_array_object);
+					//	glBindVertexArray(Object::vertex_array_object);
+					//	glBindBuffer(GL_ARRAY_BUFFER, Object::vertex_buffer_object);
+					//	glBufferData(GL_ARRAY_BUFFER, sizeof(Object::triangle), Object::triangle, GL_STATIC_DRAW);
+					//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+					//	glEnableVertexAttribArray(0);
+					//}
 
-					static void triangle_vao() {
-						glGenVertexArrays(1, &Object::vertex_array_object);
-						glBindVertexArray(Object::vertex_array_object);
-						glBindBuffer(GL_ARRAY_BUFFER, Object::vertex_buffer_object);
-						glBufferData(GL_ARRAY_BUFFER, sizeof(Object::triangle), Object::triangle, GL_STATIC_DRAW);
-						glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-						glEnableVertexAttribArray(0);
-					}
-
-					static void square_vao() {
-						glGenVertexArrays(1, &Surface::Object::vertex_array_object);
-						glBindVertexArray(Surface::Object::vertex_array_object);
-					}
+					//static void square_vao() {
+					//	glGenVertexArrays(1, &Surface::Object::vertex_array_object);
+					//	glBindVertexArray(Surface::Object::vertex_array_object);
+					//}
 
 					static void vertex_attribute_pointers() {
 						glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -154,14 +162,14 @@ namespace on {
 						glDeleteShader(Object::fragment_shader);
 					}
 
-					static void element_buffer_object() {
-						glGenBuffers(1, &Surface::Object::element_buffer_object);
-						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Surface::Object::element_buffer_object);
-						glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Surface::Object::square_indices), Surface::Object::square_indices, GL_STATIC_DRAW);
+					//static void element_buffer_object() {
+					//	glGenBuffers(1, &Surface::Object::element_buffer_object);
+					//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Surface::Object::element_buffer_object);
+					//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Surface::Object::square_indices), Surface::Object::square_indices, GL_STATIC_DRAW);
 
-						glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-						glEnableVertexAttribArray(0);
-					}
+					//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+					//	glEnableVertexAttribArray(0);
+					//}
 
 					static void texture_ebo() {
 						glGenBuffers(1, &Surface::Object::element_buffer_object);
@@ -235,27 +243,29 @@ namespace on {
 				Surface::Initialize::texture();
 				Surface::Initialize::texture_ebo();
 
+				//glfwSwapInterval(0);
+
 			}
 
 			static void render(sk::Tensor<uchar>& input) {
 
-				glClear(GL_COLOR_BUFFER_BIT);
-				
 				uchar* data = input.data(sk::host);
 
-				glUseProgram(Surface::Object::shader_program);
-				glBindTexture(GL_TEXTURE_2D, Surface::Object::texture);
+				//glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+				//transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+				//unsigned int transformLoc = glGetUniformLocation(Surface::Object::shader_program, "transform");
+				//glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, input.first_dim(), input.second_dim(), 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+				
 				glGenerateMipmap(GL_TEXTURE_2D);
-				glBindVertexArray(Surface::Object::vertex_array_object);
+
+				glClear(GL_COLOR_BUFFER_BIT);
 
 				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-				//glUseProgram(Surface::Object::shader_program);
-				//glBindVertexArray(Surface::Object::vertex_array_object);
-				////Surface::Draw::triangle();
-				//Surface::Draw::square();
 
 				glfwSwapBuffers(window);
+
 				glfwPollEvents();
 			}
 
@@ -265,7 +275,6 @@ namespace on {
 			}	
 
 		}
-
 
 		On_Structure Forge {
 

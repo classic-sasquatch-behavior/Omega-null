@@ -13,13 +13,12 @@ namespace Cell {
 		color_b = 2,
 		attractor = 3,
 		weight = 4,
-		freq_a = 5,
-		value = 6,
-		move_maj = 7,
-		move_min = 8,
+		value = 5,
+		move_maj = 6,
+		move_min = 7,
 	};
 
-	const int num_attributes = 9;
+	const int num_attributes = 8;
 
 }; using namespace Cell;
 
@@ -56,7 +55,8 @@ __global__ void draw_cells(sk::Device_Ptr<int> cells, sk::Device_Ptr<uchar> outp
 	for (int channel = 0; channel < 3; channel++) {
 		int channel_value = cells(maj, min, channel);
 
-		output.device_data[(((channel * cells.first_dim()) + maj ) * cells.second_dim()) + min] = channel_value;
+		output(maj, min, channel) = channel_value;
+		//output.device_data[(((channel * cells.first_dim()) + maj ) * cells.second_dim()) + min] = channel_value;
 	}
 }
 
@@ -82,9 +82,9 @@ __global__ void spawn(sk::Device_Ptr<int> mask, curandState* random_states, sk::
 	result(SELF, attribute::color_g) = Random(random_1, 70, 255);
 	result(SELF, attribute::color_b) = Random(random_2, 70, 255);
 	result(SELF, attribute::value) = 50;
-	result(SELF, attribute::attractor) = Random(random_3, -10000, 10000);
-	result(SELF, attribute::weight) = Random(random_4, -1000, 1000);
-	result(SELF, attribute::freq_a) = Random(random_5, -10000, 10000);
+	result(SELF, attribute::attractor) = Random(random_3, -100000, 100000);
+	result(SELF, attribute::weight) = Random(random_4, -10000, 10000);
+	//result(SELF, attribute::freq_a) = Random(random_5, -100000, 100000);
 	result(SELF, attribute::move_maj) = maj;
 	result(SELF, attribute::move_min) = min;
 
@@ -96,10 +96,12 @@ __global__ void change_environment(sk::Device_Ptr<int> environment, sk::Device_P
 	DIMS_2D(maj, min);
 	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
-	int weight = (cells(SELF, attribute::value) * cells(SELF, attribute::weight))/10;
+	int value = cells(SELF, attribute::value);
+	int weight = cells(SELF, attribute::weight);
+
 	//int attraction = (cells(SELF, attribute::value) * cells(SELF, attribute::attractor))/100;
 	FOR_MXN_INCLUSIVE(n_maj, n_min, 9, 9,
-		atomicAdd(&environment(n_maj, n_min), weight);
+		atomicAdd(&environment(n_maj, n_min), (value * weight) / 100);
 	);
 }
 
@@ -108,7 +110,7 @@ __global__ void dampen_environment(const float damping_factor, sk::Device_Ptr<in
 	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 	float value = environment(maj, min);
-	environment(maj, min) = truncf(value * damping_factor);
+	environment(maj, min) = -truncf(value * damping_factor);
 
 
 }
@@ -118,9 +120,9 @@ __global__ void radiate_environment(sk::Device_Ptr<int> environment) {
 	BOUNDS_2D(environment.first_dim(), environment.second_dim());
 
 	int value = environment(SELF);
-	FOR_NEIGHBOR(n_maj, n_min, 
+	FOR_MXN_EXCLUSIVE(n_maj, n_min, 3, 3, 
 		
-		atomicSub(&environment(n_maj, n_min), value/10);
+		atomicSub(&environment(n_maj, n_min), (value/100));
 	
 	)
 }
@@ -152,61 +154,100 @@ __global__ void set_targets(sk::Device_Ptr<int> environment, sk::Device_Ptr<int>
 	cells(SELF, attribute::move_min) = target_min;
 }
 
-//~16-17 ms
+
 __global__ void conflict(sk::Device_Ptr<int>cells, sk::Device_Ptr<int>targets, sk::Device_Ptr<int>future_cells, const int threshold = 3) {
-	
+
 	DIMS_2D(maj, min);
 	BOUNDS_2D(cells.first_dim(), cells.second_dim());
 
-	if(targets(maj, min) < 2) {return;}
+	if (targets(maj, min) < 2) { return; }
 
-	int teams[9][Cell::num_attributes - 2] = {0};
-	int num_teams = 0;
-
-	FOR_3X3_INCLUSIVE(n_maj, n_min, 
-		
-		if((cells(n_maj, n_min, attribute::move_maj) != maj)|| (cells(n_maj, n_min, attribute::move_min) != min)) {continue;}
-
-		bool unassigned = true;
-		for (int team = 0; team < num_teams; team++) {
-			int difference = fabsf(teams[team][attribute::freq_a] - cells(n_maj, n_min, attribute::freq_a));
-			if (difference < threshold) { continue; }
-
-			unassigned = false;
-
-			teams[team][attribute::value] += cells(n_maj, n_min, attribute::value);
-
-			for (int attribute = 2; attribute < Cell::num_attributes - 3; attribute++) {
-				teams[team][attribute] = cells(n_maj, n_min, attribute);
-				//teams[team][attribute] += cells(n_maj, n_min, attribute);
-				//teams[team][attribute] /= 2;
-			}
-
-		}
-		
-		for (int attribute = 0; attribute < Cell::num_attributes - 2; attribute++) {
-			teams[num_teams][attribute] += cells(n_maj, n_min, attribute) * unassigned;
-		}
-		num_teams += unassigned
-	);
+	int participants[9][Cell::num_attributes - 2] = { 0 };
+	int num_participants = 0;
 
 	int highest_value = -1;
-	int winning_team = -1;
+	int winning_cell = -1;
 	int total_value = 0;
 
-	for (int i = 0; i < 9; i++) {
-		total_value += teams[i][attribute::value];
-		if (teams[i][attribute::value] > highest_value) {
-			highest_value = teams[i][attribute::value];
-			winning_team = i;
+	FOR_3X3_INCLUSIVE(n_maj, n_min,
+
+		if ((cells(n_maj, n_min, attribute::move_maj) != maj) || (cells(n_maj, n_min, attribute::move_min) != min)) { continue; }
+
+		for (int attribute = 0; attribute < Cell::num_attributes - 2; attribute++) {
+			participants[num_participants][attribute] = cells(n_maj, n_min, attribute);
 		}
-	}
+		total_value += participants[num_participants][attribute::value];
+
+		if (participants[num_participants][attribute::value] > highest_value) {
+			highest_value = participants[num_participants][attribute::value];
+			winning_cell = num_participants;
+		}
+
+		num_participants++;
+	);
 
 	future_cells(SELF, attribute::value) = total_value;
 	for (int i = 0; i < Cell::num_attributes - 3; i++) {
-		future_cells(SELF, i) = teams[winning_team][i];
+		future_cells(SELF, i) = participants[winning_cell][i];
 	}
 }
+
+
+//~16-17 ms
+//__global__ void conflict_old(sk::Device_Ptr<int>cells, sk::Device_Ptr<int>targets, sk::Device_Ptr<int>future_cells, const int threshold = 3) {
+//	
+//	DIMS_2D(maj, min);
+//	BOUNDS_2D(cells.first_dim(), cells.second_dim());
+//
+//	if(targets(maj, min) < 2) {return;}
+//
+//	int teams[9][Cell::num_attributes - 2] = {0};
+//	int num_teams = 0;
+//
+//	FOR_3X3_INCLUSIVE(n_maj, n_min, 
+//		
+//		if((cells(n_maj, n_min, attribute::move_maj) != maj)|| (cells(n_maj, n_min, attribute::move_min) != min)) {continue;}
+//
+//		bool unassigned = true;
+//		for (int team = 0; team < num_teams; team++) {
+//			int difference = fabsf(teams[team][attribute::freq_a] - cells(n_maj, n_min, attribute::freq_a));
+//			if (difference < threshold) { continue; }
+//
+//			unassigned = false;
+//
+//			teams[team][attribute::value] += cells(n_maj, n_min, attribute::value);
+//
+//			for (int attribute = 3; attribute < Cell::num_attributes - 3; attribute++) {
+//				teams[team][attribute] = cells(n_maj, n_min, attribute);
+//				//teams[team][attribute] += cells(n_maj, n_min, attribute);
+//				//teams[team][attribute] /= 2;
+//			}
+//
+//		}
+//		
+//		for (int attribute = 0; attribute < Cell::num_attributes - 2; attribute++) {
+//			teams[num_teams][attribute] += cells(n_maj, n_min, attribute) * unassigned;
+//		}
+//		num_teams += unassigned
+//	);
+//
+//	int highest_value = -1;
+//	int winning_team = -1;
+//	int total_value = 0;
+//
+//	for (int i = 0; i < 9; i++) {
+//		total_value += teams[i][attribute::value];
+//		if (teams[i][attribute::value] > highest_value) {
+//			highest_value = teams[i][attribute::value];
+//			winning_team = i;
+//		}
+//	}
+//
+//	future_cells(SELF, attribute::value) = total_value;
+//	for (int i = 0; i < Cell::num_attributes - 3; i++) {
+//		future_cells(SELF, i) = teams[winning_team][i];
+//	}
+//}
 
 __global__ void move(sk::Device_Ptr<int> environment, sk::Device_Ptr<int> cells, sk::Device_Ptr<int> targets, sk::Device_Ptr<int> future_cells) {
 	DIMS_2D(maj, min);
@@ -243,15 +284,16 @@ __global__ void hatch(const int threshold, curandState* random_states, sk::Devic
 
 	FOR_NEIGHBOR(n_maj, n_min,
 		if(cells(n_maj, n_min, attribute::attractor) == 0 && cells(n_maj, n_min, attribute::weight) == 0){
-			cells(SELF, attribute::value) -= 5;
+			cells(SELF, attribute::value) -= 10;
 
+			//add attribute that controls how much hatching costs and at what value it occurs( I guess thats two attributes)
 			cells(n_maj, n_min, attribute::color_r) = fmaxf( 70, fminf(cells(SELF, attribute::color_r), 255));
 			cells(n_maj, n_min, attribute::color_g) = fmaxf(70, fminf(cells(SELF, attribute::color_g), 255));
 			cells(n_maj, n_min, attribute::color_b) = fmaxf(70, fminf(cells(SELF, attribute::color_b), 255));
-			cells(n_maj, n_min, attribute::attractor) = fmaxf(-10000, fminf(cells(SELF, attribute::attractor) + Random(random[0], -1, 1), 10000 ));
-			cells(n_maj, n_min, attribute::weight) = fmaxf(-1000, fminf(cells(SELF, attribute::weight) + Random(random[1], -1, 1), 1000));
-			cells(n_maj, n_min, attribute::freq_a) = fmaxf(-10000, fminf(cells(SELF, attribute::freq_a) + Random(random[2], -1, 1), 10000) );
-			cells(n_maj, n_min, attribute::value) = 5;
+			cells(n_maj, n_min, attribute::attractor) = fmaxf(-100000, fminf(cells(SELF, attribute::attractor) + Random(random[0], -1, 1), 100000 ));
+			cells(n_maj, n_min, attribute::weight) = fmaxf(-10000, fminf(cells(SELF, attribute::weight) + Random(random[1], -1, 1), 10000));
+			//cells(n_maj, n_min, attribute::freq_a) = fmaxf(-100000, fminf(cells(SELF, attribute::freq_a) + Random(random[2], -1, 1), 100000) );
+			cells(n_maj, n_min, attribute::value) = 10;
 			return;
 		}
 	);
@@ -281,6 +323,7 @@ namespace on {
 					SYNC_KERNEL(spawn); 
 
 					cudaFree(states); //bad way of doing this, because it's not clear that one would have to call cudafree on curand_xor. should at least put it in on::Random::Delete
+					//TODO: create a struct to control curand more closely
 
 					return result;
 
@@ -304,7 +347,7 @@ namespace on {
 				void Planar_Life::Step::polar(sk::Tensor<int>& future_cells, sk::Tensor<int>& environment, sk::Tensor<int>& cells, sk::Tensor<int>& targets, curandState* random) {
 					sk::configure::kernel_2d(environment.first_dim(), environment.second_dim());
 					
-					const int thresh = 6;
+					const int thresh = 20;
 					hatch << <LAUNCH >> > (thresh, random, cells);
 					SYNC_KERNEL(hatch);
 
@@ -314,7 +357,7 @@ namespace on {
 					radiate_environment << <LAUNCH >> > (environment);
 					SYNC_KERNEL(radiate_environment);
 
-					const float damping_factor = 0.3;
+					const float damping_factor = 0.1;
 					dampen_environment<<<LAUNCH>>>(damping_factor, environment);
 					SYNC_KERNEL(dampen_environment);
 

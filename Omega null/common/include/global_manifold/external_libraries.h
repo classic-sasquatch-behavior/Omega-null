@@ -14,19 +14,24 @@ typedef std::ofstream Filestream;
 #include<queue>
 #include<string>
 
-//TODO find a new way to navigate the filesystem
 //filesystem
 #include<filesystem>
 namespace fs = std::filesystem;
 
-//opengl
-//#include<Windows.h>
-//#define GL_GLEXT_PROTOTYPES 1
-//#define GL3_PROTOTYPES 1
-//#include<gl/GL.h>
 
+//opengl
+
+//glew
 #include<GL/glew.h>
 typedef unsigned int gl_name;
+
+//glm
+#include<glm/glm.hpp>
+#include<glm/gtc/matrix_transform.hpp>
+#include<glm/gtc/type_ptr.hpp>
+
+//glu
+#include<GL/GLU.h>
 
 //glfw
 #include<GLFW/glfw3.h>
@@ -35,6 +40,7 @@ typedef unsigned int gl_name;
 //xml
 #include<pugixml.hpp>
 typedef pugi::xml_node Node;
+
 
 //cuda
 #include<cuda.h>
@@ -46,6 +52,7 @@ typedef pugi::xml_node Node;
 #include<curand.h>
 #include<curand_kernel.h>
 
+
 //arrayfire
 #include<arrayfire.h>
 
@@ -56,4 +63,5 @@ typedef pugi::xml_node Node;
 #include<opencv2/imgproc.hpp>
 #include<opencv2/highgui.hpp>
 
+//skeleton key
 #include<skeleton_key.h>
