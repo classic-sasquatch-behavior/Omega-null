@@ -8,7 +8,6 @@ namespace on {
 		using On_Structure Reader;
 		using On_Structure Writer;
 
-		#ifdef FOUND_NEW_FILESYSTEM
 
 		void Load::project(std::string topdir, std::queue<fs::path>& file_queue) {
 			fs::path src_path = topdir;
@@ -130,7 +129,6 @@ namespace on {
 			kernel.shape = root.attribute("shape").as_string();
 			return kernel;
 		}
-		#endif
 	}
 }
 
